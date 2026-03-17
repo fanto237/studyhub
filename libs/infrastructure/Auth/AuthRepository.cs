@@ -22,6 +22,13 @@ public class AuthRepository(StudyHubDbContext dbContext) : IAuthRepository
         return dbContext.Users.AnyAsync(user => user.SchoolEmail == schoolEmail, cancellationToken);
     }
 
+    public Task<User?> GetUserByUsernameOrPrivateEmailAsync(string usernameOrPrivateEmail, CancellationToken cancellationToken)
+    {
+        return dbContext.Users.SingleOrDefaultAsync(
+            user => user.Username == usernameOrPrivateEmail || user.PrivateEmail == usernameOrPrivateEmail,
+            cancellationToken);
+    }
+
     public void AddUser(User user)
     {
         dbContext.Users.Add(user);
@@ -32,11 +39,23 @@ public class AuthRepository(StudyHubDbContext dbContext) : IAuthRepository
         dbContext.UserAuthCodes.Add(authCode);
     }
 
+    public void AddRefreshToken(UserRefreshToken refreshToken)
+    {
+        dbContext.UserRefreshTokens.Add(refreshToken);
+    }
+
     public Task<User?> GetUserWithAuthCodesBySchoolEmailAsync(string schoolEmail, CancellationToken cancellationToken)
     {
         return dbContext.Users
             .Include(user => user.AuthCodes)
             .SingleOrDefaultAsync(user => user.SchoolEmail == schoolEmail, cancellationToken);
+    }
+
+    public Task<UserRefreshToken?> GetRefreshTokenWithUserByHashAsync(string tokenHash, CancellationToken cancellationToken)
+    {
+        return dbContext.UserRefreshTokens
+            .Include(refreshToken => refreshToken.User)
+            .SingleOrDefaultAsync(refreshToken => refreshToken.TokenHash == tokenHash, cancellationToken);
     }
 
     public Task SaveChangesAsync(CancellationToken cancellationToken)
