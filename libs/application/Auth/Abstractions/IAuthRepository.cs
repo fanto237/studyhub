@@ -7,9 +7,12 @@ public interface IAuthRepository
     Task<bool> PrivateEmailExistsAsync(string privateEmail, CancellationToken cancellationToken);
     Task<bool> UsernameExistsAsync(string username, CancellationToken cancellationToken);
     Task<bool> SchoolEmailExistsAsync(string schoolEmail, CancellationToken cancellationToken);
+    Task<User?> GetUserByUsernameOrPrivateEmailAsync(string usernameOrPrivateEmail, CancellationToken cancellationToken);
+    Task<User?> GetUserWithAuthCodesBySchoolEmailAsync(string schoolEmail, CancellationToken cancellationToken);
+    Task<UserRefreshToken?> GetRefreshTokenWithUserByHashAsync(string tokenHash, CancellationToken cancellationToken);
     void AddUser(User user);
     void AddAuthCode(UserAuthCode authCode);
-    Task<User?> GetUserWithAuthCodesBySchoolEmailAsync(string schoolEmail, CancellationToken cancellationToken);
+    void AddRefreshToken(UserRefreshToken refreshToken);
     Task SaveChangesAsync(CancellationToken cancellationToken);
     Task ExecuteInTransactionAsync(Func<CancellationToken, Task> operation, CancellationToken cancellationToken);
 }
