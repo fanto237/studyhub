@@ -1,5 +1,5 @@
 namespace Application;
 
-public static class ApplicationAssemblyMarker
+public class ApplicationAssemblyMarker
 {
 }
