@@ -1,3 +1,8 @@
+using Application.Abstractions.Email;
+using Application.Auth.Abstractions;
+using Infrastructure.Auth;
+using Infrastructure.Email;
+using Infrastructure.Options;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -17,8 +22,13 @@ public static class ServiceCollectionExtensions
 
         var connectionString = NormalizeConnectionString(rawConnectionString);
 
+        services.Configure<EmailSetting>(configuration.GetSection(EmailSetting.SectionName));
+
         services.AddDbContext<StudyHubDbContext>(options =>
             options.UseNpgsql(connectionString));
+
+        services.AddScoped<IAuthRepository, AuthRepository>();
+        services.AddScoped<IAuthEmailService, AuthEmailService>();
 
         return services;
     }
