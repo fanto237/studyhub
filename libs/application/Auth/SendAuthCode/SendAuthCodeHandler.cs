@@ -11,37 +11,62 @@ namespace Application.Auth.SendAuthCode;
 
 public class SendAuthCodeHandler
 {
-
-  public static async Task<SendAuthCodeResult> Handle(SendAuthCodeCommand command, CancellationToken cancellationToken, IAuthEmailService emailService, IValidator<SendAuthCodeCommand> validator, ILogger<SendAuthCodeHandler> logger, IAuthRepository authRepository, TimeProvider timeProvider, IAuthEmailService authEmailService)
+  public static async Task<SendAuthCodeResult> Handle(
+      SendAuthCodeCommand command,
+      CancellationToken cancellationToken,
+      IValidator<SendAuthCodeCommand> validator,
+      ILogger<SendAuthCodeHandler> logger,
+      IAuthRepository authRepository,
+      TimeProvider timeProvider,
+      IAuthEmailService authEmailService)
   {
     var validationResult = await validator.ValidateAsync(command, cancellationToken);
     if (!validationResult.IsValid)
+    {
       return new SendAuthCodeResult(
           SendAuthCodeOutcome.InvalidRequest,
           string.Join(" ", validationResult.Errors.Select(error => error.ErrorMessage).Distinct()));
+    }
 
-    var userExists = await authRepository.SchoolEmailExistsAsync(command.SchoolEmail, cancellationToken);
+    var schoolEmail = AuthValueNormalizer.NormalizeEmail(command.SchoolEmail);
+    var userExists = await authRepository.SchoolEmailExistsAsync(schoolEmail, cancellationToken);
 
     if (!userExists)
+    {
       return new SendAuthCodeResult(
-        SendAuthCodeOutcome.SchoolEmailNotRegistered,
-        $"There is no user with the SchoolEmail {command.SchoolEmail}");
+          SendAuthCodeOutcome.SchoolEmailNotRegistered,
+          $"There is no user with the school email {schoolEmail}.");
+    }
 
-    var user = await authRepository.GetUserWithAuthCodesBySchoolEmailAsync(command.SchoolEmail, cancellationToken);
+    var user = await authRepository.GetUserWithAuthCodesBySchoolEmailAsync(schoolEmail, cancellationToken);
+    if (user is null)
+    {
+      return new SendAuthCodeResult(
+          SendAuthCodeOutcome.SchoolEmailNotRegistered,
+          $"There is no user with the school email {schoolEmail}.");
+    }
 
-    if (user!.IsVerified)
-      return new SendAuthCodeResult(SendAuthCodeOutcome.UserAlreadyVerified, $"The user with the email with the school addreess ${command.SchoolEmail} is already verified");
+    if (user.IsVerified)
+    {
+      return new SendAuthCodeResult(
+          SendAuthCodeOutcome.UserAlreadyVerified,
+          $"The user with the school email {schoolEmail} is already verified.");
+    }
 
     var now = timeProvider.GetUtcNow();
 
     var existingCodes = user.AuthCodes
-    .Where(authCode => authCode.Purpose == AuthCodePurpose.SchoolEmailVerification)
-    .Where(authCode => authCode.DeliveryAddress == command.SchoolEmail)
-    .Where(authCode => authCode.ConsumedAt is null)
-    .Where(authcode => now < authcode.ExpiresAt);
+        .Where(authCode => authCode.Purpose == AuthCodePurpose.SchoolEmailVerification)
+        .Where(authCode => authCode.DeliveryAddress == schoolEmail)
+        .Where(authCode => authCode.ConsumedAt is null)
+        .Where(authCode => now < authCode.ExpiresAt);
 
-    if (!existingCodes.Any())
-      return new SendAuthCodeResult(SendAuthCodeOutcome.CodeAlreadySent, "The user has already received and code");
+    if (existingCodes.Any())
+    {
+      return new SendAuthCodeResult(
+          SendAuthCodeOutcome.CodeAlreadySent,
+          "The user has already received an active verification code.");
+    }
 
     var expiresAt = now.AddMinutes(10);
     var verificationCode = GenerateVerificationCode();
@@ -49,16 +74,13 @@ public class SendAuthCodeHandler
     var authCode = new UserAuthCode
     {
       Id = Guid.NewGuid(),
-      UserId = user!.Id,
+      UserId = user.Id,
       Purpose = AuthCodePurpose.SchoolEmailVerification,
       Code = verificationCode,
-      DeliveryAddress = command.SchoolEmail,
+      DeliveryAddress = schoolEmail,
       ExpiresAt = expiresAt,
       CreatedAt = now,
     };
-
-    authRepository.AddAuthCode(authCode);
-    await authRepository.SaveChangesAsync(cancellationToken);
 
     try
     {
@@ -68,22 +90,21 @@ public class SendAuthCodeHandler
         await authRepository.SaveChangesAsync(ct);
 
         await authEmailService.SendSchoolVerificationCodeAsync(
-                  user.FullName,
-                  user.SchoolEmail,
-                  verificationCode,
-                  expiresAt,
-                  ct);
+            user.FullName,
+            user.SchoolEmail,
+            verificationCode,
+            expiresAt,
+            ct);
       }, cancellationToken);
     }
     catch (Exception exception)
     {
-      logger.LogError(exception, "Failed to sent the code for the user with school email {SchoolEmail}", user.SchoolEmail);
+      logger.LogError(exception, "Failed to send the code for the user with school email {SchoolEmail}", user.SchoolEmail);
       throw;
     }
 
-    return new SendAuthCodeResult(SendAuthCodeOutcome.Success, "The new confirmation code has been sent");
+    return new SendAuthCodeResult(SendAuthCodeOutcome.Success, "The new confirmation code has been sent.");
   }
-
 
   private static string GenerateVerificationCode()
   {

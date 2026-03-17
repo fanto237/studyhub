@@ -160,9 +160,10 @@ public static class AuthEndpoints
 
     return result.Outcome switch
     {
-      SendAuthCodeOutcome.Success => Results.Ok(result),
+      SendAuthCodeOutcome.Success => Results.Ok(result.Message),
       SendAuthCodeOutcome.SchoolEmailNotRegistered => Results.Json(new { message = result.Message }, statusCode: StatusCodes.Status404NotFound),
       SendAuthCodeOutcome.UserAlreadyVerified => Results.Json(new { message = result.Message }, statusCode: StatusCodes.Status409Conflict),
+      SendAuthCodeOutcome.CodeAlreadySent => Results.Json(new { message = result.Message }, statusCode: StatusCodes.Status429TooManyRequests),
       _ => Results.BadRequest(new { message = result.Message }),
     };
   }
