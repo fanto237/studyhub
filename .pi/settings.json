@@ -1,0 +1,15 @@
+{
+  "skills": [
+    "/Users/lucien/repos/agents/skills/angular-best-practices",
+    "/Users/lucien/repos/agents/skills/angular-expert",
+    "/Users/lucien/repos/agents/skills/angular-project-structure",
+    "/Users/lucien/repos/agents/skills/code-research",
+    "/Users/lucien/repos/agents/skills/api-design-principles",
+    "/Users/lucien/repos/agents/skills/frontend-design",
+    "/Users/lucien/repos/agents/skills/minimal-api-extensions-guide",
+    "/Users/lucien/repos/agents/skills/tailwind-v4",
+    "/Users/lucien/repos/agents/skills/nx-workspace-patterns",
+    "/Users/lucien/repos/agents/skills/wolverine-cqrs-csharp",
+    "/Users/lucien/repos/agents/skills/web-browser"
+  ]
+}

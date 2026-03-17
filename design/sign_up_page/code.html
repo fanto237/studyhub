@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sign Up - ExamShare</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#3b2bee",
+              "background-light": "#f8f8fc",
+              "background-dark": "#121022",
+              "accent-purple": "#8A63D2",
+              "text-light": "#0f0d1b",
+              "text-dark": "#f8f8fc",
+              "subtle-light": "#524c9a",
+              "subtle-dark": "#a8a2d3",
+              "border-light": "#d1cfe7",
+              "border-dark": "#312d4d",
+              "error": "#DC3545",
+            },
+            fontFamily: {
+              "display": ["Lexend", "sans-serif"]
+            },
+            borderRadius: {
+                "DEFAULT": "0.5rem", 
+                "lg": "0.75rem", 
+                "xl": "1rem", 
+                "full": "9999px"
+            },
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: 'Lexend', sans-serif;
+        }
+    </style>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark">
+<div class="relative flex min-h-screen w-full flex-col">
+<!-- Top Navigation Bar -->
+<header class="w-full px-4 sm:px-8 md:px-16 lg:px-24 xl:px-40 py-3 border-b border-solid border-border-light dark:border-border-dark">
+<div class="mx-auto flex max-w-7xl items-center justify-between">
+<div class="flex items-center gap-4 text-text-light dark:text-text-dark">
+<div class="size-6 text-primary">
+<svg fill="currentColor" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M39.475 21.6262C40.358 21.4363 40.6863 21.5589 40.7581 21.5934C40.7876 21.655 40.8547 21.857 40.8082 22.3336C40.7408 23.0255 40.4502 24.0046 39.8572 25.2301C38.6799 27.6631 36.5085 30.6631 33.5858 33.5858C30.6631 36.5085 27.6632 38.6799 25.2301 39.8572C24.0046 40.4502 23.0255 40.7407 22.3336 40.8082C21.8571 40.8547 21.6551 40.7875 21.5934 40.7581C21.5589 40.6863 21.4363 40.358 21.6262 39.475C21.8562 38.4054 22.4689 36.9657 23.5038 35.2817C24.7575 33.2417 26.5497 30.9744 28.7621 28.762C30.9744 26.5497 33.2417 24.7574 35.2817 23.5037C36.9657 22.4689 38.4054 21.8562 39.475 21.6262ZM4.41189 29.2403L18.7597 43.5881C19.8813 44.7097 21.4027 44.9179 22.7217 44.7893C24.0585 44.659 25.5148 44.1631 26.9723 43.4579C29.9052 42.0387 33.2618 39.5667 36.4142 36.4142C39.5667 33.2618 42.0387 29.9052 43.4579 26.9723C44.1631 25.5148 44.659 24.0585 44.7893 22.7217C44.9179 21.4027 44.7097 19.8813 43.5881 18.7597L29.2403 4.41187C27.8527 3.02428 25.8765 3.02573 24.2861 3.36776C22.6081 3.72863 20.7334 4.58419 18.8396 5.74801C16.4978 7.18716 13.9881 9.18353 11.5858 11.5858C9.18354 13.988 7.18717 16.4978 5.74802 18.8396C4.58421 20.7334 3.72865 22.6081 3.36778 24.2861C3.02574 25.8765 3.02429 27.8527 4.41189 29.2403Z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+<h1 class="text-xl font-bold tracking-tighter">ExamShare</h1>
+</div>
+<button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-wide hover:bg-opacity-90 transition-colors">
+<span class="truncate">Log In</span>
+</button>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex flex-1 items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+<div class="w-full max-w-lg space-y-8">
+<!-- Page Heading -->
+<div class="text-center">
+<h2 class="text-4xl font-black tracking-tighter text-text-light dark:text-text-dark">Create Your Account</h2>
+<p class="mt-2 text-base text-subtle-light dark:text-subtle-dark">Unlock access to a library of exam resources from your peers.</p>
+</div>
+<!-- Form -->
+<form class="mt-8 space-y-6 bg-white dark:bg-background-dark/50 p-8 rounded-xl shadow-sm border border-border-light dark:border-border-dark">
+<div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+<!-- Full Name -->
+<div class="sm:col-span-2">
+<label class="block text-sm font-medium text-text-light dark:text-text-dark pb-2" for="full-name">Full Name</label>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary focus:ring-opacity-50 border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark/30 h-12 placeholder:text-subtle-light dark:placeholder:text-subtle-dark px-4 text-base font-normal" id="full-name" name="full-name" placeholder="Enter your full name" required="" type="text"/>
+</div>
+<!-- Username -->
+<div class="sm:col-span-2">
+<label class="block text-sm font-medium text-text-light dark:text-text-dark pb-2" for="username">Username</label>
+<div class="relative">
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary focus:ring-opacity-50 border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark/30 h-12 placeholder:text-subtle-light dark:placeholder:text-subtle-dark px-4 text-base font-normal pr-10" id="username" name="username" placeholder="Choose a username" required="" type="text"/>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+<span class="material-symbols-outlined text-green-500" data-icon="check_circle">check_circle</span>
+</div>
+</div>
+</div>
+<!-- Email Address -->
+<div class="sm:col-span-2">
+<label class="block text-sm font-medium text-text-light dark:text-text-dark pb-2" for="email">Email Address</label>
+<input autocomplete="email" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary focus:ring-opacity-50 border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark/30 h-12 placeholder:text-subtle-light dark:placeholder:text-subtle-dark px-4 text-base font-normal" id="email" name="email" placeholder="Enter your email address" required="" type="email"/>
+<p class="mt-1 text-xs text-error hidden">Invalid email format</p>
+</div>
+<!-- Password -->
+<div class="sm:col-span-2">
+<label class="block text-sm font-medium text-text-light dark:text-text-dark pb-2" for="password">Password</label>
+<div class="relative">
+<input autocomplete="new-password" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary focus:ring-opacity-50 border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark/30 h-12 placeholder:text-subtle-light dark:placeholder:text-subtle-dark px-4 text-base font-normal pr-10" id="password" name="password" placeholder="Create a password" required="" type="password"/>
+<button class="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer text-subtle-light dark:text-subtle-dark hover:text-accent-purple" type="button">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+</button>
+</div>
+</div>
+<!-- University Email -->
+<div class="sm:col-span-2">
+<label class="flex items-center gap-2 text-sm font-medium text-text-light dark:text-text-dark pb-2" for="uni-email">
+<span>University Email</span>
+<span class="material-symbols-outlined text-sm text-subtle-light dark:text-subtle-dark cursor-help" data-icon="help_outline" title="We use your university email for verification purposes to ensure our community is made of real students.">help_outline</span>
+</label>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary focus:ring-opacity-50 border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark/30 h-12 placeholder:text-subtle-light dark:placeholder:text-subtle-dark px-4 text-base font-normal" id="uni-email" name="uni-email" placeholder="e.g., student.name@university.edu" required="" type="email"/>
+</div>
+<!-- Faculty/Department -->
+<div class="sm:col-span-2">
+<label class="block text-sm font-medium text-text-light dark:text-text-dark pb-2" for="faculty">Faculty / Department</label>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary focus:ring-opacity-50 border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark/30 h-12 placeholder:text-subtle-light dark:placeholder:text-subtle-dark px-4 text-base font-normal" id="faculty" name="faculty" placeholder="e.g., Computer Science" required="" type="text"/>
+</div>
+<!-- Year of Study -->
+<div>
+<label class="block text-sm font-medium text-text-light dark:text-text-dark pb-2" for="year-of-study">Year of Study</label>
+<select class="form-select flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary focus:ring-opacity-50 border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark/30 h-12 placeholder:text-subtle-light dark:placeholder:text-subtle-dark px-4 text-base font-normal" id="year-of-study" name="year-of-study">
+<option>1st Year</option>
+<option>2nd Year</option>
+<option>3rd Year</option>
+<option>4th Year</option>
+<option>Postgraduate</option>
+</select>
+</div>
+</div>
+<!-- Terms and Conditions -->
+<div class="flex items-start pt-2">
+<div class="flex h-5 items-center">
+<input class="form-checkbox h-4 w-4 rounded border-border-light dark:border-border-dark text-primary focus:ring-primary bg-background-light dark:bg-background-dark/30" id="terms" name="terms" type="checkbox"/>
+</div>
+<div class="ml-3 text-sm">
+<label class="text-subtle-light dark:text-subtle-dark" for="terms">I agree to the
+                                <a class="font-medium text-primary hover:underline" href="#">Terms of Service</a> and
+                                <a class="font-medium text-primary hover:underline" href="#">Privacy Policy</a>.
+                            </label>
+</div>
+</div>
+<!-- Sign Up Button -->
+<div>
+<button class="group relative flex w-full justify-center rounded-lg border border-transparent bg-primary py-3 px-4 text-base font-bold text-white hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark transition-colors" type="submit">
+                            Sign Up
+                        </button>
+</div>
+<!-- Log In Link -->
+<div class="text-center text-sm text-subtle-light dark:text-subtle-dark">
+<p>
+                            Already have an account?
+                            <a class="font-medium text-primary hover:underline" href="#">Log In</a>
+</p>
+</div>
+</form>
+</div>
+</main>
+</div>
+</body></html>

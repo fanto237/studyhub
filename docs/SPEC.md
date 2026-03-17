@@ -1,0 +1,18 @@
+- **Tech Stack:**
+  - _Frontend:_ Angular configured as a PWA, Tailwind CSS and Daisyui for styling.
+  - _Backend:_ Asp.net Minimal Api (Clean architecture with CQRS using wolverine)
+  - _Database:_ PostgreSQL (relational structure is perfect for users, posts, and nested comments).
+  - _Storage:_ AWS S3 (or Cloudflare R2 for cheaper egress) for PDF storage.
+- **Architecture Overview:** Standard Client-Server model using RESTful APIs. Frontend handles the PWA caching for offline shell loading.
+- **Core Database Schema:**
+  - `Users`: id, private_email, role (admin/simple user) school_email, hash, is_verified, last_verified_date, karma_score.
+  - `Posts`: id, user_id, title, description, s3_url, upvotes, downvotes, created_at.
+  - `Comments`: id, post_id, user_id, parent_comment_id (for threading), text, created_at.
+  - `Tags`: id, name.
+  - `Post_Tags`: post_id, tag_id.
+- **Key API Endpoints:**
+  - `POST /api/auth/send-verification`
+  - `GET /api/feed?sort=[trending|top|new]&page=[x]`
+  - `POST /api/posts/upload` (multipart/form-data)
+  - `POST /api/posts/:id/vote`
+- **Integrations:** SendGrid or AWS SES for transactional emails. PDF.js (Mozilla) for the embedded client-side viewer.

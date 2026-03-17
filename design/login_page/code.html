@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Login - ExamShare</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2b4bee",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101322",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="font-display">
+<div class="relative flex min-h-screen w-full flex-col items-center justify-center bg-background-light dark:bg-background-dark p-4 group/design-root" style='font-family: "Inter", "Noto Sans", sans-serif;'>
+<div class="w-full max-w-md space-y-8">
+<div class="flex flex-col items-center gap-4">
+<svg class="h-10 w-10 text-primary" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<div class="flex flex-wrap justify-center gap-3">
+<p class="text-4xl font-black leading-tight tracking-tighter text-[#18181B] dark:text-white">Log In to Your Account</p>
+</div>
+</div>
+<div class="bg-white dark:bg-background-dark/50 rounded-xl shadow-sm p-8 space-y-6 border border-zinc-200 dark:border-zinc-800">
+<div class="flex flex-col gap-4">
+<label class="flex flex-col flex-1">
+<p class="text-base font-medium leading-normal pb-2 text-[#18181B] dark:text-zinc-200">Username or Email</p>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg h-12 px-4 bg-background-light dark:bg-background-dark/60 text-[#18181B] dark:text-zinc-100 placeholder:text-zinc-500 text-base font-normal leading-normal border border-zinc-300 dark:border-zinc-700 focus:ring-2 focus:ring-primary/50 focus:border-primary" placeholder="Enter your username or email" value=""/>
+</label>
+<label class="flex flex-col flex-1">
+<div class="flex items-center justify-between pb-2">
+<p class="text-base font-medium leading-normal text-[#18181B] dark:text-zinc-200">Password</p>
+</div>
+<div class="flex w-full flex-1 items-stretch rounded-lg">
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg h-12 px-4 bg-background-light dark:bg-background-dark/60 text-[#18181B] dark:text-zinc-100 placeholder:text-zinc-500 text-base font-normal leading-normal border border-zinc-300 dark:border-zinc-700 focus:ring-2 focus:ring-primary/50 focus:border-primary" placeholder="Enter your password" type="password" value=""/>
+</div>
+<a class="text-right text-primary text-sm font-normal leading-normal pt-2 underline hover:text-primary/80" href="#">Forgot Password?</a>
+</label>
+</div>
+<div class="flex">
+<button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 flex-1 bg-primary text-white text-base font-bold leading-normal tracking-wide hover:bg-primary/90 transition-colors">
+<span class="truncate">Login</span>
+</button>
+</div>
+</div>
+<p class="text-center text-zinc-600 dark:text-zinc-400 text-sm font-normal leading-normal">Don't have an account? <a class="font-bold text-primary hover:underline" href="#">Sign Up</a></p>
+</div>
+</div>
+</body></html>

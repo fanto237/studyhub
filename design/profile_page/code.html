@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>User Profile - ExamShare</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2b4bee",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101322",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col bg-background-light dark:bg-background-dark group/design-root overflow-x-hidden">
+<!-- TopNavBar Component -->
+<header class="sticky top-0 z-50 flex items-center justify-center whitespace-nowrap border-b border-solid border-slate-200 dark:border-slate-700 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm px-4 md:px-10 lg:px-20 py-3">
+<div class="flex items-center justify-between w-full max-w-7xl">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3 text-slate-900 dark:text-white">
+<div class="size-6 text-primary">
+<svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M39.475 21.6262C40.358 21.4363 40.6863 21.5589 40.7581 21.5934C40.7876 21.655 40.8547 21.857 40.8082 22.3336C40.7408 23.0255 40.4502 24.0046 39.8572 25.2301C38.6799 27.6631 36.5085 30.6631 33.5858 33.5858C30.6631 36.5085 27.6632 38.6799 25.2301 39.8572C24.0046 40.4502 23.0255 40.7407 22.3336 40.8082C21.8571 40.8547 21.6551 40.7875 21.5934 40.7581C21.5589 40.6863 21.4363 40.358 21.6262 39.475C21.8562 38.4054 22.4689 36.9657 23.5038 35.2817C24.7575 33.2417 26.5497 30.9744 28.7621 28.762C30.9744 26.5497 33.2417 24.7574 35.2817 23.5037C36.9657 22.4689 38.4054 21.8562 39.475 21.6262ZM4.41189 29.2403L18.7597 43.5881C19.8813 44.7097 21.4027 44.9179 22.7217 44.7893C24.0585 44.659 25.5148 44.1631 26.9723 43.4579C29.9052 42.0387 33.2618 39.5667 36.4142 36.4142C39.5667 33.2618 42.0387 29.9052 43.4579 26.9723C44.1631 25.5148 44.659 24.0585 44.7893 22.7217C44.9179 21.4027 44.7097 19.8813 43.5881 18.7597L29.2403 4.41187C27.8527 3.02428 25.8765 3.02573 24.2861 3.36776C22.6081 3.72863 20.7334 4.58419 18.8396 5.74801C16.4978 7.18716 13.9881 9.18353 11.5858 11.5858C9.18354 13.988 7.18717 16.4978 5.74802 18.8396C4.58421 20.7334 3.72865 22.6081 3.36778 24.2861C3.02574 25.8765 3.02429 27.8527 4.41189 29.2403Z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+<h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">ExamShare</h2>
+</div>
+<div class="hidden md:flex items-center gap-9">
+<a class="text-slate-900 dark:text-slate-200 text-sm font-medium leading-normal" href="#">Home</a>
+<a class="text-slate-900 dark:text-slate-200 text-sm font-medium leading-normal" href="#">Browse</a>
+<a class="text-slate-900 dark:text-slate-200 text-sm font-medium leading-normal" href="#">Upload</a>
+</div>
+</div>
+<div class="flex flex-1 justify-end gap-3 md:gap-4">
+<label class="hidden sm:flex flex-col min-w-40 !h-10 max-w-64">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full">
+<div class="text-slate-500 dark:text-slate-400 flex bg-slate-200 dark:bg-slate-800 items-center justify-center pl-4 rounded-l-lg">
+<span class="material-symbols-outlined" style="font-size: 20px;">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-200 focus:outline-0 focus:ring-0 border-none bg-slate-200 dark:bg-slate-800 focus:border-none h-full placeholder:text-slate-500 dark:placeholder:text-slate-400 px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal" placeholder="Search" value=""/>
+</div>
+</label>
+<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-slate-200 gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5">
+<span class="material-symbols-outlined" style="font-size: 20px;">notifications</span>
+</button>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="User avatar image" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDisfi9IWS1FnjVFMq33ulZJXEOC0sYKFYfmY15e7gAEXIaVP3ze0N4ORobZDuCGI1QIUmOOkK3Y4Ma9cxY8OiU8MJrdD_kAKD_c8Zhq56zXKGbyBGWP9ar8lFFAluTo1V8ek5ZJBuS-nzRs-W__WYCCkGwCi1Qt513UYqO5Wa0hNHhKrh1t2HleZluh78GaXYdRu2snuO0pUmjae7rHXDlv4Y7BwLyMtrFEAR_ox2ibpC-MqZxR7Z36jIOyl-sFO0rke4W08sXhBSx");'></div>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="w-full max-w-7xl mx-auto py-8 px-4 md:px-10 lg:px-20">
+<div class="flex flex-col lg:flex-row gap-8">
+<!-- Left Column: Profile Sidebar -->
+<aside class="w-full lg:w-1/3 xl:w-1/4 flex-shrink-0">
+<div class="sticky top-28 flex flex-col gap-6 p-6 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700">
+<div class="flex flex-col items-center gap-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-24" data-alt="User avatar image" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuATUU6vdrAS50SX3b0XLaKNg7sFY1E6rLvnLZNl2ECc1URdfOVktGdTeEGKul3RDteCzf1pGcumQe7qYZ50d9-Sx6via7LqdPaVe_-JegeQe11-ruDnWqDsRSkg2gsznAM0fNPN9vH1Ao6yXFCiQBW3bABHnNpBSjgIWqerSh25fh68cPJrlSLE2eHAh_5co2pVAMkiAvoTVqrY6nSHqq3bK_uYXSeg6u0FuJ2RRurkAIoMpBgZXZcmqI1Bfrf_hFZkqnZPFV17_7MU");'></div>
+<div class="flex flex-col text-center">
+<h1 class="text-slate-900 dark:text-white text-xl font-bold leading-normal">Samantha Reed</h1>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-normal leading-normal">Stanford University</p>
+</div>
+</div>
+<!-- ProfileStats Component -->
+<div class="flex flex-col sm:flex-row lg:flex-col gap-3">
+<div class="flex min-w-[111px] flex-1 basis-[fit-content] flex-col gap-2 rounded-lg border border-slate-200 dark:border-slate-700 p-3 items-start bg-background-light dark:bg-slate-900">
+<p class="text-slate-900 dark:text-white tracking-light text-2xl font-bold leading-tight">1,204</p>
+<div class="flex items-center gap-2">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-normal leading-normal">Total Upvotes</p>
+</div>
+</div>
+<div class="flex min-w-[111px] flex-1 basis-[fit-content] flex-col gap-2 rounded-lg border border-slate-200 dark:border-slate-700 p-3 items-start bg-background-light dark:bg-slate-900">
+<p class="text-slate-900 dark:text-white tracking-light text-2xl font-bold leading-tight">28</p>
+<div class="flex items-center gap-2">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-normal leading-normal">PDFs Uploaded</p>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-2 mt-2">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/20 dark:bg-primary/30" href="#">
+<span class="material-symbols-outlined text-primary" style="font-size: 20px;">person</span>
+<p class="text-primary text-sm font-medium leading-normal">My Profile</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors" href="#">
+<span class="material-symbols-outlined text-slate-600 dark:text-slate-300" style="font-size: 20px;">favorite</span>
+<p class="text-slate-900 dark:text-white text-sm font-medium leading-normal">My Favorites</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors" href="#">
+<span class="material-symbols-outlined text-slate-600 dark:text-slate-300" style="font-size: 20px;">settings</span>
+<p class="text-slate-900 dark:text-white text-sm font-medium leading-normal">Account Settings</p>
+</a>
+</div>
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors">
+<span class="truncate">Edit Profile</span>
+</button>
+</div>
+</aside>
+<!-- Right Column: Main Content -->
+<div class="w-full lg:w-2/3 xl:w-3/4">
+<div class="flex flex-col gap-6">
+<!-- PageHeading and Chips -->
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+<p class="text-slate-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em] min-w-72">My Uploads</p>
+<div class="flex gap-3 overflow-x-auto">
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-white dark:bg-slate-800 dark:border-slate-700 border pl-4 pr-2 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+<p class="text-slate-900 dark:text-white text-sm font-medium leading-normal">Sort by: Most Recent</p>
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400" style="font-size: 20px;">expand_more</span>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-white dark:bg-slate-800 dark:border-slate-700 border pl-4 pr-2 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+<p class="text-slate-900 dark:text-white text-sm font-medium leading-normal">Filter by Subject</p>
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400" style="font-size: 20px;">expand_more</span>
+</button>
+</div>
+</div>
+<!-- PDF Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+<!-- PDF Card 1 -->
+<div class="flex flex-col gap-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-sm hover:shadow-md transition-shadow">
+<div class="flex flex-col gap-1">
+<p class="text-sm font-medium text-purple-600 dark:text-purple-400">CS 101</p>
+<h3 class="text-lg font-bold text-slate-900 dark:text-white">Introduction to Computer Science Midterm</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400">Uploaded on Oct 26, 2023</p>
+</div>
+<div class="flex items-center justify-between mt-auto">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
+<button class="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"><span class="material-symbols-outlined text-green-500" style="font-size: 20px;">thumb_up</span></button>
+<span class="text-sm font-medium">128</span>
+</div>
+<div class="flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
+<button class="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"><span class="material-symbols-outlined text-red-500" style="font-size: 20px;">thumb_down</span></button>
+<span class="text-sm font-medium">4</span>
+</div>
+</div>
+<button class="flex h-9 cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-md bg-primary/20 dark:bg-primary/30 px-4 text-sm font-bold text-primary hover:bg-primary/30 dark:hover:bg-primary/40 transition-colors">View</button>
+</div>
+</div>
+<!-- PDF Card 2 -->
+<div class="flex flex-col gap-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-sm hover:shadow-md transition-shadow">
+<div class="flex flex-col gap-1">
+<p class="text-sm font-medium text-purple-600 dark:text-purple-400">MATH 250</p>
+<h3 class="text-lg font-bold text-slate-900 dark:text-white">Linear Algebra Final Exam Study Guide</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400">Uploaded on Oct 15, 2023</p>
+</div>
+<div class="flex items-center justify-between mt-auto">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
+<button class="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"><span class="material-symbols-outlined text-green-500" style="font-size: 20px;">thumb_up</span></button>
+<span class="text-sm font-medium">97</span>
+</div>
+<div class="flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
+<button class="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"><span class="material-symbols-outlined text-red-500" style="font-size: 20px;">thumb_down</span></button>
+<span class="text-sm font-medium">1</span>
+</div>
+</div>
+<button class="flex h-9 cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-md bg-primary/20 dark:bg-primary/30 px-4 text-sm font-bold text-primary hover:bg-primary/30 dark:hover:bg-primary/40 transition-colors">View</button>
+</div>
+</div>
+<!-- PDF Card 3 -->
+<div class="flex flex-col gap-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-sm hover:shadow-md transition-shadow">
+<div class="flex flex-col gap-1">
+<p class="text-sm font-medium text-purple-600 dark:text-purple-400">PHY 112</p>
+<h3 class="text-lg font-bold text-slate-900 dark:text-white">Quantum Mechanics Problem Set</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400">Uploaded on Sep 30, 2023</p>
+</div>
+<div class="flex items-center justify-between mt-auto">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
+<button class="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"><span class="material-symbols-outlined text-green-500" style="font-size: 20px;">thumb_up</span></button>
+<span class="text-sm font-medium">82</span>
+</div>
+<div class="flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
+<button class="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"><span class="material-symbols-outlined text-red-500" style="font-size: 20px;">thumb_down</span></button>
+<span class="text-sm font-medium">7</span>
+</div>
+</div>
+<button class="flex h-9 cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-md bg-primary/20 dark:bg-primary/30 px-4 text-sm font-bold text-primary hover:bg-primary/30 dark:hover:bg-primary/40 transition-colors">View</button>
+</div>
+</div>
+<!-- Empty State Card (Example) -->
+<div class="col-span-1 md:col-span-2 xl:col-span-3 flex flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-12 text-center">
+<span class="material-symbols-outlined text-slate-400 dark:text-slate-500" style="font-size: 48px;">cloud_upload</span>
+<h3 class="text-lg font-bold text-slate-900 dark:text-white">You haven't uploaded any documents yet.</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400 max-w-sm">Share your knowledge with the community! Upload your first exam file to get started and earn upvotes from fellow students.</p>
+<button class="flex mt-2 min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-6 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors">
+<span class="truncate">Upload Your First PDF</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

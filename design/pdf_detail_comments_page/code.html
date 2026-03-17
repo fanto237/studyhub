@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ExamShare - PDF Viewer</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24
+        }
+    </style>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#2b4bee",
+              "background-light": "#f6f6f8",
+              "background-dark": "#101322",
+            },
+            fontFamily: {
+              "display": ["Inter", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark">
+<div class="relative flex min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<!-- TopNavBar -->
+<header class="sticky top-0 z-50 flex items-center justify-center whitespace-nowrap border-b border-solid border-gray-200 dark:border-gray-800 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm">
+<div class="flex items-center justify-between w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-3">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-2 text-gray-900 dark:text-white">
+<div class="size-6 text-primary">
+<svg fill="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"></path>
+</svg>
+</div>
+<h2 class="text-xl font-bold leading-tight tracking-[-0.015em]">ExamShare</h2>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-gray-800 dark:text-gray-200 text-sm font-medium leading-normal hover:text-primary dark:hover:text-primary" href="#">Home</a>
+<a class="text-gray-800 dark:text-gray-200 text-sm font-medium leading-normal hover:text-primary dark:hover:text-primary" href="#">Courses</a>
+<a class="text-gray-800 dark:text-gray-200 text-sm font-medium leading-normal hover:text-primary dark:hover:text-primary" href="#">Upload</a>
+</nav>
+</div>
+<div class="flex flex-1 justify-end items-center gap-4">
+<div class="hidden sm:block relative w-full max-w-xs">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">search</span>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 border-none bg-gray-100 dark:bg-gray-800 h-10 placeholder:text-gray-400 dark:placeholder:text-gray-500 pl-10 pr-4 text-sm font-normal leading-normal" placeholder="Search for exams..." value=""/>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-transparent text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 text-sm font-bold leading-normal tracking-[0.015em]">
+<span class="truncate">Login</span>
+</button>
+<button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90">
+<span class="truncate">Sign Up</span>
+</button>
+</div>
+</div>
+</div>
+</header>
+<main class="flex flex-1 justify-center py-5 sm:py-8">
+<div class="layout-content-container flex flex-col w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+<!-- PageHeading -->
+<div class="flex flex-wrap justify-between items-start gap-6 py-4">
+<div class="flex flex-col gap-2">
+<p class="text-gray-900 dark:text-white text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">Advanced Quantum Mechanics - Final Exam</p>
+<p class="text-gray-500 dark:text-gray-400 text-base font-normal leading-normal">Uploaded by <span class="font-medium text-gray-700 dark:text-gray-300">Alex Johnson</span> on Oct 26, 2023</p>
+</div>
+<!-- ActionsBar (Desktop) -->
+<div class="hidden md:flex items-center gap-4">
+<div class="flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800">
+<button class="text-purple-600 dark:text-purple-400 p-1.5 rounded-full hover:bg-purple-100 dark:hover:bg-purple-900/50">
+<span class="material-symbols-outlined text-2xl">arrow_upward</span>
+</button>
+<p class="text-gray-700 dark:text-gray-300 text-sm font-bold leading-normal tracking-[0.015em] w-6 text-center">152</p>
+<button class="text-gray-500 dark:text-gray-400 p-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+<span class="material-symbols-outlined text-2xl">arrow_downward</span>
+</button>
+</div>
+<button class="flex flex-col items-center gap-1.5 text-center w-20 py-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+<div class="text-gray-800 dark:text-gray-200"><span class="material-symbols-outlined">bookmark</span></div>
+<p class="text-gray-600 dark:text-gray-300 text-xs font-medium leading-normal">Save</p>
+</button>
+<button class="flex flex-col items-center gap-1.5 text-center w-20 py-2.5 rounded-lg bg-primary hover:bg-primary/90 text-white">
+<div class="text-white"><span class="material-symbols-outlined">download</span></div>
+<p class="text-white text-xs font-medium leading-normal">Download</p>
+</button>
+</div>
+</div>
+<!-- ProfileStats -->
+<div class="flex flex-wrap gap-3 py-3 border-y border-gray-200 dark:border-gray-800">
+<div class="flex flex-1 min-w-[120px] flex-col gap-1 items-start">
+<p class="text-gray-900 dark:text-white tracking-light text-2xl font-bold leading-tight">1.2k</p>
+<div class="flex items-center gap-2"><p class="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal">Views</p></div>
+</div>
+<div class="flex flex-1 min-w-[120px] flex-col gap-1 items-start">
+<p class="text-gray-900 dark:text-white tracking-light text-2xl font-bold leading-tight">482</p>
+<div class="flex items-center gap-2"><p class="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal">Downloads</p></div>
+</div>
+<div class="flex flex-1 min-w-[120px] flex-col gap-1 items-start">
+<p class="text-gray-900 dark:text-white tracking-light text-2xl font-bold leading-tight">23</p>
+<div class="flex items-center gap-2"><p class="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal">Comments</p></div>
+</div>
+</div>
+<!-- PDF Viewer -->
+<div class="mt-8">
+<div class="relative w-full h-[70vh] max-h-[1000px] bg-gray-100 dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
+<img class="w-full h-full object-cover opacity-30" data-alt="Abstract image of a blurred PDF document preview" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBT4mfIhRTok8Ngqt3quaJW-iZm8k4nTVs7HSvnKRFneX6ZPB8ULK3x_0-ZBmLXNpGB_wMMFfqlWo--RSHSvu0LxBBr-KyXQn3qzvQZ6kCYavf4wIgPGQRSHagemF4WbnJkdF2DP-ocCAVKqxMxAeRi3qX7RnjTOTsiTi9gsbyMCjnTVfOHYi0_Ik8iDmewmWc0w7i8WLx-3DPi3i-FYjrbAKAF5ZP4lq_-PvtTIbmzGd8l81gV5KQQQwUjC7--3YkiS6oFgqdpVk3y"/>
+<div class="absolute inset-0 flex flex-col items-center justify-center p-4">
+<span class="material-symbols-outlined text-6xl text-gray-400 dark:text-gray-600">picture_as_pdf</span>
+<p class="text-gray-600 dark:text-gray-400 mt-4 text-lg font-medium">PDF Viewer</p>
+<p class="text-gray-500 dark:text-gray-500 text-sm">Document preview would be embedded here.</p>
+</div>
+</div>
+</div>
+<!-- Comment Section -->
+<div class="mt-12">
+<h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Discussion (23)</h3>
+<!-- Comment Input Card -->
+<div class="flex items-start gap-4 p-4 bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 flex-shrink-0" data-alt="User avatar image" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA5zFL1UpOmi9oqyCCWrHcyWgTRZFQHbCRU5tI35oFAaB4JTUga5IbGsuX04OlONqOD59GjETOHniID3UWnaHWXFDdbPUUf7wLRavV4c2f1beD8Yh3Q05GfumU4lWcEXWQfzAgu513GKUCFnoUy4r7d1ZbineovMpT6pFslRwKGGckJrxDHxXMqAo5f0ZktBHUHSGmU3XMWtX8nYnTlI59og6oc0Wscn53Muzo4TMNpvETFkieDqobOAr4hh75KZ4guPOnu9nPpx8rW");'></div>
+<div class="w-full">
+<textarea class="form-textarea w-full resize-none rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 placeholder:text-gray-400 dark:placeholder:text-gray-500 text-base font-normal" placeholder="Add to the discussion..." rows="3"></textarea>
+<div class="flex justify-end mt-3">
+<button class="flex min-w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold tracking-[0.015em] hover:bg-primary/90">
+<span class="truncate">Post Comment</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Comment Thread -->
+<div class="mt-8 space-y-8">
+<!-- Parent Comment Card -->
+<div class="flex items-start gap-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 flex-shrink-0" data-alt="User avatar image for Sarah L." style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuACnaLu3H-sN9-jErHLQRyKnwCr_J7rsV97Q1GHjWhtvkGdNrsF2spPpxYx5xGeVMsGlcs5Bqcev9tmH5Y50jyEtW1V4CsCredLTvlF0RnHStmt1NzcGmC2KrmeYNkg4w99BV33sRyfAMUq7KGdolCACBoEhjuxxFNAKwMZxXgak4iMj-CDOm0H6JTFn2Enu46RjJFK3Io7d8NXbffQzmBaH-1p8ZMCfGqdAIxPyGX5mrsZie0VLfP_ijyRHjA88x-ilq69YVwUN-7H");'></div>
+<div class="flex-1">
+<div class="bg-white dark:bg-gray-900 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800">
+<div class="flex items-center justify-between">
+<p class="font-bold text-gray-900 dark:text-white">Sarah L.</p>
+<p class="text-xs text-gray-500 dark:text-gray-400">2 days ago</p>
+</div>
+<p class="mt-2 text-gray-700 dark:text-gray-300">This was incredibly helpful, especially the section on Hilbert spaces. Thanks for sharing!</p>
+</div>
+<div class="flex items-center gap-4 mt-2 px-2">
+<div class="flex items-center justify-center gap-1.5">
+<button class="text-purple-600 dark:text-purple-400 rounded-full hover:bg-purple-100 dark:hover:bg-purple-900/50 p-1"><span class="material-symbols-outlined text-xl">arrow_upward</span></button>
+<p class="text-gray-600 dark:text-gray-400 text-xs font-bold">32</p>
+</div>
+<button class="text-gray-500 dark:text-gray-400 text-xs font-bold hover:underline">Reply</button>
+</div>
+</div>
+</div>
+<!-- Threaded Reply Card -->
+<div class="ml-8 md:ml-14 flex items-start gap-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 flex-shrink-0" data-alt="User avatar image for Mike P." style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAstvpIktwVf1JF2-UWWdtt2FLyE-JUElCLDk685sNbR59DfgZYg_EmGSBycIKIY1T9BGLRE9tg-IvSvU1wTKKMytV1Qsepsu9bQ4Nc64P5aXhxaN9rPkczNWzdH0NVqXO_2Aky19h8KpegY2tQGQAgGIqaiyBqI-KsAnAMPyVT3IowykmyxXmGjOIFjP4A1xYvBFh_MvhdwdKMMNF2qLfRn7eMs5ltj2s0o0AsgTsKRDCiwlv4fN4teSHAVDQQYCB4_97_SkKe2GWp");'></div>
+<div class="flex-1">
+<div class="bg-white dark:bg-gray-900 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800">
+<div class="flex items-center justify-between">
+<p class="font-bold text-gray-900 dark:text-white">Mike P.</p>
+<p class="text-xs text-gray-500 dark:text-gray-400">1 day ago</p>
+</div>
+<p class="mt-2 text-gray-700 dark:text-gray-300">Agreed! Question 3b was brutal, I'm glad I found this to review.</p>
+</div>
+<div class="flex items-center gap-4 mt-2 px-2">
+<div class="flex items-center justify-center gap-1.5">
+<button class="text-purple-600 dark:text-purple-400 rounded-full hover:bg-purple-100 dark:hover:bg-purple-900/50 p-1"><span class="material-symbols-outlined text-xl">arrow_upward</span></button>
+<p class="text-gray-600 dark:text-gray-400 text-xs font-bold">5</p>
+</div>
+<button class="text-gray-500 dark:text-gray-400 text-xs font-bold hover:underline">Reply</button>
+</div>
+</div>
+</div>
+<!-- Parent Comment Card -->
+<div class="flex items-start gap-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 flex-shrink-0" data-alt="User avatar image for Chloe K." style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuANO2k-T1d_f5n_972Y9pN0U7yJ3m6M4gVumgW0gUy2iCB2_UGXKCd0SVMqOyw1-l7m_pnXb-4kPB2unGpHwsk60vM0oAcksd7GzdoQapaPadLr4EIsKcqi8Dh0aH-6LMj8Nny4xYFOE7SaiogNHKEarGjBeAC9vUq7gjkxMJHyPCrl52_LxvuQmE7l7nt6RhZFay8clFIrmX28eUdyMDD3jsZaexOlkY917nAkqw5r6wsFxS5-V6k4rWmf7gkyO3ynpl44_T_NsbkD");'></div>
+<div class="flex-1">
+<div class="bg-white dark:bg-gray-900 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800">
+<div class="flex items-center justify-between">
+<p class="font-bold text-gray-900 dark:text-white">Chloe K.</p>
+<p class="text-xs text-gray-500 dark:text-gray-400">4 days ago</p>
+</div>
+<p class="mt-2 text-gray-700 dark:text-gray-300">Does anyone have the solutions for this? Or maybe just for the first section? Would be a lifesaver.</p>
+</div>
+<div class="flex items-center gap-4 mt-2 px-2">
+<div class="flex items-center justify-center gap-1.5">
+<button class="text-purple-600 dark:text-purple-400 rounded-full hover:bg-purple-100 dark:hover:bg-purple-900/50 p-1"><span class="material-symbols-outlined text-xl">arrow_upward</span></button>
+<p class="text-gray-600 dark:text-gray-400 text-xs font-bold">11</p>
+</div>
+<button class="text-gray-500 dark:text-gray-400 text-xs font-bold hover:underline">Reply</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>
