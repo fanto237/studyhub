@@ -3,12 +3,14 @@
 **Generated:** 2026-03-17
 
 ## OVERVIEW
+
 Project: **StudyHub**
 Stack: **Nx 22.5 monorepo** with **Angular 21.1** + **SSR/Express** frontend, **TypeScript 5.9**, **Tailwind CSS 4.2** + **daisyUI 5.5** for frontend styling, **ESLint 9** + **Prettier 3**, and a **.NET 10** backend/app libraries using **ASP.NET Core Minimal APIs**, **WolverineFx 5.20**, **Serilog 4.3**, **EF Core 10**, and **Npgsql 10**.
 
 This repository is an early full-stack scaffold for a student-focused exam-sharing product. Product intent is documented in `docs/PRD.md` and `docs/SPEC.md`; implementation is still mostly starter/template code.
 
 ## STRUCTURE
+
 - `apps/web/`: Angular application managed by Nx.
   - `apps/web/src/`: frontend source root.
   - `apps/web/src/app/`: root component, app config, and route definitions.
@@ -17,7 +19,7 @@ This repository is an early full-stack scaffold for a student-focused exam-shari
   - `apps/web/project.json`: Nx targets for `build`, `serve`, `lint`, and `serve-static`.
 - `apps/api/`: ASP.NET Core Web app.
   - `apps/api/Program.cs`: current Minimal API bootstrap; still template-level.
-  - `apps/api/Properties/launchSettings.json`: local dev URLs (`http://localhost:5046`, `https://localhost:7088`).
+  - `apps/api/Properties/launchSettings.json`: local dev URL (`https://localhost:3000`).
   - `apps/api/Api.http`: scratch file for manual API requests.
 - `libs/domain/`: domain-layer .NET library.
 - `libs/application/`: application-layer .NET library; references `libs/domain`.
@@ -30,20 +32,22 @@ This repository is an early full-stack scaffold for a student-focused exam-shari
 - `.vscode/extensions.json`: recommended VS Code extensions (Angular Console, Prettier, ESLint).
 
 ## COMMANDS
-| Action | Command |
-|--------|---------|
-| Install JS deps | `npm ci` |
-| Restore .NET deps | `npx nx restore Api` |
-| Lint frontend | `npx nx lint web` |
-| Build frontend | `npx nx build web` |
-| Build backend | `npx nx build Api` |
-| Run frontend | `npx nx serve web` |
-| Run backend | `npx nx run Api` |
-| Build full .NET solution directly | `dotnet build apps/Studyhub.slnx` |
-| Run API directly | `dotnet run --project apps/api/Api.csproj` |
-| Test | `No automated tests are configured yet` |
+
+| Action                            | Command                                    |
+| --------------------------------- | ------------------------------------------ |
+| Install JS deps                   | `npm ci`                                   |
+| Restore .NET deps                 | `npx nx restore Api`                       |
+| Lint frontend                     | `npx nx lint web`                          |
+| Build frontend                    | `npx nx build web`                         |
+| Build backend                     | `npx nx build Api`                         |
+| Run frontend                      | `npx nx serve web`                         |
+| Run backend                       | `npx nx run Api`                           |
+| Build full .NET solution directly | `dotnet build apps/Studyhub.slnx`          |
+| Run API directly                  | `dotnet run --project apps/api/Api.csproj` |
+| Test                              | `No automated tests are configured yet`    |
 
 ## CODING STANDARDS
+
 - **Workspace style**
   - Monorepo orchestration is done through Nx.
   - `.editorconfig` enforces UTF-8, spaces, 2-space indentation, final newline, and trimmed trailing whitespace.
@@ -71,6 +75,7 @@ This repository is an early full-stack scaffold for a student-focused exam-shari
   - `@nx/enforce-module-boundaries` is enabled, though current dependency constraints are permissive (`*` -> `*`).
 
 ## WHERE TO LOOK
+
 - **Frontend source**: `apps/web/src`
 - **Backend source**: `apps/api`
 - **Shared backend libs**: `libs/domain`, `libs/application`, `libs/infrastructure`
@@ -80,6 +85,7 @@ This repository is an early full-stack scaffold for a student-focused exam-shari
 - **Tests**: No test directories or test targets exist yet
 
 ## NOTES
+
 - This repo is closer to a scaffold than a completed implementation.
   - Frontend still shows the default Nx/Angular welcome component.
   - Backend currently exposes only the template `/weatherforecast` endpoint.

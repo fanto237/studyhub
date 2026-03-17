@@ -1,22 +1,41 @@
+using Api.Extensions;
+using Application;
+using Application.Extensions;
+using Domain.Entities;
 using Infrastructure.Extensions;
 using Infrastructure.Persistence;
+using Microsoft.AspNetCore.Identity;
+using Wolverine;
 
 var builder = WebApplication.CreateBuilder(args);
 
 if (builder.Environment.IsDevelopment())
 {
-  builder.Configuration.AddUserSecrets<StudyHubDbContext>(optional: true);
+    var infrastructureSettingsPath = Path.GetFullPath(
+        Path.Combine(builder.Environment.ContentRootPath, "../../libs/infrastructure/appsettings.Development.json"));
+
+    builder.Configuration.AddJsonFile(infrastructureSettingsPath, optional: true, reloadOnChange: true);
+    builder.Configuration.AddUserSecrets<StudyHubDbContext>(optional: true);
 }
 
+builder.Host.UseWolverine(options =>
+{
+    options.Discovery.IncludeAssembly(typeof(ApplicationAssemblyMarker).Assembly);
+});
+
 builder.Services.AddOpenApi();
+builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddSingleton(TimeProvider.System);
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-  app.MapOpenApi();
+    app.MapOpenApi();
 }
 
 app.UseHttpsRedirection();
+app.MapAuthEndpoints();
+app.Run();

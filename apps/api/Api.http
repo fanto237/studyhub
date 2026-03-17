@@ -1,6 +1,26 @@
 @Api_HostAddress = http://localhost:5046
 
-GET {{Api_HostAddress}}/weatherforecast/
+POST {{Api_HostAddress}}/api/auth/register
+Content-Type: application/json
 Accept: application/json
+
+{
+  "privateEmail": "student.personal@example.com",
+  "username": "studybuddy",
+  "fullName": "Taylor Student",
+  "password": "Pa55word!",
+  "schoolEmail": "taylor@student.school.edu"
+}
+
+###
+
+POST {{Api_HostAddress}}/api/auth/verify-account
+Content-Type: application/json
+Accept: application/json
+
+{
+  "schoolEmail": "taylor@student.school.edu",
+  "code": "123456"
+}
 
 ###
