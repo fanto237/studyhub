@@ -90,6 +90,9 @@ public class CreatePostHandler
         StorageUrl = storedFile.StorageUrl,
         Upvotes = 0,
         Downvotes = 0,
+        IsHidden = false,
+        ReportCount = 0,
+        DeletedAt = null,
         CreatedAt = now,
       };
 

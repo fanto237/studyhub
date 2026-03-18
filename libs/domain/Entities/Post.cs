@@ -9,6 +9,9 @@ public class Post
     public string StorageUrl { get; set; } = string.Empty;
     public int Upvotes { get; set; }
     public int Downvotes { get; set; }
+    public bool IsHidden { get; set; }
+    public int ReportCount { get; set; }
+    public DateTimeOffset? DeletedAt { get; set; }
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 
     public User User { get; set; } = null!;
