@@ -21,6 +21,16 @@ public class PostConfiguration : IEntityTypeConfiguration<Post>
             .HasMaxLength(2048)
             .IsRequired();
 
+        builder.Property(post => post.IsHidden)
+            .HasDefaultValue(false)
+            .IsRequired();
+
+        builder.Property(post => post.ReportCount)
+            .HasDefaultValue(0)
+            .IsRequired();
+
+        builder.Property(post => post.DeletedAt);
+
         builder.Property(post => post.CreatedAt)
             .IsRequired();
 
@@ -30,5 +40,6 @@ public class PostConfiguration : IEntityTypeConfiguration<Post>
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasIndex(post => post.UserId);
+        builder.HasIndex(post => new { post.IsHidden, post.DeletedAt });
     }
 }
