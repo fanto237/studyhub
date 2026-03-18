@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Api.DTOs.Posts;
 using Application.Posts.CreatePost;
+using Application.Posts.GetPosts;
 using Microsoft.AspNetCore.Mvc;
 using Wolverine;
 
@@ -13,6 +14,11 @@ public static class PostEndpoints
     var group = app.MapGroup("/api/posts")
         .WithTags("Posts");
 
+    group.MapGet(string.Empty, GetPosts)
+        .WithName("GetPosts")
+        .WithDescription("Returns the authenticated StudyHub post feed.")
+        .RequireAuthorization();
+
     group.MapPost(string.Empty, CreatePost)
         .WithName("CreatePost")
         .WithDescription("Uploads a PDF to Cloudflare R2 and creates a StudyHub post.")
@@ -20,6 +26,43 @@ public static class PostEndpoints
         .DisableAntiforgery();
 
     return app;
+  }
+
+  private static async Task<IResult> GetPosts(
+      [AsParameters] GetPostsQuery query,
+      IMessageBus bus,
+      CancellationToken cancellationToken)
+  {
+    var result = await bus.InvokeAsync<GetPostsResult>(
+        query,
+        cancellationToken);
+
+    return result.Outcome switch
+    {
+      GetPostsOutcome.Success => Results.Ok(new GetPostsResponse(
+          (result.Items ?? [])
+              .Select(item => new PostFeedItemResponse(
+                  item.Id,
+                  item.Title,
+                  item.Description,
+                  item.StorageUrl,
+                  item.Upvotes,
+                  item.Downvotes,
+                  item.Score,
+                  item.CreatedAt,
+                  item.CommentCount,
+                  item.Tags,
+                  new PostFeedUserResponse(
+                      item.User.Id,
+                      item.User.Username,
+                      item.User.FullName)))
+              .ToArray(),
+          result.Page,
+          result.PageSize,
+          result.TotalCount,
+          result.TotalPages)),
+      _ => Results.BadRequest(new { message = result.Message }),
+    };
   }
 
   private static async Task<IResult> CreatePost(
