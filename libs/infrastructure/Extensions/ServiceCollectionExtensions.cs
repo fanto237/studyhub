@@ -1,13 +1,19 @@
+using Amazon.Runtime;
+using Amazon.S3;
 using Application.Abstractions.Email;
 using Application.Auth.Abstractions;
+using Application.Posts.Abstractions;
 using Infrastructure.Auth;
 using Infrastructure.Email;
 using Infrastructure.Options;
 using Infrastructure.Persistence;
+using Infrastructure.Posts;
+using Infrastructure.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Npgsql;
 
 namespace Infrastructure.Extensions;
@@ -25,14 +31,36 @@ public static class ServiceCollectionExtensions
 
     services.Configure<EmailSetting>(configuration.GetSection(EmailSetting.SectionName));
 
+    services.AddOptions<CloudflareOptions>()
+        .BindConfiguration(CloudflareOptions.SectionName)
+        .Validate(options => !string.IsNullOrWhiteSpace(options.Api), $"{CloudflareOptions.SectionName}:Api is required.")
+        .Validate(options => !string.IsNullOrWhiteSpace(options.AccessKeyId), $"{CloudflareOptions.SectionName}:AccessKeyId is required.")
+        .Validate(options => !string.IsNullOrWhiteSpace(options.SecretAccessKey), $"{CloudflareOptions.SectionName}:SecretAccessKey is required.")
+        .Validate(options => !string.IsNullOrWhiteSpace(options.BucketName), $"{CloudflareOptions.SectionName}:BucketName is required.")
+        .ValidateOnStart();
+
     services.AddDbContext<StudyHubDbContext>(options =>
         options.UseNpgsql(connectionString)
           .EnableSensitiveDataLogging()
           .LogTo(Console.WriteLine, LogLevel.Information));
 
+    services.AddSingleton<IAmazonS3>(serviceProvider =>
+    {
+      var cloudflareOptions = serviceProvider.GetRequiredService<IOptions<CloudflareOptions>>().Value;
+      var credentials = new BasicAWSCredentials(cloudflareOptions.AccessKeyId, cloudflareOptions.SecretAccessKey);
+
+      return new AmazonS3Client(credentials, new AmazonS3Config
+      {
+        ServiceURL = cloudflareOptions.Api,
+        ForcePathStyle = true,
+      });
+    });
+
     services.AddScoped<IAuthRepository, AuthRepository>();
     services.AddScoped<IAuthEmailService, AuthEmailService>();
     services.AddSingleton<IAuthTokenService, AuthTokenService>();
+    services.AddScoped<IPostRepository, PostRepository>();
+    services.AddScoped<IPostFileStorageService, CloudflareR2PostFileStorageService>();
 
     return services;
   }
