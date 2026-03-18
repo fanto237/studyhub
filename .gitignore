@@ -45,5 +45,6 @@ Thumbs.db
 
 # .NET
 **/bin/
+**/bin\Debug/
 **/obj/
 /artifacts/
