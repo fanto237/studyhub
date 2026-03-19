@@ -1,4 +1,5 @@
 using Application.Posts.Abstractions;
+using Application.Posts.GetPost;
 using Application.Posts.GetPosts;
 using Domain.Entities;
 using Infrastructure.Persistence;
@@ -88,6 +89,75 @@ public class PostRepository(StudyHubDbContext dbContext) : IPostRepository
         query.PageSize,
         totalCount,
         totalPages);
+  }
+
+  public async Task<GetPostResult> GetPostAsync(GetPostQuery query, CancellationToken cancellationToken)
+  {
+    var post = await dbContext.Posts
+        .AsNoTracking()
+        .Where(candidate => candidate.Id == query.PostId)
+        .Where(candidate => candidate.DeletedAt == null)
+        .Where(candidate => !candidate.IsHidden)
+        .Select(candidate => new
+        {
+          candidate.Id,
+          candidate.Title,
+          candidate.Description,
+          candidate.StorageUrl,
+          candidate.Upvotes,
+          candidate.Downvotes,
+          Score = candidate.Upvotes - candidate.Downvotes,
+          candidate.CreatedAt,
+          Tags = candidate.PostTags
+              .OrderBy(postTag => postTag.Tag.Name)
+              .Select(postTag => postTag.Tag.Name)
+              .ToArray(),
+          User = new PostDetailUser(
+              candidate.UserId,
+              candidate.User.Username,
+              candidate.User.FullName),
+        })
+        .FirstOrDefaultAsync(cancellationToken);
+
+    if (post is null)
+    {
+      return new GetPostResult(
+          GetPostOutcome.NotFound,
+          "The requested post was not found.");
+    }
+
+    var comments = await dbContext.Comments
+        .AsNoTracking()
+        .Where(comment => comment.PostId == query.PostId)
+        .OrderBy(comment => comment.CreatedAt)
+        .ThenBy(comment => comment.Id)
+        .Select(comment => new PostDetailComment(
+            comment.Id,
+            comment.ParentCommentId,
+            comment.Text,
+            comment.CreatedAt,
+            new PostDetailUser(
+                comment.UserId,
+                comment.User.Username,
+                comment.User.FullName)))
+        .ToListAsync(cancellationToken);
+
+    return new GetPostResult(
+        GetPostOutcome.Success,
+        "Post retrieved successfully.",
+        new PostDetail(
+            post.Id,
+            post.Title,
+            post.Description,
+            post.StorageUrl,
+            post.Upvotes,
+            post.Downvotes,
+            post.Score,
+            post.CreatedAt,
+            comments.Count,
+            post.Tags,
+            post.User,
+            comments));
   }
 
   public void AddPost(Post post)
