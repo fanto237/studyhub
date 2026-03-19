@@ -9,7 +9,7 @@ using Application.Auth.SendAuthCode;
 using Application.Auth.VerifyAccount;
 using Wolverine;
 
-namespace Api.Extensions;
+namespace Api.Endpoints;
 
 public static class AuthEndpoints
 {

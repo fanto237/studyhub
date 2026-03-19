@@ -5,7 +5,7 @@ using Application.Posts.GetPosts;
 using Microsoft.AspNetCore.Mvc;
 using Wolverine;
 
-namespace Api.Extensions;
+namespace Api.Endpoints;
 
 public static class PostEndpoints
 {

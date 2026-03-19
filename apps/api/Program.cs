@@ -1,30 +1,31 @@
+using Api.Endpoints;
 using Api.Extensions;
 using Application;
 using Application.Extensions;
+using Application.Posts.CreatePost;
 using Domain.Entities;
 using Infrastructure.Extensions;
-using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
 using Wolverine;
 
 var builder = WebApplication.CreateBuilder(args);
 
-if (builder.Environment.IsDevelopment())
-{
-    var applicationSettingsPath = Path.GetFullPath(
-        Path.Combine(builder.Environment.ContentRootPath, "../../libs/application/appsettings.Development.json"));
-    var infrastructureSettingsPath = Path.GetFullPath(
-        Path.Combine(builder.Environment.ContentRootPath, "../../libs/infrastructure/appsettings.Development.json"));
+// if (builder.Environment.IsDevelopment())
+// {
+//     var applicationSettingsPath = Path.GetFullPath(
+//         Path.Combine(builder.Environment.ContentRootPath, "../../libs/application/appsettings.Development.json"));
+//     var infrastructureSettingsPath = Path.GetFullPath(
+//         Path.Combine(builder.Environment.ContentRootPath, "../../libs/infrastructure/appsettings.Development.json"));
 
-    builder.Configuration.AddJsonFile(applicationSettingsPath, optional: true, reloadOnChange: true);
-    builder.Configuration.AddJsonFile(infrastructureSettingsPath, optional: true, reloadOnChange: true);
-    builder.Configuration.AddUserSecrets<ApplicationAssemblyMarker>(optional: true);
-    builder.Configuration.AddUserSecrets<StudyHubDbContext>(optional: true);
-}
+//     builder.Configuration.AddJsonFile(applicationSettingsPath, optional: true, reloadOnChange: true);
+//     builder.Configuration.AddJsonFile(infrastructureSettingsPath, optional: true, reloadOnChange: true);
+//     builder.Configuration.AddUserSecrets<ApplicationAssemblyMarker>(optional: true);
+//     builder.Configuration.AddUserSecrets<StudyHubDbContext>(optional: true);
+// }
 
 builder.Host.UseWolverine(options =>
 {
-    options.Discovery.IncludeAssembly(typeof(ApplicationAssemblyMarker).Assembly);
+  options.Discovery.IncludeAssembly(typeof(CreatePostHandler).Assembly);
 });
 
 builder.Services.AddOpenApi();
@@ -38,7 +39,7 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+  app.MapOpenApi();
 }
 
 app.UseHttpsRedirection();
