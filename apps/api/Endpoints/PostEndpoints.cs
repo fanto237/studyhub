@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Api.DTOs.Posts;
 using Application.Posts.CreatePost;
+using Application.Posts.GetPost;
 using Application.Posts.GetPosts;
 using Microsoft.AspNetCore.Mvc;
 using Wolverine;
@@ -17,6 +18,11 @@ public static class PostEndpoints
     group.MapGet(string.Empty, GetPosts)
         .WithName("GetPosts")
         .WithDescription("Returns the authenticated StudyHub post feed.")
+        .RequireAuthorization();
+
+    group.MapGet("/{postId:guid}", GetPost)
+        .WithName("GetPost")
+        .WithDescription("Returns a single authenticated StudyHub post with its discussion thread.")
         .RequireAuthorization();
 
     group.MapPost(string.Empty, CreatePost)
@@ -61,6 +67,48 @@ public static class PostEndpoints
           result.PageSize,
           result.TotalCount,
           result.TotalPages)),
+      _ => Results.BadRequest(new { message = result.Message }),
+    };
+  }
+
+  private static async Task<IResult> GetPost(
+      Guid postId,
+      IMessageBus bus,
+      CancellationToken cancellationToken)
+  {
+    var result = await bus.InvokeAsync<GetPostResult>(
+        new GetPostQuery(postId),
+        cancellationToken);
+
+    return result.Outcome switch
+    {
+      GetPostOutcome.Success => Results.Ok(new GetPostResponse(
+          result.Item!.Id,
+          result.Item.Title,
+          result.Item.Description,
+          result.Item.StorageUrl,
+          result.Item.Upvotes,
+          result.Item.Downvotes,
+          result.Item.Score,
+          result.Item.CreatedAt,
+          result.Item.CommentCount,
+          result.Item.Tags,
+          new GetPostUserResponse(
+              result.Item.User.Id,
+              result.Item.User.Username,
+              result.Item.User.FullName),
+          result.Item.Comments
+              .Select(comment => new GetPostCommentResponse(
+                  comment.Id,
+                  comment.ParentCommentId,
+                  comment.Text,
+                  comment.CreatedAt,
+                  new GetPostUserResponse(
+                      comment.User.Id,
+                      comment.User.Username,
+                      comment.User.FullName)))
+              .ToArray())),
+      GetPostOutcome.NotFound => Results.NotFound(new { message = result.Message }),
       _ => Results.BadRequest(new { message = result.Message }),
     };
   }
