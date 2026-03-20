@@ -10,7 +10,7 @@ public class AuthEmailService(IOptions<EmailSetting> emailOptions) : IAuthEmailS
 {
     private readonly EmailSetting _emailSetting = emailOptions.Value;
 
-    public async Task SendSchoolVerificationCodeAsync(
+    public Task SendSchoolVerificationCodeAsync(
         string fullName,
         string schoolEmail,
         string code,
@@ -21,6 +21,29 @@ public class AuthEmailService(IOptions<EmailSetting> emailOptions) : IAuthEmailS
         var htmlBody = StudyHubEmailTemplateFactory.BuildSchoolVerificationHtml(fullName, code, expiresAt);
         var plainTextBody = StudyHubEmailTemplateFactory.BuildSchoolVerificationPlainText(fullName, code, expiresAt);
 
+        return SendEmailAsync(schoolEmail, subject, htmlBody, plainTextBody, cancellationToken);
+    }
+
+    public Task SendWelcomeEmailAsync(
+        string fullName,
+        string privateEmail,
+        string schoolEmail,
+        CancellationToken cancellationToken = default)
+    {
+        var subject = "Welcome to StudyHub — your account is verified";
+        var htmlBody = StudyHubEmailTemplateFactory.BuildWelcomeHtml(fullName, schoolEmail);
+        var plainTextBody = StudyHubEmailTemplateFactory.BuildWelcomePlainText(fullName, schoolEmail);
+
+        return SendEmailAsync(privateEmail, subject, htmlBody, plainTextBody, cancellationToken);
+    }
+
+    private async Task SendEmailAsync(
+        string recipientEmail,
+        string subject,
+        string htmlBody,
+        string plainTextBody,
+        CancellationToken cancellationToken)
+    {
         using var message = new MailMessage
         {
             From = new MailAddress(_emailSetting.From, _emailSetting.DisplayName),
@@ -29,7 +52,7 @@ public class AuthEmailService(IOptions<EmailSetting> emailOptions) : IAuthEmailS
             IsBodyHtml = true,
         };
 
-        message.To.Add(new MailAddress(schoolEmail));
+        message.To.Add(new MailAddress(recipientEmail));
         message.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(plainTextBody, null, "text/plain"));
         message.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(htmlBody, null, "text/html"));
 
