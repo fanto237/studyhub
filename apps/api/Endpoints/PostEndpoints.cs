@@ -4,6 +4,7 @@ using Application.Posts.CreatePost;
 using Application.Posts.DeletePost;
 using Application.Posts.GetPost;
 using Application.Posts.GetPosts;
+using Application.Posts.ReportPost;
 using Application.Posts.UpdatePost;
 using Application.Posts.VotePost;
 using Domain.Enums;
@@ -47,6 +48,11 @@ public static class PostEndpoints
     group.MapPost("/{postId:guid}/vote", VotePost)
         .WithName("VotePost")
         .WithDescription("Upvotes, downvotes, or removes the authenticated user's vote on a StudyHub post.")
+        .RequireAuthorization();
+
+    group.MapPost("/{postId:guid}/report", ReportPost)
+        .WithName("ReportPost")
+        .WithDescription("Reports a StudyHub post for moderation review or automatic hiding.")
         .RequireAuthorization();
 
     group.MapPost(string.Empty, CreatePost)
@@ -216,6 +222,43 @@ public static class PostEndpoints
           result.CurrentVote,
           result.Message)),
       VotePostOutcome.NotFound => Results.NotFound(new { message = result.Message }),
+      _ => Results.BadRequest(new { message = result.Message }),
+    };
+  }
+
+  private static async Task<IResult> ReportPost(
+      Guid postId,
+      ReportPostRequest request,
+      ClaimsPrincipal user,
+      IMessageBus bus,
+      CancellationToken cancellationToken)
+  {
+    var userIdValue = user.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (!Guid.TryParse(userIdValue, out var userId))
+    {
+      return Results.Unauthorized();
+    }
+
+    var roleValue = user.FindFirstValue(ClaimTypes.Role);
+    if (!Enum.TryParse<UserRole>(roleValue, ignoreCase: true, out var role))
+    {
+      return Results.Forbid();
+    }
+
+    var result = await bus.InvokeAsync<ReportPostResult>(
+        new ReportPostCommand(postId, userId, role, request.Reason, request.Details),
+        cancellationToken);
+
+    return result.Outcome switch
+    {
+      ReportPostOutcome.Success => Results.Ok(new ReportPostResponse(
+          result.PostId!.Value,
+          result.ReportCount,
+          result.IsHidden,
+          result.Message)),
+      ReportPostOutcome.NotFound => Results.NotFound(new { message = result.Message }),
+      ReportPostOutcome.AlreadyReported => Results.Conflict(new { message = result.Message }),
+      ReportPostOutcome.Forbidden => Results.Json(new { message = result.Message }, statusCode: StatusCodes.Status403Forbidden),
       _ => Results.BadRequest(new { message = result.Message }),
     };
   }
