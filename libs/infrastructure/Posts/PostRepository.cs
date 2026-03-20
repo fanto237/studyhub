@@ -108,6 +108,7 @@ public class PostRepository(StudyHubDbContext dbContext) : IPostRepository
           candidate.Downvotes,
           Score = candidate.Upvotes - candidate.Downvotes,
           candidate.CreatedAt,
+          candidate.UpdatedAt,
           Tags = candidate.PostTags
               .OrderBy(postTag => postTag.Tag.Name)
               .Select(postTag => postTag.Tag.Name)
@@ -154,10 +155,18 @@ public class PostRepository(StudyHubDbContext dbContext) : IPostRepository
             post.Downvotes,
             post.Score,
             post.CreatedAt,
+            post.UpdatedAt,
             comments.Count,
             post.Tags,
             post.User,
             comments));
+  }
+
+  public Task<Post?> GetPostForUpdateAsync(Guid postId, CancellationToken cancellationToken)
+  {
+    return dbContext.Posts
+        .Include(post => post.PostTags)
+        .FirstOrDefaultAsync(post => post.Id == postId, cancellationToken);
   }
 
   public void AddPost(Post post)
@@ -168,6 +177,11 @@ public class PostRepository(StudyHubDbContext dbContext) : IPostRepository
   public void AddTags(IEnumerable<Tag> tags)
   {
     dbContext.Tags.AddRange(tags);
+  }
+
+  public void RemovePostTags(IEnumerable<PostTag> postTags)
+  {
+    dbContext.PostTags.RemoveRange(postTags);
   }
 
   public Task SaveChangesAsync(CancellationToken cancellationToken)
