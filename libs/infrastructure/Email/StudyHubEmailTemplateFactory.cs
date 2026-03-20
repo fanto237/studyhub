@@ -79,8 +79,11 @@ If you didn't create a StudyHub account, you can ignore this email.
 
     public static string BuildWelcomeHtml(string fullName, string schoolEmail)
     {
+        const string appUrl = "https://studyhubz.net";
+
         var safeName = System.Net.WebUtility.HtmlEncode(string.IsNullOrWhiteSpace(fullName) ? "there" : fullName);
         var safeSchoolEmail = System.Net.WebUtility.HtmlEncode(schoolEmail);
+        var safeAppUrl = System.Net.WebUtility.HtmlEncode(appUrl);
 
         return $$"""
 <!DOCTYPE html>
@@ -90,16 +93,19 @@ If you didn't create a StudyHub account, you can ignore this email.
       <div style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:24px;overflow:hidden;box-shadow:0 18px 45px rgba(74,58,255,0.12);">
         <div style="background:linear-gradient(135deg,#6d5efc 0%,#8b5cf6 55%,#38bdf8 100%);padding:40px 32px;color:#ffffff;">
           <div style="font-size:13px;letter-spacing:0.18em;text-transform:uppercase;opacity:0.88;font-weight:700;">StudyHub</div>
-          <h1 style="margin:14px 0 10px;font-size:30px;line-height:1.2;font-weight:800;">Welcome to StudyHub</h1>
+          <h1 style="margin:14px 0 10px;font-size:30px;line-height:1.2;font-weight:800;">You're in — welcome to StudyHub</h1>
           <p style="margin:0;font-size:16px;line-height:1.7;max-width:460px;opacity:0.96;">
-            Your account is now active and you're ready to explore a trusted, student-focused library of past exams.
+            Your account is verified and ready. Start discovering past exams, finding the right material faster, and contributing to a student-powered study community.
           </p>
         </div>
 
         <div style="padding:32px;">
           <p style="margin:0 0 16px;font-size:16px;line-height:1.7;">Hi {{safeName}},</p>
-          <p style="margin:0 0 20px;font-size:16px;line-height:1.7;color:#433b62;">
-            Great news — your school email has been verified and your StudyHub account is ready to use.
+          <p style="margin:0 0 18px;font-size:16px;line-height:1.7;color:#433b62;">
+            Your school email has been verified successfully, so your StudyHub account is now fully active.
+          </p>
+          <p style="margin:0 0 24px;font-size:16px;line-height:1.7;color:#433b62;">
+            StudyHub is built to help you quickly find useful past exams, revise with more confidence, and give back by sharing resources with other students.
           </p>
 
           <div style="margin:0 0 24px;padding:20px;border-radius:20px;background:linear-gradient(180deg,#f8f7ff 0%,#f1efff 100%);border:1px solid #e3defe;">
@@ -107,17 +113,34 @@ If you didn't create a StudyHub account, you can ignore this email.
             <div style="font-size:18px;line-height:1.6;font-weight:700;color:#241b55;word-break:break-word;">{{safeSchoolEmail}}</div>
           </div>
 
+          <div style="margin:0 0 24px;text-align:center;">
+            <a href="{{safeAppUrl}}" style="display:inline-block;padding:14px 26px;border-radius:999px;background:linear-gradient(135deg,#6d5efc 0%,#8b5cf6 55%,#38bdf8 100%);color:#ffffff;text-decoration:none;font-size:15px;font-weight:800;letter-spacing:0.01em;box-shadow:0 12px 28px rgba(74,58,255,0.22);">
+              Open StudyHub
+            </a>
+            <p style="margin:12px 0 0;font-size:13px;line-height:1.6;color:#6a6387;">
+              Or copy and paste this link into your browser:<br />
+              <span style="color:#4a3aff;font-weight:700;word-break:break-all;">{{safeAppUrl}}</span>
+            </p>
+          </div>
+
           <div style="margin:0 0 24px;padding:18px 20px;border-radius:18px;background:#fcfbff;border:1px solid #ece8ff;">
-            <p style="margin:0 0 10px;font-size:14px;font-weight:700;color:#241b55;">What you can do next</p>
+            <p style="margin:0 0 10px;font-size:14px;font-weight:700;color:#241b55;">A great way to get started</p>
             <ul style="margin:0;padding-left:18px;color:#5e567e;font-size:14px;line-height:1.8;">
-              <li>Browse the latest exam uploads from the community.</li>
-              <li>Search by course, topic, or tag to find relevant material faster.</li>
-              <li>Upload your own past exams to help other students succeed.</li>
+              <li>Search for your course, subject, or exam topic.</li>
+              <li>Explore recent uploads and highly rated materials.</li>
+              <li>Upload a past exam to help other students and grow the community.</li>
             </ul>
           </div>
 
+          <div style="margin:0 0 24px;padding:18px 20px;border-radius:18px;background:#fcfbff;border:1px solid #ece8ff;">
+            <p style="margin:0 0 8px;font-size:14px;font-weight:700;color:#241b55;">Why StudyHub exists</p>
+            <p style="margin:0;font-size:14px;line-height:1.7;color:#5e567e;">
+              Finding quality exam prep material should feel easy, not frustrating. We're building StudyHub to make exam discovery more organized, more useful, and more community-driven.
+            </p>
+          </div>
+
           <p style="margin:0 0 8px;font-size:15px;line-height:1.7;color:#433b62;">
-            Thanks for joining StudyHub — we're excited to have you in the community.
+            Thanks for joining us — we're excited to have you here.
           </p>
           <p style="margin:0;font-size:15px;line-height:1.7;color:#433b62;">
             See you on StudyHub,<br />
@@ -133,20 +156,29 @@ If you didn't create a StudyHub account, you can ignore this email.
 
     public static string BuildWelcomePlainText(string fullName, string schoolEmail)
     {
+        const string appUrl = "https://studyhubz.net";
+
         var greetingName = string.IsNullOrWhiteSpace(fullName) ? "there" : fullName.Trim();
 
         return $"""
 Hi {greetingName},
 
-Welcome to StudyHub.
+You're in — welcome to StudyHub.
 
-Your school email has been verified and your account is now active.
+Your school email has been verified successfully, so your account is now fully active.
 
 Verified school email: {schoolEmail}
 
-You can now browse uploads, search for relevant material, and contribute your own past exams to help other students.
+Get started here: {appUrl}
 
-Thanks for joining StudyHub.
+A great way to begin:
+- Search for your course, subject, or exam topic.
+- Explore recent uploads and highly rated materials.
+- Upload a past exam to help other students and grow the community.
+
+StudyHub is built to help students discover useful past exams faster and study with more confidence.
+
+Thanks for joining us.
 
 - The StudyHub Team
 """;
