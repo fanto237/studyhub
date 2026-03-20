@@ -1,4 +1,5 @@
 using System.Text;
+using Application.Posts;
 using Application.Posts.Abstractions;
 using Domain.Entities;
 using FluentValidation;
@@ -51,9 +52,9 @@ public class CreatePostHandler
 
     var now = timeProvider.GetUtcNow();
     var postId = Guid.NewGuid();
-    var normalizedTitle = NormalizeTitle(command.Title);
-    var normalizedDescription = NormalizeDescription(command.Description);
-    var normalizedTags = NormalizeTags(command.Tags);
+    var normalizedTitle = PostMetadataNormalizer.NormalizeTitle(command.Title);
+    var normalizedDescription = PostMetadataNormalizer.NormalizeDescription(command.Description);
+    var normalizedTags = PostMetadataNormalizer.NormalizeTags(command.Tags);
     var objectKey = $"posts/{command.UserId.ToString("N")}/{postId.ToString("N")}.pdf";
     string? uploadedObjectKey = null;
 
@@ -94,6 +95,7 @@ public class CreatePostHandler
         ReportCount = 0,
         DeletedAt = null,
         CreatedAt = now,
+        UpdatedAt = null,
       };
 
       foreach (var tag in allTags)
@@ -172,34 +174,8 @@ public class CreatePostHandler
     return false;
   }
 
-  private static string NormalizeTitle(string title)
-  {
-    return string.Join(' ', title.Split([' ', '\t', '\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
-  }
-
-  private static string? NormalizeDescription(string? description)
-  {
-    return string.IsNullOrWhiteSpace(description) ? null : description.Trim();
-  }
-
   private static string NormalizeContentType(string contentType)
   {
     return string.IsNullOrWhiteSpace(contentType) ? "application/pdf" : contentType.Trim();
-  }
-
-  private static IReadOnlyList<string> NormalizeTags(IEnumerable<string> tags)
-  {
-    return tags
-        .Select(tag => tag?.Trim() ?? string.Empty)
-        .Where(tag => !string.IsNullOrWhiteSpace(tag))
-        .Select(CollapseWhitespace)
-        .Select(tag => tag.ToLowerInvariant())
-        .Distinct(StringComparer.Ordinal)
-        .ToArray();
-  }
-
-  private static string CollapseWhitespace(string value)
-  {
-    return string.Join(' ', value.Split([' ', '\t', '\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
   }
 }
