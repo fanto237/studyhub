@@ -34,6 +34,8 @@ public class PostConfiguration : IEntityTypeConfiguration<Post>
         builder.Property(post => post.CreatedAt)
             .IsRequired();
 
+        builder.Property(post => post.UpdatedAt);
+
         builder.HasOne(post => post.User)
             .WithMany(user => user.Posts)
             .HasForeignKey(post => post.UserId)
