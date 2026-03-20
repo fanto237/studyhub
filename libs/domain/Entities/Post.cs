@@ -18,4 +18,5 @@ public class Post
     public User User { get; set; } = null!;
     public ICollection<Comment> Comments { get; set; } = new List<Comment>();
     public ICollection<PostTag> PostTags { get; set; } = new List<PostTag>();
+    public ICollection<PostVote> Votes { get; set; } = new List<PostVote>();
 }

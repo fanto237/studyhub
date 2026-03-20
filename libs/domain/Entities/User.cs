@@ -18,6 +18,7 @@ public class User
 
   public ICollection<Post> Posts { get; set; } = [];
   public ICollection<Comment> Comments { get; set; } = [];
+  public ICollection<PostVote> PostVotes { get; set; } = [];
   public ICollection<UserAuthCode> AuthCodes { get; set; } = [];
   public ICollection<UserRefreshToken> RefreshTokens { get; set; } = [];
 }
