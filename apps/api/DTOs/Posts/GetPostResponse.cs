@@ -9,6 +9,7 @@ public record GetPostResponse(
     int Downvotes,
     int Score,
     DateTimeOffset CreatedAt,
+    DateTimeOffset? UpdatedAt,
     int CommentCount,
     IReadOnlyList<string> Tags,
     GetPostUserResponse User,
