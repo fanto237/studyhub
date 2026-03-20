@@ -3,6 +3,8 @@ using Api.DTOs.Posts;
 using Application.Posts.CreatePost;
 using Application.Posts.GetPost;
 using Application.Posts.GetPosts;
+using Application.Posts.UpdatePost;
+using Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Wolverine;
 
@@ -23,6 +25,11 @@ public static class PostEndpoints
     group.MapGet("/{postId:guid}", GetPost)
         .WithName("GetPost")
         .WithDescription("Returns a single authenticated StudyHub post with its discussion thread.")
+        .RequireAuthorization();
+
+    group.MapPatch("/{postId:guid}", UpdatePost)
+        .WithName("UpdatePost")
+        .WithDescription("Edits a StudyHub post's metadata.")
         .RequireAuthorization();
 
     group.MapPost(string.Empty, CreatePost)
@@ -82,33 +89,46 @@ public static class PostEndpoints
 
     return result.Outcome switch
     {
-      GetPostOutcome.Success => Results.Ok(new GetPostResponse(
-          result.Item!.Id,
-          result.Item.Title,
-          result.Item.Description,
-          result.Item.StorageUrl,
-          result.Item.Upvotes,
-          result.Item.Downvotes,
-          result.Item.Score,
-          result.Item.CreatedAt,
-          result.Item.CommentCount,
-          result.Item.Tags,
-          new GetPostUserResponse(
-              result.Item.User.Id,
-              result.Item.User.Username,
-              result.Item.User.FullName),
-          result.Item.Comments
-              .Select(comment => new GetPostCommentResponse(
-                  comment.Id,
-                  comment.ParentCommentId,
-                  comment.Text,
-                  comment.CreatedAt,
-                  new GetPostUserResponse(
-                      comment.User.Id,
-                      comment.User.Username,
-                      comment.User.FullName)))
-              .ToArray())),
+      GetPostOutcome.Success => Results.Ok(MapGetPostResponse(result.Item!)),
       GetPostOutcome.NotFound => Results.NotFound(new { message = result.Message }),
+      _ => Results.BadRequest(new { message = result.Message }),
+    };
+  }
+
+  private static async Task<IResult> UpdatePost(
+      Guid postId,
+      UpdatePostRequest request,
+      ClaimsPrincipal user,
+      IMessageBus bus,
+      CancellationToken cancellationToken)
+  {
+    var userIdValue = user.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (!Guid.TryParse(userIdValue, out var userId))
+    {
+      return Results.Unauthorized();
+    }
+
+    var roleValue = user.FindFirstValue(ClaimTypes.Role);
+    if (!Enum.TryParse<UserRole>(roleValue, ignoreCase: true, out var role))
+    {
+      return Results.Forbid();
+    }
+
+    var command = new UpdatePostCommand(
+        postId,
+        userId,
+        role,
+        request.Title,
+        request.Description,
+        request.Tags ?? []);
+
+    var result = await bus.InvokeAsync<UpdatePostResult>(command, cancellationToken);
+
+    return result.Outcome switch
+    {
+      UpdatePostOutcome.Success => Results.Ok(MapGetPostResponse(result.Item!)),
+      UpdatePostOutcome.NotFound => Results.NotFound(new { message = result.Message }),
+      UpdatePostOutcome.Forbidden => Results.Forbid(),
       _ => Results.BadRequest(new { message = result.Message }),
     };
   }
@@ -172,5 +192,36 @@ public static class PostEndpoints
       CreatePostOutcome.InvalidFile => Results.BadRequest(new { message = result.Message }),
       _ => Results.BadRequest(new { message = result.Message }),
     };
+  }
+
+  private static GetPostResponse MapGetPostResponse(PostDetail item)
+  {
+    return new GetPostResponse(
+        item.Id,
+        item.Title,
+        item.Description,
+        item.StorageUrl,
+        item.Upvotes,
+        item.Downvotes,
+        item.Score,
+        item.CreatedAt,
+        item.UpdatedAt,
+        item.CommentCount,
+        item.Tags,
+        new GetPostUserResponse(
+            item.User.Id,
+            item.User.Username,
+            item.User.FullName),
+        item.Comments
+            .Select(comment => new GetPostCommentResponse(
+                comment.Id,
+                comment.ParentCommentId,
+                comment.Text,
+                comment.CreatedAt,
+                new GetPostUserResponse(
+                    comment.User.Id,
+                    comment.User.Username,
+                    comment.User.FullName)))
+            .ToArray());
   }
 }
