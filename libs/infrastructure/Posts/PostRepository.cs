@@ -175,6 +175,13 @@ public class PostRepository(StudyHubDbContext dbContext) : IPostRepository
         .FirstOrDefaultAsync(post => post.Id == postId, cancellationToken);
   }
 
+  public Task<Post?> GetPostForVotingAsync(Guid postId, Guid userId, CancellationToken cancellationToken)
+  {
+    return dbContext.Posts
+        .Include(post => post.Votes.Where(vote => vote.UserId == userId))
+        .FirstOrDefaultAsync(post => post.Id == postId, cancellationToken);
+  }
+
   public void AddPost(Post post)
   {
     dbContext.Posts.Add(post);
@@ -185,9 +192,19 @@ public class PostRepository(StudyHubDbContext dbContext) : IPostRepository
     dbContext.Tags.AddRange(tags);
   }
 
+  public void AddPostVote(PostVote postVote)
+  {
+    dbContext.PostVotes.Add(postVote);
+  }
+
   public void RemovePostTags(IEnumerable<PostTag> postTags)
   {
     dbContext.PostTags.RemoveRange(postTags);
+  }
+
+  public void RemovePostVote(PostVote postVote)
+  {
+    dbContext.PostVotes.Remove(postVote);
   }
 
   public Task SaveChangesAsync(CancellationToken cancellationToken)
