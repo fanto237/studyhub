@@ -5,6 +5,7 @@ using Application.Posts.DeletePost;
 using Application.Posts.GetPost;
 using Application.Posts.GetPosts;
 using Application.Posts.UpdatePost;
+using Application.Posts.VotePost;
 using Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Wolverine;
@@ -36,6 +37,11 @@ public static class PostEndpoints
     group.MapDelete("/{postId:guid}", DeletePost)
         .WithName("DeletePost")
         .WithDescription("Soft-deletes a StudyHub post.")
+        .RequireAuthorization();
+
+    group.MapPost("/{postId:guid}/vote", VotePost)
+        .WithName("VotePost")
+        .WithDescription("Upvotes, downvotes, or removes the authenticated user's vote on a StudyHub post.")
         .RequireAuthorization();
 
     group.MapPost(string.Empty, CreatePost)
@@ -166,6 +172,37 @@ public static class PostEndpoints
       DeletePostOutcome.Success => Results.NoContent(),
       DeletePostOutcome.NotFound => Results.NotFound(new { message = result.Message }),
       DeletePostOutcome.Forbidden => Results.Forbid(),
+      _ => Results.BadRequest(new { message = result.Message }),
+    };
+  }
+
+  private static async Task<IResult> VotePost(
+      Guid postId,
+      VotePostRequest request,
+      ClaimsPrincipal user,
+      IMessageBus bus,
+      CancellationToken cancellationToken)
+  {
+    var userIdValue = user.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (!Guid.TryParse(userIdValue, out var userId))
+    {
+      return Results.Unauthorized();
+    }
+
+    var result = await bus.InvokeAsync<VotePostResult>(
+        new VotePostCommand(postId, userId, request.Vote),
+        cancellationToken);
+
+    return result.Outcome switch
+    {
+      VotePostOutcome.Success => Results.Ok(new VotePostResponse(
+          result.PostId!.Value,
+          result.Upvotes,
+          result.Downvotes,
+          result.Score,
+          result.CurrentVote,
+          result.Message)),
+      VotePostOutcome.NotFound => Results.NotFound(new { message = result.Message }),
       _ => Results.BadRequest(new { message = result.Message }),
     };
   }
