@@ -13,6 +13,7 @@ public class Post
     public int ReportCount { get; set; }
     public DateTimeOffset? DeletedAt { get; set; }
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+    public DateTimeOffset? UpdatedAt { get; set; }
 
     public User User { get; set; } = null!;
     public ICollection<Comment> Comments { get; set; } = new List<Comment>();
