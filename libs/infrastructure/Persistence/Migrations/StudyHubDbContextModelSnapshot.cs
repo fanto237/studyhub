@@ -128,6 +128,31 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("PostTags");
                 });
 
+            modelBuilder.Entity("Domain.Entities.PostReport", b =>
+                {
+                    b.Property<Guid>("PostId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Details")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<int>("Reason")
+                        .HasColumnType("integer");
+
+                    b.HasKey("PostId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PostReports");
+                });
+
             modelBuilder.Entity("Domain.Entities.PostVote", b =>
                 {
                     b.Property<Guid>("PostId")
@@ -363,6 +388,25 @@ namespace Infrastructure.Persistence.Migrations
                     b.Navigation("Tag");
                 });
 
+            modelBuilder.Entity("Domain.Entities.PostReport", b =>
+                {
+                    b.HasOne("Domain.Entities.Post", "Post")
+                        .WithMany("Reports")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "User")
+                        .WithMany("PostReports")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Post");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Domain.Entities.PostVote", b =>
                 {
                     b.HasOne("Domain.Entities.Post", "Post")
@@ -415,6 +459,8 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.Navigation("PostTags");
 
+                    b.Navigation("Reports");
+
                     b.Navigation("Votes");
                 });
 
@@ -428,6 +474,8 @@ namespace Infrastructure.Persistence.Migrations
                     b.Navigation("AuthCodes");
 
                     b.Navigation("Comments");
+
+                    b.Navigation("PostReports");
 
                     b.Navigation("PostVotes");
 
