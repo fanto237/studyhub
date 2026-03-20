@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Api.DTOs.Posts;
 using Application.Posts.CreatePost;
+using Application.Posts.DeletePost;
 using Application.Posts.GetPost;
 using Application.Posts.GetPosts;
 using Application.Posts.UpdatePost;
@@ -30,6 +31,11 @@ public static class PostEndpoints
     group.MapPatch("/{postId:guid}", UpdatePost)
         .WithName("UpdatePost")
         .WithDescription("Edits a StudyHub post's metadata.")
+        .RequireAuthorization();
+
+    group.MapDelete("/{postId:guid}", DeletePost)
+        .WithName("DeletePost")
+        .WithDescription("Soft-deletes a StudyHub post.")
         .RequireAuthorization();
 
     group.MapPost(string.Empty, CreatePost)
@@ -129,6 +135,37 @@ public static class PostEndpoints
       UpdatePostOutcome.Success => Results.Ok(MapGetPostResponse(result.Item!)),
       UpdatePostOutcome.NotFound => Results.NotFound(new { message = result.Message }),
       UpdatePostOutcome.Forbidden => Results.Forbid(),
+      _ => Results.BadRequest(new { message = result.Message }),
+    };
+  }
+
+  private static async Task<IResult> DeletePost(
+      Guid postId,
+      ClaimsPrincipal user,
+      IMessageBus bus,
+      CancellationToken cancellationToken)
+  {
+    var userIdValue = user.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (!Guid.TryParse(userIdValue, out var userId))
+    {
+      return Results.Unauthorized();
+    }
+
+    var roleValue = user.FindFirstValue(ClaimTypes.Role);
+    if (!Enum.TryParse<UserRole>(roleValue, ignoreCase: true, out var role))
+    {
+      return Results.Forbid();
+    }
+
+    var result = await bus.InvokeAsync<DeletePostResult>(
+        new DeletePostCommand(postId, userId, role),
+        cancellationToken);
+
+    return result.Outcome switch
+    {
+      DeletePostOutcome.Success => Results.NoContent(),
+      DeletePostOutcome.NotFound => Results.NotFound(new { message = result.Message }),
+      DeletePostOutcome.Forbidden => Results.Forbid(),
       _ => Results.BadRequest(new { message = result.Message }),
     };
   }
