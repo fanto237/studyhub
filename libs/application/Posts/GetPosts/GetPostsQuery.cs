@@ -6,4 +6,5 @@ public record GetPostsQuery(
     int PageSize,
     string? Search,
     string? Tag,
-    Guid? CurrentUserId = null);
+    Guid? CurrentUserId = null,
+    Guid? AuthorUserId = null);

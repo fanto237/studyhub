@@ -24,6 +24,11 @@ public static class PostEndpoints
         .WithDescription("Returns the authenticated StudyHub post feed.")
         .RequireAuthorization();
 
+    group.MapGet("/me", GetMyPosts)
+        .WithName("GetMyPosts")
+        .WithDescription("Returns the authenticated user's visible StudyHub posts.")
+        .RequireAuthorization();
+
     group.MapGet("/{postId:guid}", GetPost)
         .WithName("GetPost")
         .WithDescription("Returns a single authenticated StudyHub post with its discussion thread.")
@@ -69,33 +74,26 @@ public static class PostEndpoints
         new GetPostsQuery(query.Sort, query.Page, query.PageSize, query.Search, query.Tag, userId),
         cancellationToken);
 
-    return result.Outcome switch
+    return MapGetPostsResult(result);
+  }
+
+  private static async Task<IResult> GetMyPosts(
+      [AsParameters] GetPostsQuery query,
+      ClaimsPrincipal user,
+      IMessageBus bus,
+      CancellationToken cancellationToken)
+  {
+    var userIdValue = user.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (!Guid.TryParse(userIdValue, out var userId))
     {
-      GetPostsOutcome.Success => Results.Ok(new GetPostsResponse(
-          (result.Items ?? [])
-              .Select(item => new PostFeedItemResponse(
-                  item.Id,
-                  item.Title,
-                  item.Description,
-                  item.StorageUrl,
-                  item.Upvotes,
-                  item.Downvotes,
-                  item.Score,
-                  item.CreatedAt,
-                  item.CommentCount,
-                  item.Tags,
-                  new PostFeedUserResponse(
-                      item.User.Id,
-                      item.User.Username,
-                      item.User.FullName),
-                  MapVote(item.CurrentVote)))
-              .ToArray(),
-          result.Page,
-          result.PageSize,
-          result.TotalCount,
-          result.TotalPages)),
-      _ => Results.BadRequest(new { message = result.Message }),
-    };
+      return Results.Unauthorized();
+    }
+
+    var result = await bus.InvokeAsync<GetPostsResult>(
+        new GetPostsQuery(query.Sort, query.Page, query.PageSize, query.Search, query.Tag, userId, userId),
+        cancellationToken);
+
+    return MapGetPostsResult(result);
   }
 
   private static async Task<IResult> GetPost(
@@ -279,6 +277,37 @@ public static class PostEndpoints
           result.Message)),
       CreatePostOutcome.PayloadTooLarge => Results.Json(new { message = result.Message }, statusCode: StatusCodes.Status413PayloadTooLarge),
       CreatePostOutcome.InvalidFile => Results.BadRequest(new { message = result.Message }),
+      _ => Results.BadRequest(new { message = result.Message }),
+    };
+  }
+
+  private static IResult MapGetPostsResult(GetPostsResult result)
+  {
+    return result.Outcome switch
+    {
+      GetPostsOutcome.Success => Results.Ok(new GetPostsResponse(
+          (result.Items ?? [])
+              .Select(item => new PostFeedItemResponse(
+                  item.Id,
+                  item.Title,
+                  item.Description,
+                  item.StorageUrl,
+                  item.Upvotes,
+                  item.Downvotes,
+                  item.Score,
+                  item.CreatedAt,
+                  item.CommentCount,
+                  item.Tags,
+                  new PostFeedUserResponse(
+                      item.User.Id,
+                      item.User.Username,
+                      item.User.FullName),
+                  MapVote(item.CurrentVote)))
+              .ToArray(),
+          result.Page,
+          result.PageSize,
+          result.TotalCount,
+          result.TotalPages)),
       _ => Results.BadRequest(new { message = result.Message }),
     };
   }

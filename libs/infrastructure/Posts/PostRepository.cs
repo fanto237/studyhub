@@ -29,6 +29,11 @@ public class PostRepository(StudyHubDbContext dbContext) : IPostRepository
         .Where(post => post.DeletedAt == null)
         .Where(post => !post.IsHidden);
 
+    if (query.AuthorUserId.HasValue)
+    {
+      postsQuery = postsQuery.Where(post => post.UserId == query.AuthorUserId.Value);
+    }
+
     if (!string.IsNullOrWhiteSpace(query.Tag))
     {
       postsQuery = postsQuery.Where(post => post.PostTags.Any(postTag => postTag.Tag.Name == query.Tag));
