@@ -169,6 +169,12 @@ public class PostRepository(StudyHubDbContext dbContext) : IPostRepository
         .FirstOrDefaultAsync(post => post.Id == postId, cancellationToken);
   }
 
+  public Task<Post?> GetPostForDeleteAsync(Guid postId, CancellationToken cancellationToken)
+  {
+    return dbContext.Posts
+        .FirstOrDefaultAsync(post => post.Id == postId, cancellationToken);
+  }
+
   public void AddPost(Post post)
   {
     dbContext.Posts.Add(post);

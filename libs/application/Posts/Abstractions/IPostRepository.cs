@@ -10,6 +10,7 @@ public interface IPostRepository
     Task<GetPostsResult> GetPostsAsync(GetPostsQuery query, CancellationToken cancellationToken);
     Task<GetPostResult> GetPostAsync(GetPostQuery query, CancellationToken cancellationToken);
     Task<Post?> GetPostForUpdateAsync(Guid postId, CancellationToken cancellationToken);
+    Task<Post?> GetPostForDeleteAsync(Guid postId, CancellationToken cancellationToken);
     void AddPost(Post post);
     void AddTags(IEnumerable<Tag> tags);
     void RemovePostTags(IEnumerable<PostTag> postTags);
