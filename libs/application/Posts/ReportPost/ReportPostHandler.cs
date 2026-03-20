@@ -3,7 +3,6 @@ using Application.Posts.Abstractions;
 using Domain.Entities;
 using Domain.Enums;
 using FluentValidation;
-using Microsoft.Extensions.Options;
 
 namespace Application.Posts.ReportPost;
 

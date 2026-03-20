@@ -201,6 +201,13 @@ public class PostRepository(StudyHubDbContext dbContext) : IPostRepository
         .FirstOrDefaultAsync(post => post.Id == postId, cancellationToken);
   }
 
+  public Task<Post?> GetPostForReportingAsync(Guid postId, Guid userId, CancellationToken cancellationToken)
+  {
+    return dbContext.Posts
+        .Include(post => post.Reports.Where(report => report.UserId == userId))
+        .FirstOrDefaultAsync(post => post.Id == postId, cancellationToken);
+  }
+
   public void AddPost(Post post)
   {
     dbContext.Posts.Add(post);
@@ -214,6 +221,11 @@ public class PostRepository(StudyHubDbContext dbContext) : IPostRepository
   public void AddPostVote(PostVote postVote)
   {
     dbContext.PostVotes.Add(postVote);
+  }
+
+  public void AddPostReport(PostReport postReport)
+  {
+    dbContext.PostReports.Add(postReport);
   }
 
   public void RemovePostTags(IEnumerable<PostTag> postTags)
