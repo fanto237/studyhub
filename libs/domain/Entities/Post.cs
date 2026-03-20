@@ -19,4 +19,5 @@ public class Post
   public ICollection<Comment> Comments { get; set; } = [];
   public ICollection<PostTag> PostTags { get; set; } = [];
   public ICollection<PostVote> Votes { get; set; } = [];
+  public ICollection<PostReport> Reports { get; set; } = [];
 }
