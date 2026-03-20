@@ -12,6 +12,7 @@ public class StudyHubDbContext(DbContextOptions<StudyHubDbContext> options) : Db
     public DbSet<Comment> Comments => Set<Comment>();
     public DbSet<Tag> Tags => Set<Tag>();
     public DbSet<PostTag> PostTags => Set<PostTag>();
+    public DbSet<PostVote> PostVotes => Set<PostVote>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
