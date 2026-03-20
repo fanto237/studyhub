@@ -13,7 +13,8 @@ public record GetPostResponse(
     int CommentCount,
     IReadOnlyList<string> Tags,
     GetPostUserResponse User,
-    IReadOnlyList<GetPostCommentResponse> Comments);
+    IReadOnlyList<GetPostCommentResponse> Comments,
+    string? CurrentVote);
 
 public record GetPostUserResponse(
     Guid Id,

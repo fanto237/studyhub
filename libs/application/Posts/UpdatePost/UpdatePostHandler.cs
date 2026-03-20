@@ -95,7 +95,7 @@ public class UpdatePostHandler
 
         await postRepository.SaveChangesAsync(cancellationToken);
 
-        var getPostResult = await postRepository.GetPostAsync(new GetPostQuery(post.Id), cancellationToken);
+        var getPostResult = await postRepository.GetPostAsync(new GetPostQuery(post.Id, command.ActorUserId), cancellationToken);
         if (getPostResult.Outcome != GetPostOutcome.Success || getPostResult.Item is null)
         {
             return new UpdatePostResult(

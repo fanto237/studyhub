@@ -2,6 +2,7 @@ using Application.Posts.Abstractions;
 using Application.Posts.GetPost;
 using Application.Posts.GetPosts;
 using Domain.Entities;
+using Domain.Enums;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -78,7 +79,13 @@ public class PostRepository(StudyHubDbContext dbContext) : IPostRepository
             new PostFeedUser(
                 post.UserId,
                 post.User.Username,
-                post.User.FullName)))
+                post.User.FullName),
+            query.CurrentUserId.HasValue
+                ? post.Votes
+                    .Where(vote => vote.UserId == query.CurrentUserId.Value)
+                    .Select(vote => (PostVoteValue?)vote.Value)
+                    .FirstOrDefault()
+                : null))
         .ToListAsync(cancellationToken);
 
     return new GetPostsResult(
@@ -113,6 +120,12 @@ public class PostRepository(StudyHubDbContext dbContext) : IPostRepository
               .OrderBy(postTag => postTag.Tag.Name)
               .Select(postTag => postTag.Tag.Name)
               .ToArray(),
+          CurrentVote = query.CurrentUserId.HasValue
+              ? candidate.Votes
+                  .Where(vote => vote.UserId == query.CurrentUserId.Value)
+                  .Select(vote => (PostVoteValue?)vote.Value)
+                  .FirstOrDefault()
+              : null,
           User = new PostDetailUser(
               candidate.UserId,
               candidate.User.Username,
@@ -159,7 +172,8 @@ public class PostRepository(StudyHubDbContext dbContext) : IPostRepository
             comments.Count,
             post.Tags,
             post.User,
-            comments));
+            comments,
+            post.CurrentVote));
   }
 
   public Task<Post?> GetPostForUpdateAsync(Guid postId, CancellationToken cancellationToken)

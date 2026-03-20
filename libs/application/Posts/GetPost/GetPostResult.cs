@@ -1,3 +1,6 @@
+using Domain.Entities;
+using Domain.Enums;
+
 namespace Application.Posts.GetPost;
 
 public record GetPostResult(
@@ -18,7 +21,8 @@ public record PostDetail(
     int CommentCount,
     IReadOnlyList<string> Tags,
     PostDetailUser User,
-    IReadOnlyList<PostDetailComment> Comments);
+    IReadOnlyList<PostDetailComment> Comments,
+    PostVoteValue? CurrentVote);
 
 public record PostDetailUser(
     Guid Id,

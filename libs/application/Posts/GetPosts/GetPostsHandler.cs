@@ -16,7 +16,8 @@ public class GetPostsHandler
         query.Page <= 0 ? GetPostsQueryValidator.DefaultPage : query.Page,
         query.PageSize <= 0 ? GetPostsQueryValidator.DefaultPageSize : query.PageSize,
         NormalizeSearch(query.Search),
-        NormalizeTag(query.Tag));
+        NormalizeTag(query.Tag),
+        query.CurrentUserId);
 
     var validationResult = await validator.ValidateAsync(normalizedQuery, cancellationToken);
     if (!validationResult.IsValid)

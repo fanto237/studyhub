@@ -1,3 +1,5 @@
+using Domain.Enums;
+
 namespace Application.Posts.GetPosts;
 
 public record GetPostsResult(
@@ -20,7 +22,8 @@ public record PostFeedItem(
     DateTimeOffset CreatedAt,
     int CommentCount,
     IReadOnlyList<string> Tags,
-    PostFeedUser User);
+    PostFeedUser User,
+    PostVoteValue? CurrentVote);
 
 public record PostFeedUser(
     Guid Id,

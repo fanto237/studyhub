@@ -1,3 +1,3 @@
 namespace Application.Posts.GetPost;
 
-public record GetPostQuery(Guid PostId);
+public record GetPostQuery(Guid PostId, Guid? CurrentUserId = null);

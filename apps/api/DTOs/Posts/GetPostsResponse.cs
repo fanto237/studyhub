@@ -18,7 +18,8 @@ public record PostFeedItemResponse(
     DateTimeOffset CreatedAt,
     int CommentCount,
     IReadOnlyList<string> Tags,
-    PostFeedUserResponse User);
+    PostFeedUserResponse User,
+    string? CurrentVote);
 
 public record PostFeedUserResponse(
     Guid Id,

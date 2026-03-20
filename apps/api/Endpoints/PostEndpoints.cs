@@ -55,11 +55,18 @@ public static class PostEndpoints
 
   private static async Task<IResult> GetPosts(
       [AsParameters] GetPostsQuery query,
+      ClaimsPrincipal user,
       IMessageBus bus,
       CancellationToken cancellationToken)
   {
+    var userIdValue = user.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (!Guid.TryParse(userIdValue, out var userId))
+    {
+      return Results.Unauthorized();
+    }
+
     var result = await bus.InvokeAsync<GetPostsResult>(
-        query,
+        new GetPostsQuery(query.Sort, query.Page, query.PageSize, query.Search, query.Tag, userId),
         cancellationToken);
 
     return result.Outcome switch
@@ -80,7 +87,8 @@ public static class PostEndpoints
                   new PostFeedUserResponse(
                       item.User.Id,
                       item.User.Username,
-                      item.User.FullName)))
+                      item.User.FullName),
+                  MapVote(item.CurrentVote)))
               .ToArray(),
           result.Page,
           result.PageSize,
@@ -92,11 +100,18 @@ public static class PostEndpoints
 
   private static async Task<IResult> GetPost(
       Guid postId,
+      ClaimsPrincipal user,
       IMessageBus bus,
       CancellationToken cancellationToken)
   {
+    var userIdValue = user.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (!Guid.TryParse(userIdValue, out var userId))
+    {
+      return Results.Unauthorized();
+    }
+
     var result = await bus.InvokeAsync<GetPostResult>(
-        new GetPostQuery(postId),
+        new GetPostQuery(postId, userId),
         cancellationToken);
 
     return result.Outcome switch
@@ -296,6 +311,17 @@ public static class PostEndpoints
                     comment.User.Id,
                     comment.User.Username,
                     comment.User.FullName)))
-            .ToArray());
+            .ToArray(),
+        MapVote(item.CurrentVote));
+  }
+
+  private static string? MapVote(PostVoteValue? vote)
+  {
+    return vote switch
+    {
+      PostVoteValue.Upvote => "up",
+      PostVoteValue.Downvote => "down",
+      _ => null,
+    };
   }
 }
