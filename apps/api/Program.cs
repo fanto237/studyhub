@@ -10,19 +10,6 @@ using Wolverine;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// if (builder.Environment.IsDevelopment())
-// {
-//     var applicationSettingsPath = Path.GetFullPath(
-//         Path.Combine(builder.Environment.ContentRootPath, "../../libs/application/appsettings.Development.json"));
-//     var infrastructureSettingsPath = Path.GetFullPath(
-//         Path.Combine(builder.Environment.ContentRootPath, "../../libs/infrastructure/appsettings.Development.json"));
-
-//     builder.Configuration.AddJsonFile(applicationSettingsPath, optional: true, reloadOnChange: true);
-//     builder.Configuration.AddJsonFile(infrastructureSettingsPath, optional: true, reloadOnChange: true);
-//     builder.Configuration.AddUserSecrets<ApplicationAssemblyMarker>(optional: true);
-//     builder.Configuration.AddUserSecrets<StudyHubDbContext>(optional: true);
-// }
-
 builder.Host.UseWolverine(options =>
 {
   options.Discovery.IncludeAssembly(typeof(CreatePostHandler).Assembly);
