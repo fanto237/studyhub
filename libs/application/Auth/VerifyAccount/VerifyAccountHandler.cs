@@ -1,6 +1,8 @@
+using Application.Abstractions.Email;
 using Application.Auth.Abstractions;
 using Domain.Enums;
 using FluentValidation;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Auth.VerifyAccount;
 
@@ -10,7 +12,9 @@ public class VerifyAccountHandler
       VerifyAccountCommand command,
       IValidator<VerifyAccountCommand> validator,
       IAuthRepository authRepository,
+      IAuthEmailService authEmailService,
       TimeProvider timeProvider,
+      ILogger<VerifyAccountHandler> logger,
       CancellationToken cancellationToken)
   {
     var validationResult = await validator.ValidateAsync(command, cancellationToken);
@@ -74,6 +78,23 @@ public class VerifyAccountHandler
     }
 
     await authRepository.SaveChangesAsync(cancellationToken);
+
+    try
+    {
+      await authEmailService.SendWelcomeEmailAsync(
+          user.FullName,
+          user.PrivateEmail,
+          user.SchoolEmail,
+          cancellationToken);
+    }
+    catch (Exception exception)
+    {
+      logger.LogWarning(
+          exception,
+          "User {UserId} was verified successfully, but the welcome email could not be sent to {PrivateEmail}",
+          user.Id,
+          user.PrivateEmail);
+    }
 
     return new VerifyAccountResult(
         VerifyAccountOutcome.Success,

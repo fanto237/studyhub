@@ -8,4 +8,10 @@ public interface IAuthEmailService
         string code,
         DateTimeOffset expiresAt,
         CancellationToken cancellationToken = default);
+
+    Task SendWelcomeEmailAsync(
+        string fullName,
+        string privateEmail,
+        string schoolEmail,
+        CancellationToken cancellationToken = default);
 }
