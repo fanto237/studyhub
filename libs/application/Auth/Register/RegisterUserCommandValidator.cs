@@ -28,6 +28,11 @@ public class RegisterUserCommandValidator : AbstractValidator<RegisterUserComman
             .MinimumLength(2)
             .MaximumLength(120);
 
+        RuleFor(command => command.UniversityName)
+            .NotEmpty()
+            .MinimumLength(2)
+            .MaximumLength(200);
+
         RuleFor(command => command.Password)
             .NotEmpty()
             .MinimumLength(8)

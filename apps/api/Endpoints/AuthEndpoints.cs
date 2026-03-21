@@ -59,6 +59,7 @@ public static class AuthEndpoints
           result.Username!,
           result.FullName!,
           result.SchoolEmail!,
+          result.UniversityName!,
           result.IsVerified,
           result.Message)),
       RegisterUserOutcome.PrivateEmailAlreadyRegistered => Results.Conflict(new { message = result.Message }),

@@ -8,4 +8,5 @@ public record RegisterUserResult(
     string? Username = null,
     string? FullName = null,
     string? SchoolEmail = null,
+    string? UniversityName = null,
     bool IsVerified = false);

@@ -10,5 +10,7 @@ internal static class AuthValueNormalizer
 
   public static string NormalizeFullName(string value) => value.Trim();
 
+  public static string NormalizeUniversityName(string value) => value.Trim();
+
   public static string NormalizeCode(string value) => value.Trim();
 }

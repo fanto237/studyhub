@@ -6,5 +6,6 @@ public record RegisterAccountResponse(
     string Username,
     string FullName,
     string SchoolEmail,
+    string UniversityName,
     bool IsVerified,
     string Message);

@@ -34,6 +34,7 @@ public class RegisterUserHandler
     var schoolEmail = AuthValueNormalizer.NormalizeEmail(command.SchoolEmail);
     var username = AuthValueNormalizer.NormalizeUsername(command.Username);
     var fullName = AuthValueNormalizer.NormalizeFullName(command.FullName);
+    var universityName = AuthValueNormalizer.NormalizeUniversityName(command.UniversityName);
 
     if (await authRepository.PrivateEmailExistsAsync(privateEmail, cancellationToken))
     {
@@ -66,6 +67,7 @@ public class RegisterUserHandler
       Username = username,
       FullName = fullName,
       SchoolEmail = schoolEmail,
+      UniversityName = universityName,
       IsVerified = false,
       LastVerifiedAt = null,
       KarmaScore = 0,
@@ -116,6 +118,7 @@ public class RegisterUserHandler
         user.Username,
         user.FullName,
         user.SchoolEmail,
+        user.UniversityName,
         user.IsVerified);
   }
 
