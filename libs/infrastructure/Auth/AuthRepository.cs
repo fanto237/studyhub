@@ -1,4 +1,5 @@
 using Application.Auth.Abstractions;
+using Application.Users.GetCurrentUser;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +28,60 @@ public class AuthRepository(StudyHubDbContext dbContext) : IAuthRepository
         return dbContext.Users.SingleOrDefaultAsync(
             user => user.Username == usernameOrPrivateEmail || user.PrivateEmail == usernameOrPrivateEmail,
             cancellationToken);
+    }
+
+    public async Task<GetCurrentUserResult> GetCurrentUserAsync(
+        GetCurrentUserQuery query,
+        int latestPostsLimit,
+        CancellationToken cancellationToken)
+    {
+        var user = await dbContext.Users
+            .AsNoTracking()
+            .Where(candidate => candidate.Id == query.UserId)
+            .Select(candidate => new CurrentUserProfile(
+                candidate.Id,
+                candidate.Username,
+                candidate.FullName,
+                candidate.PrivateEmail,
+                candidate.SchoolEmail,
+                candidate.UniversityName,
+                candidate.Role,
+                candidate.IsVerified,
+                candidate.LastVerifiedAt,
+                candidate.KarmaScore,
+                candidate.CreatedAt,
+                candidate.Posts
+                    .Where(post => post.DeletedAt == null && !post.IsHidden)
+                    .OrderByDescending(post => post.CreatedAt)
+                    .Take(latestPostsLimit)
+                    .Select(post => new CurrentUserLatestPost(
+                        post.Id,
+                        post.Title,
+                        post.Description,
+                        post.StorageUrl,
+                        post.Upvotes,
+                        post.Downvotes,
+                        post.Upvotes - post.Downvotes,
+                        post.CreatedAt,
+                        post.Comments.Count,
+                        post.PostTags
+                            .OrderBy(postTag => postTag.Tag.Name)
+                            .Select(postTag => postTag.Tag.Name)
+                            .ToArray()))
+                    .ToArray()))
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (user is null)
+        {
+            return new GetCurrentUserResult(
+                GetCurrentUserOutcome.NotFound,
+                "The requested user was not found.");
+        }
+
+        return new GetCurrentUserResult(
+            GetCurrentUserOutcome.Success,
+            "Current user retrieved successfully.",
+            user);
     }
 
     public void AddUser(User user)

@@ -1,3 +1,4 @@
+using Application.Users.GetCurrentUser;
 using Domain.Entities;
 
 namespace Application.Auth.Abstractions;
@@ -8,6 +9,7 @@ public interface IAuthRepository
     Task<bool> UsernameExistsAsync(string username, CancellationToken cancellationToken);
     Task<bool> SchoolEmailExistsAsync(string schoolEmail, CancellationToken cancellationToken);
     Task<User?> GetUserByUsernameOrPrivateEmailAsync(string usernameOrPrivateEmail, CancellationToken cancellationToken);
+    Task<GetCurrentUserResult> GetCurrentUserAsync(GetCurrentUserQuery query, int latestPostsLimit, CancellationToken cancellationToken);
     Task<User?> GetUserWithAuthCodesBySchoolEmailAsync(string schoolEmail, CancellationToken cancellationToken);
     Task<UserRefreshToken?> GetRefreshTokenWithUserByHashAsync(string tokenHash, CancellationToken cancellationToken);
     void AddUser(User user);
