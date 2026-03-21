@@ -1,6 +1,8 @@
 using System.Security.Claims;
 using Api.DTOs.Posts;
+using Api.DTOs.Users;
 using Application.Posts.GetPosts;
+using Application.Users.GetCurrentUser;
 using Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Wolverine;
@@ -14,12 +16,40 @@ public static class UserEndpoints
     var group = app.MapGroup("/api/users")
         .WithTags("Users");
 
+    group.MapGet("/me", GetCurrentUser)
+        .WithName("GetCurrentUser")
+        .WithDescription("Returns the authenticated StudyHub user's account profile.")
+        .RequireAuthorization();
+
     group.MapGet("/{userId:guid}/posts", GetUserPosts)
         .WithName("GetUserPosts")
         .WithDescription("Returns the visible StudyHub posts authored by the specified user.")
         .RequireAuthorization();
 
     return app;
+  }
+
+  private static async Task<IResult> GetCurrentUser(
+      ClaimsPrincipal user,
+      IMessageBus bus,
+      CancellationToken cancellationToken)
+  {
+    var userIdValue = user.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (!Guid.TryParse(userIdValue, out var userId))
+    {
+      return Results.Unauthorized();
+    }
+
+    var result = await bus.InvokeAsync<GetCurrentUserResult>(
+        new GetCurrentUserQuery(userId),
+        cancellationToken);
+
+    return result.Outcome switch
+    {
+      GetCurrentUserOutcome.Success => Results.Ok(MapGetCurrentUserResponse(result.Item!)),
+      GetCurrentUserOutcome.NotFound => Results.NotFound(new { message = result.Message }),
+      _ => Results.BadRequest(new { message = result.Message }),
+    };
   }
 
   private static async Task<IResult> GetUserPosts(
@@ -66,6 +96,35 @@ public static class UserEndpoints
           result.TotalPages)),
       _ => Results.BadRequest(new { message = result.Message }),
     };
+  }
+
+  private static GetCurrentUserResponse MapGetCurrentUserResponse(CurrentUserProfile item)
+  {
+    return new GetCurrentUserResponse(
+        item.Id,
+        item.Username,
+        item.FullName,
+        item.PrivateEmail,
+        item.SchoolEmail,
+        item.UniversityName,
+        item.Role,
+        item.IsVerified,
+        item.LastVerifiedAt,
+        item.KarmaScore,
+        item.CreatedAt,
+        item.LatestPosts
+            .Select(post => new CurrentUserLatestPostResponse(
+                post.Id,
+                post.Title,
+                post.Description,
+                post.StorageUrl,
+                post.Upvotes,
+                post.Downvotes,
+                post.Score,
+                post.CreatedAt,
+                post.CommentCount,
+                post.Tags))
+            .ToArray());
   }
 
   private static string? MapVote(PostVoteValue? vote)
