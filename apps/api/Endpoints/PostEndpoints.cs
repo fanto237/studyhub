@@ -18,47 +18,40 @@ public static class PostEndpoints
   public static WebApplication MapPostEndpoints(this WebApplication app)
   {
     var group = app.MapGroup("/api/posts")
-        .WithTags("Posts");
+        .WithTags("Posts")
+        .RequireAuthorization();
 
     group.MapGet(string.Empty, GetPosts)
         .WithName("GetPosts")
-        .WithDescription("Returns the authenticated StudyHub post feed.")
-        .RequireAuthorization();
+        .WithDescription("Returns the authenticated StudyHub post feed.");
 
     group.MapGet("/me", GetMyPosts)
         .WithName("GetMyPosts")
-        .WithDescription("Returns the authenticated user's visible StudyHub posts.")
-        .RequireAuthorization();
+        .WithDescription("Returns the authenticated user's visible StudyHub posts.");
 
     group.MapGet("/{postId:guid}", GetPost)
         .WithName("GetPost")
-        .WithDescription("Returns a single authenticated StudyHub post with its discussion thread.")
-        .RequireAuthorization();
+        .WithDescription("Returns a single authenticated StudyHub post with its discussion thread.");
 
     group.MapPatch("/{postId:guid}", UpdatePost)
         .WithName("UpdatePost")
-        .WithDescription("Edits a StudyHub post's metadata.")
-        .RequireAuthorization();
+        .WithDescription("Edits a StudyHub post's metadata.");
 
     group.MapDelete("/{postId:guid}", DeletePost)
         .WithName("DeletePost")
-        .WithDescription("Soft-deletes a StudyHub post.")
-        .RequireAuthorization();
+        .WithDescription("Soft-deletes a StudyHub post.");
 
     group.MapPost("/{postId:guid}/vote", VotePost)
         .WithName("VotePost")
-        .WithDescription("Upvotes, downvotes, or removes the authenticated user's vote on a StudyHub post.")
-        .RequireAuthorization();
+        .WithDescription("Upvotes, downvotes, or removes the authenticated user's vote on a StudyHub post.");
 
     group.MapPost("/{postId:guid}/report", ReportPost)
         .WithName("ReportPost")
-        .WithDescription("Reports a StudyHub post for moderation review or automatic hiding.")
-        .RequireAuthorization();
+        .WithDescription("Reports a StudyHub post for moderation review or automatic hiding.");
 
     group.MapPost(string.Empty, CreatePost)
         .WithName("CreatePost")
         .WithDescription("Uploads a PDF to Cloudflare R2 and creates a StudyHub post.")
-        .RequireAuthorization()
         .DisableAntiforgery();
 
     return app;

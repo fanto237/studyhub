@@ -32,11 +32,13 @@ public static class AuthEndpoints
 
     group.MapPost("/refresh", RefreshSession)
         .WithName("RefreshSession")
-        .WithDescription("Rotates the refresh token and issues a new access token.");
+        .WithDescription("Rotates the refresh token and issues a new access token.")
+        .RequireAuthorization();
 
     group.MapPost("/logout", Logout)
         .WithName("Logout")
-        .WithDescription("Revokes the current refresh token session and clears auth cookies.");
+        .WithDescription("Revokes the current refresh token session and clears auth cookies.")
+        .RequireAuthorization();
 
     group.MapPost("/send-code", SendAuthCode)
         .WithName("SendCode")

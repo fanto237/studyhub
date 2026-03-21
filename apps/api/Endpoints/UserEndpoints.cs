@@ -3,6 +3,7 @@ using Api.DTOs.Posts;
 using Api.DTOs.Users;
 using Application.Posts.GetPosts;
 using Application.Users.GetCurrentUser;
+using Application.Users.GetPublicUserProfile;
 using Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Wolverine;
@@ -14,17 +15,20 @@ public static class UserEndpoints
   public static WebApplication MapUserEndpoints(this WebApplication app)
   {
     var group = app.MapGroup("/api/users")
-        .WithTags("Users");
+        .WithTags("Users")
+        .RequireAuthorization();
 
     group.MapGet("/me", GetCurrentUser)
         .WithName("GetCurrentUser")
-        .WithDescription("Returns the authenticated StudyHub user's account profile.")
-        .RequireAuthorization();
+        .WithDescription("Returns the authenticated StudyHub user's account profile.");
+
+    group.MapGet("/{userId:guid}", GetPublicUserProfile)
+        .WithName("GetPublicUserProfile")
+        .WithDescription("Returns the public StudyHub profile for the specified user.");
 
     group.MapGet("/{userId:guid}/posts", GetUserPosts)
         .WithName("GetUserPosts")
-        .WithDescription("Returns the visible StudyHub posts authored by the specified user.")
-        .RequireAuthorization();
+        .WithDescription("Returns the visible StudyHub posts authored by the specified user.");
 
     return app;
   }
@@ -48,6 +52,23 @@ public static class UserEndpoints
     {
       GetCurrentUserOutcome.Success => Results.Ok(MapGetCurrentUserResponse(result.Item!)),
       GetCurrentUserOutcome.NotFound => Results.NotFound(new { message = result.Message }),
+      _ => Results.BadRequest(new { message = result.Message }),
+    };
+  }
+
+  private static async Task<IResult> GetPublicUserProfile(
+      Guid userId,
+      IMessageBus bus,
+      CancellationToken cancellationToken)
+  {
+    var result = await bus.InvokeAsync<GetPublicUserProfileResult>(
+        new GetPublicUserProfileQuery(userId),
+        cancellationToken);
+
+    return result.Outcome switch
+    {
+      GetPublicUserProfileOutcome.Success => Results.Ok(MapGetPublicUserProfileResponse(result.Item!)),
+      GetPublicUserProfileOutcome.NotFound => Results.NotFound(new { message = result.Message }),
       _ => Results.BadRequest(new { message = result.Message }),
     };
   }
@@ -114,6 +135,32 @@ public static class UserEndpoints
         item.CreatedAt,
         item.LatestPosts
             .Select(post => new CurrentUserLatestPostResponse(
+                post.Id,
+                post.Title,
+                post.Description,
+                post.StorageUrl,
+                post.Upvotes,
+                post.Downvotes,
+                post.Score,
+                post.CreatedAt,
+                post.CommentCount,
+                post.Tags))
+            .ToArray());
+  }
+
+  private static GetPublicUserProfileResponse MapGetPublicUserProfileResponse(PublicUserProfile item)
+  {
+    return new GetPublicUserProfileResponse(
+        item.Id,
+        item.Username,
+        item.UniversityName,
+        item.IsVerified,
+        item.KarmaScore,
+        item.CreatedAt,
+        item.TotalUploads,
+        item.TotalUpvotesReceived,
+        item.LatestPosts
+            .Select(post => new PublicUserLatestPostResponse(
                 post.Id,
                 post.Title,
                 post.Description,
