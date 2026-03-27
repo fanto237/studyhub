@@ -41,7 +41,7 @@ public class RefreshSessionHandler
         }
 
         var user = storedRefreshToken.User;
-        if (!user.IsVerified)
+        if (user.DeletedAt is not null || !user.IsVerified)
         {
             return new RefreshSessionResult(
                 RefreshSessionOutcome.InvalidRefreshToken,

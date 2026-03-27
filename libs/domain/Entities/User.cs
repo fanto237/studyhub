@@ -4,6 +4,9 @@ namespace Domain.Entities;
 
 public class User
 {
+  public const string DeletedUsername = "deleted-user";
+  public const string DeletedFullName = "Deleted User";
+
   public Guid Id { get; set; }
   public string PrivateEmail { get; set; } = string.Empty;
   public string Username { get; set; } = string.Empty;
@@ -16,6 +19,7 @@ public class User
   public DateTimeOffset? LastVerifiedAt { get; set; }
   public int KarmaScore { get; set; }
   public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+  public DateTimeOffset? DeletedAt { get; set; }
 
   public ICollection<Post> Posts { get; set; } = [];
   public ICollection<Comment> Comments { get; set; } = [];

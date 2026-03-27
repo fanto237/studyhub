@@ -26,7 +26,7 @@ public class LoginHandler
 
     var usernameOrPrivateEmail = AuthValueNormalizer.NormalizeUsernameOrPrivateEmail(command.UsernameOrPrivateEmail);
     var user = await authRepository.GetUserByUsernameOrPrivateEmailAsync(usernameOrPrivateEmail, cancellationToken);
-    if (user is null)
+    if (user is null || user.DeletedAt is not null)
     {
       return new LoginResult(
           LoginOutcome.InvalidCredentials,
