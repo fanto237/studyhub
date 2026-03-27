@@ -40,6 +40,8 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(user => user.CreatedAt)
             .IsRequired();
 
+        builder.Property(user => user.DeletedAt);
+
         builder.HasIndex(user => user.PrivateEmail)
             .IsUnique();
 
