@@ -83,8 +83,8 @@ public class PostRepository(StudyHubDbContext dbContext) : IPostRepository
                 .ToArray(),
             new PostFeedUser(
                 post.UserId,
-                post.User.Username,
-                post.User.FullName),
+                post.User.DeletedAt != null ? User.DeletedUsername : post.User.Username,
+                post.User.DeletedAt != null ? User.DeletedFullName : post.User.FullName),
             query.CurrentUserId.HasValue
                 ? post.Votes
                     .Where(vote => vote.UserId == query.CurrentUserId.Value)
@@ -133,8 +133,8 @@ public class PostRepository(StudyHubDbContext dbContext) : IPostRepository
               : null,
           User = new PostDetailUser(
               candidate.UserId,
-              candidate.User.Username,
-              candidate.User.FullName),
+              candidate.User.DeletedAt != null ? User.DeletedUsername : candidate.User.Username,
+              candidate.User.DeletedAt != null ? User.DeletedFullName : candidate.User.FullName),
         })
         .FirstOrDefaultAsync(cancellationToken);
 
@@ -157,8 +157,8 @@ public class PostRepository(StudyHubDbContext dbContext) : IPostRepository
             comment.CreatedAt,
             new PostDetailUser(
                 comment.UserId,
-                comment.User.Username,
-                comment.User.FullName)))
+                comment.User.DeletedAt != null ? User.DeletedUsername : comment.User.Username,
+                comment.User.DeletedAt != null ? User.DeletedFullName : comment.User.FullName)))
         .ToListAsync(cancellationToken);
 
     return new GetPostResult(

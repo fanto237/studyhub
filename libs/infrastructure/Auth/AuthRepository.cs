@@ -11,23 +11,37 @@ public class AuthRepository(StudyHubDbContext dbContext) : IAuthRepository
 {
   public Task<bool> PrivateEmailExistsAsync(string privateEmail, CancellationToken cancellationToken)
   {
-    return dbContext.Users.AnyAsync(user => user.PrivateEmail == privateEmail, cancellationToken);
+    return dbContext.Users.AnyAsync(
+        user => user.DeletedAt == null && user.PrivateEmail == privateEmail,
+        cancellationToken);
   }
 
   public Task<bool> UsernameExistsAsync(string username, CancellationToken cancellationToken)
   {
-    return dbContext.Users.AnyAsync(user => user.Username == username, cancellationToken);
+    return dbContext.Users.AnyAsync(
+        user => user.DeletedAt == null && user.Username == username,
+        cancellationToken);
   }
 
   public Task<bool> SchoolEmailExistsAsync(string schoolEmail, CancellationToken cancellationToken)
   {
-    return dbContext.Users.AnyAsync(user => user.SchoolEmail == schoolEmail, cancellationToken);
+    return dbContext.Users.AnyAsync(
+        user => user.DeletedAt == null && user.SchoolEmail == schoolEmail,
+        cancellationToken);
+  }
+
+  public Task<bool> IsUserActiveAsync(Guid userId, CancellationToken cancellationToken)
+  {
+    return dbContext.Users.AnyAsync(
+        user => user.Id == userId && user.DeletedAt == null,
+        cancellationToken);
   }
 
   public Task<User?> GetUserByUsernameOrPrivateEmailAsync(string usernameOrPrivateEmail, CancellationToken cancellationToken)
   {
     return dbContext.Users.SingleOrDefaultAsync(
-        user => user.Username == usernameOrPrivateEmail || user.PrivateEmail == usernameOrPrivateEmail,
+        user => user.DeletedAt == null
+            && (user.Username == usernameOrPrivateEmail || user.PrivateEmail == usernameOrPrivateEmail),
         cancellationToken);
   }
 
@@ -39,6 +53,7 @@ public class AuthRepository(StudyHubDbContext dbContext) : IAuthRepository
     var user = await dbContext.Users
         .AsNoTracking()
         .Where(candidate => candidate.Id == query.UserId)
+        .Where(candidate => candidate.DeletedAt == null)
         .Select(candidate => new CurrentUserProfile(
             candidate.Id,
             candidate.Username,
@@ -93,6 +108,7 @@ public class AuthRepository(StudyHubDbContext dbContext) : IAuthRepository
     var user = await dbContext.Users
         .AsNoTracking()
         .Where(candidate => candidate.Id == query.UserId)
+        .Where(candidate => candidate.DeletedAt == null)
         .Select(candidate => new PublicUserProfile(
             candidate.Id,
             candidate.Username,
@@ -153,18 +169,40 @@ public class AuthRepository(StudyHubDbContext dbContext) : IAuthRepository
     dbContext.UserRefreshTokens.Add(refreshToken);
   }
 
+  public void RemoveAuthCodes(IEnumerable<UserAuthCode> authCodes)
+  {
+    dbContext.UserAuthCodes.RemoveRange(authCodes);
+  }
+
+  public void RemoveRefreshTokens(IEnumerable<UserRefreshToken> refreshTokens)
+  {
+    dbContext.UserRefreshTokens.RemoveRange(refreshTokens);
+  }
+
   public Task<User?> GetUserWithAuthCodesBySchoolEmailAsync(string schoolEmail, CancellationToken cancellationToken)
   {
     return dbContext.Users
         .Include(user => user.AuthCodes)
-        .SingleOrDefaultAsync(user => user.SchoolEmail == schoolEmail, cancellationToken);
+        .SingleOrDefaultAsync(
+            user => user.DeletedAt == null && user.SchoolEmail == schoolEmail,
+            cancellationToken);
+  }
+
+  public Task<User?> GetUserForDeletionAsync(Guid userId, CancellationToken cancellationToken)
+  {
+    return dbContext.Users
+        .Include(user => user.AuthCodes)
+        .Include(user => user.RefreshTokens)
+        .SingleOrDefaultAsync(user => user.Id == userId, cancellationToken);
   }
 
   public Task<UserRefreshToken?> GetRefreshTokenWithUserByHashAsync(string tokenHash, CancellationToken cancellationToken)
   {
     return dbContext.UserRefreshTokens
         .Include(refreshToken => refreshToken.User)
-        .SingleOrDefaultAsync(refreshToken => refreshToken.TokenHash == tokenHash, cancellationToken);
+        .SingleOrDefaultAsync(
+            refreshToken => refreshToken.TokenHash == tokenHash && refreshToken.User.DeletedAt == null,
+            cancellationToken);
   }
 
   public Task SaveChangesAsync(CancellationToken cancellationToken)
