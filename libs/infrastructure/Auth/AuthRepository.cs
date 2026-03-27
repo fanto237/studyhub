@@ -188,6 +188,14 @@ public class AuthRepository(StudyHubDbContext dbContext) : IAuthRepository
             cancellationToken);
   }
 
+  public Task<User?> GetUserForUpdateAsync(Guid userId, CancellationToken cancellationToken)
+  {
+    return dbContext.Users
+        .SingleOrDefaultAsync(
+            user => user.Id == userId && user.DeletedAt == null,
+            cancellationToken);
+  }
+
   public Task<User?> GetUserForDeletionAsync(Guid userId, CancellationToken cancellationToken)
   {
     return dbContext.Users

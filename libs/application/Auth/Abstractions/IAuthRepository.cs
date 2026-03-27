@@ -14,6 +14,7 @@ public interface IAuthRepository
     Task<GetCurrentUserResult> GetCurrentUserAsync(GetCurrentUserQuery query, int latestPostsLimit, CancellationToken cancellationToken);
     Task<GetPublicUserProfileResult> GetPublicUserProfileAsync(GetPublicUserProfileQuery query, int latestPostsLimit, CancellationToken cancellationToken);
     Task<User?> GetUserWithAuthCodesBySchoolEmailAsync(string schoolEmail, CancellationToken cancellationToken);
+    Task<User?> GetUserForUpdateAsync(Guid userId, CancellationToken cancellationToken);
     Task<User?> GetUserForDeletionAsync(Guid userId, CancellationToken cancellationToken);
     Task<UserRefreshToken?> GetRefreshTokenWithUserByHashAsync(string tokenHash, CancellationToken cancellationToken);
     void AddUser(User user);
