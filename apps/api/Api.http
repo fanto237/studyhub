@@ -115,6 +115,18 @@ Accept: application/json
 
 ###
 
+PATCH {{Api_HostAddress}}/api/users/me
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username": "studybuddy-updated",
+  "fullName": "Taylor Student Updated",
+  "privateEmail": "student.personal.updated@example.com"
+}
+
+###
+
 DELETE {{Api_HostAddress}}/api/users/00000000-0000-0000-0000-000000000000
 Accept: application/json
 

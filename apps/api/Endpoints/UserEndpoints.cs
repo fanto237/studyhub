@@ -6,6 +6,7 @@ using Application.Posts.GetPosts;
 using Application.Users.DeleteUser;
 using Application.Users.GetCurrentUser;
 using Application.Users.GetPublicUserProfile;
+using Application.Users.UpdateCurrentUser;
 using Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Wolverine;
@@ -23,6 +24,10 @@ public static class UserEndpoints
     group.MapGet("/me", GetCurrentUser)
         .WithName("GetCurrentUser")
         .WithDescription("Returns the authenticated StudyHub user's account profile.");
+
+    group.MapPatch("/me", UpdateCurrentUser)
+        .WithName("UpdateCurrentUser")
+        .WithDescription("Updates editable fields for the authenticated StudyHub user's account profile.");
 
     group.MapGet("/{userId:guid}", GetPublicUserProfile)
         .WithName("GetPublicUserProfile")
@@ -58,6 +63,36 @@ public static class UserEndpoints
     {
       GetCurrentUserOutcome.Success => Results.Ok(MapGetCurrentUserResponse(result.Item!)),
       GetCurrentUserOutcome.NotFound => Results.NotFound(new { message = result.Message }),
+      _ => Results.BadRequest(new { message = result.Message }),
+    };
+  }
+
+  private static async Task<IResult> UpdateCurrentUser(
+      UpdateCurrentUserRequest request,
+      ClaimsPrincipal user,
+      IMessageBus bus,
+      CancellationToken cancellationToken)
+  {
+    var userIdValue = user.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (!Guid.TryParse(userIdValue, out var userId))
+    {
+      return Results.Unauthorized();
+    }
+
+    var result = await bus.InvokeAsync<UpdateCurrentUserResult>(
+        new UpdateCurrentUserCommand(
+            userId,
+            request.Username,
+            request.FullName,
+            request.PrivateEmail),
+        cancellationToken);
+
+    return result.Outcome switch
+    {
+      UpdateCurrentUserOutcome.Success => Results.Ok(MapGetCurrentUserResponse(result.Item!)),
+      UpdateCurrentUserOutcome.NotFound => Results.NotFound(new { message = result.Message }),
+      UpdateCurrentUserOutcome.UsernameAlreadyRegistered => Results.Conflict(new { message = result.Message }),
+      UpdateCurrentUserOutcome.PrivateEmailAlreadyRegistered => Results.Conflict(new { message = result.Message }),
       _ => Results.BadRequest(new { message = result.Message }),
     };
   }
