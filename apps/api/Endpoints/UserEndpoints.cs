@@ -1,7 +1,9 @@
 using System.Security.Claims;
+using Api.Auth;
 using Api.DTOs.Posts;
 using Api.DTOs.Users;
 using Application.Posts.GetPosts;
+using Application.Users.DeleteUser;
 using Application.Users.GetCurrentUser;
 using Application.Users.GetPublicUserProfile;
 using Domain.Enums;
@@ -29,6 +31,10 @@ public static class UserEndpoints
     group.MapGet("/{userId:guid}/posts", GetUserPosts)
         .WithName("GetUserPosts")
         .WithDescription("Returns the visible StudyHub posts authored by the specified user.");
+
+    group.MapDelete("/{userId:guid}", DeleteUser)
+        .WithName("DeleteUser")
+        .WithDescription("Anonymizes the authenticated StudyHub user account and signs the session out.");
 
     return app;
   }
@@ -115,6 +121,42 @@ public static class UserEndpoints
           result.PageSize,
           result.TotalCount,
           result.TotalPages)),
+      _ => Results.BadRequest(new { message = result.Message }),
+    };
+  }
+
+  private static async Task<IResult> DeleteUser(
+      Guid userId,
+      ClaimsPrincipal user,
+      HttpContext httpContext,
+      IMessageBus bus,
+      CancellationToken cancellationToken)
+  {
+    var actorUserIdValue = user.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (!Guid.TryParse(actorUserIdValue, out var actorUserId))
+    {
+      return Results.Unauthorized();
+    }
+
+    if (actorUserId != userId)
+    {
+      return Results.Forbid();
+    }
+
+    var result = await bus.InvokeAsync<DeleteUserResult>(
+        new DeleteUserCommand(userId),
+        cancellationToken);
+
+    if (result.Outcome == DeleteUserOutcome.Success)
+    {
+      AuthCookies.ClearAuthCookies(httpContext);
+      return Results.NoContent();
+    }
+
+    return result.Outcome switch
+    {
+      DeleteUserOutcome.NotFound => Results.NotFound(new { message = result.Message }),
+      DeleteUserOutcome.AlreadyDeleted => Results.NotFound(new { message = result.Message }),
       _ => Results.BadRequest(new { message = result.Message }),
     };
   }
