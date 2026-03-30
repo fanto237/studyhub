@@ -157,7 +157,7 @@ public class PostRepository(StudyHubDbContext dbContext) : IPostRepository
         .Select(comment => new PostDetailComment(
             comment.Id,
             comment.ParentCommentId,
-            comment.Text,
+            comment.DeletedAt != null ? "[deleted]" : comment.Text,
             comment.CreatedAt,
             new PostDetailUser(
                 comment.UserId,

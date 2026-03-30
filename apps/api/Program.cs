@@ -33,6 +33,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapAuthEndpoints();
+app.MapCommentEndpoints();
 app.MapFeedEndpoints();
 app.MapPostEndpoints();
 app.MapUserEndpoints();
