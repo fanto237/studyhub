@@ -116,7 +116,7 @@ public static class UserEndpoints
 
   private static async Task<IResult> GetUserPosts(
       Guid userId,
-      [AsParameters] GetPostsQuery query,
+      [AsParameters] GetPostsRequest query,
       ClaimsPrincipal user,
       IMessageBus bus,
       CancellationToken cancellationToken)
@@ -128,7 +128,7 @@ public static class UserEndpoints
     }
 
     var result = await bus.InvokeAsync<GetPostsResult>(
-        new GetPostsQuery(query.Sort, query.Page, query.PageSize, query.Search, query.Tag, requesterUserId, userId),
+        new GetPostsQuery(query.Sort, query.Page, query.PageSize, query.Search, query.Tags ?? [], requesterUserId, userId),
         cancellationToken);
 
     return result.Outcome switch

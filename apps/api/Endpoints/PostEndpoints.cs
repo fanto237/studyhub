@@ -58,7 +58,7 @@ public static class PostEndpoints
   }
 
   private static async Task<IResult> GetPosts(
-      [AsParameters] GetPostsQuery query,
+      [AsParameters] GetPostsRequest query,
       ClaimsPrincipal user,
       IMessageBus bus,
       CancellationToken cancellationToken)
@@ -70,14 +70,14 @@ public static class PostEndpoints
     }
 
     var result = await bus.InvokeAsync<GetPostsResult>(
-        new GetPostsQuery(query.Sort, query.Page, query.PageSize, query.Search, query.Tag, userId),
+        new GetPostsQuery(query.Sort, query.Page, query.PageSize, query.Search, query.Tags ?? [], userId),
         cancellationToken);
 
     return MapGetPostsResult(result);
   }
 
   private static async Task<IResult> GetMyPosts(
-      [AsParameters] GetPostsQuery query,
+      [AsParameters] GetPostsRequest query,
       ClaimsPrincipal user,
       IMessageBus bus,
       CancellationToken cancellationToken)
@@ -89,7 +89,7 @@ public static class PostEndpoints
     }
 
     var result = await bus.InvokeAsync<GetPostsResult>(
-        new GetPostsQuery(query.Sort, query.Page, query.PageSize, query.Search, query.Tag, userId, userId),
+        new GetPostsQuery(query.Sort, query.Page, query.PageSize, query.Search, query.Tags ?? [], userId, userId),
         cancellationToken);
 
     return MapGetPostsResult(result);
