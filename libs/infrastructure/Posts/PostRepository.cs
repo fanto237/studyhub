@@ -1,4 +1,5 @@
 using Application.Posts.Abstractions;
+using Application.Posts.GetFeed;
 using Application.Posts.GetPost;
 using Application.Posts.GetPosts;
 using Domain.Entities;
@@ -24,20 +25,14 @@ public class PostRepository(StudyHubDbContext dbContext) : IPostRepository
 
   public async Task<GetPostsResult> GetPostsAsync(GetPostsQuery query, CancellationToken cancellationToken)
   {
-    var postsQuery = dbContext.Posts
-        .AsNoTracking()
-        .Where(post => post.DeletedAt == null)
-        .Where(post => !post.IsHidden);
+    var postsQuery = BuildVisiblePostsQuery();
 
     if (query.AuthorUserId.HasValue)
     {
       postsQuery = postsQuery.Where(post => post.UserId == query.AuthorUserId.Value);
     }
 
-    if (!string.IsNullOrWhiteSpace(query.Tag))
-    {
-      postsQuery = postsQuery.Where(post => post.PostTags.Any(postTag => postTag.Tag.Name == query.Tag));
-    }
+    postsQuery = ApplyTagFilter(postsQuery, query.Tags);
 
     if (!string.IsNullOrWhiteSpace(query.Search))
     {
@@ -64,33 +59,9 @@ public class PostRepository(StudyHubDbContext dbContext) : IPostRepository
     var totalPages = totalCount == 0 ? 0 : (int)Math.Ceiling(totalCount / (double)query.PageSize);
     var skip = (query.Page - 1) * query.PageSize;
 
-    var items = await postsQuery
+    var items = await ProjectToPostFeedItems(postsQuery, query.CurrentUserId)
         .Skip(skip)
         .Take(query.PageSize)
-        .Select(post => new PostFeedItem(
-            post.Id,
-            post.Title,
-            post.Description,
-            post.StorageUrl,
-            post.Upvotes,
-            post.Downvotes,
-            post.Upvotes - post.Downvotes,
-            post.CreatedAt,
-            post.Comments.Count,
-            post.PostTags
-                .OrderBy(postTag => postTag.Tag.Name)
-                .Select(postTag => postTag.Tag.Name)
-                .ToArray(),
-            new PostFeedUser(
-                post.UserId,
-                post.User.DeletedAt != null ? User.DeletedUsername : post.User.Username,
-                post.User.DeletedAt != null ? User.DeletedFullName : post.User.FullName),
-            query.CurrentUserId.HasValue
-                ? post.Votes
-                    .Where(vote => vote.UserId == query.CurrentUserId.Value)
-                    .Select(vote => (PostVoteValue?)vote.Value)
-                    .FirstOrDefault()
-                : null))
         .ToListAsync(cancellationToken);
 
     return new GetPostsResult(
@@ -101,6 +72,39 @@ public class PostRepository(StudyHubDbContext dbContext) : IPostRepository
         query.PageSize,
         totalCount,
         totalPages);
+  }
+
+  public async Task<GetFeedResult> GetFeedAsync(GetFeedQuery query, CancellationToken cancellationToken)
+  {
+    var sort = query.Sort ?? "new";
+
+    if (!GetFeedCursorCodec.TryDecode(query.Cursor, sort, out var cursor, out var error))
+    {
+      return new GetFeedResult(
+          GetFeedOutcome.InvalidRequest,
+          error ?? "The feed cursor is invalid.");
+    }
+
+    var postsQuery = BuildVisiblePostsQuery();
+    postsQuery = ApplyTagFilter(postsQuery, query.Tags);
+    postsQuery = ApplyFeedCursor(postsQuery, sort, cursor);
+
+    var items = await ProjectToPostFeedItems(ApplyFeedOrdering(postsQuery, sort), query.CurrentUserId)
+        .Take(query.Limit + 1)
+        .ToListAsync(cancellationToken);
+
+    var hasMore = items.Count > query.Limit;
+    var pageItems = hasMore ? items.Take(query.Limit).ToArray() : items.ToArray();
+    var nextCursor = hasMore && pageItems.Length > 0
+        ? GetFeedCursorCodec.Encode(sort, pageItems[^1])
+        : null;
+
+    return new GetFeedResult(
+        GetFeedOutcome.Success,
+        "Feed retrieved successfully.",
+        pageItems,
+        nextCursor,
+        hasMore);
   }
 
   public async Task<GetPostResult> GetPostAsync(GetPostQuery query, CancellationToken cancellationToken)
@@ -122,19 +126,19 @@ public class PostRepository(StudyHubDbContext dbContext) : IPostRepository
           candidate.CreatedAt,
           candidate.UpdatedAt,
           Tags = candidate.PostTags
-              .OrderBy(postTag => postTag.Tag.Name)
-              .Select(postTag => postTag.Tag.Name)
-              .ToArray(),
+                .OrderBy(postTag => postTag.Tag.Name)
+                .Select(postTag => postTag.Tag.Name)
+                .ToArray(),
           CurrentVote = query.CurrentUserId.HasValue
-              ? candidate.Votes
-                  .Where(vote => vote.UserId == query.CurrentUserId.Value)
-                  .Select(vote => (PostVoteValue?)vote.Value)
-                  .FirstOrDefault()
-              : null,
+                ? candidate.Votes
+                    .Where(vote => vote.UserId == query.CurrentUserId.Value)
+                    .Select(vote => (PostVoteValue?)vote.Value)
+                    .FirstOrDefault()
+                : null,
           User = new PostDetailUser(
-              candidate.UserId,
-              candidate.User.DeletedAt != null ? User.DeletedUsername : candidate.User.Username,
-              candidate.User.DeletedAt != null ? User.DeletedFullName : candidate.User.FullName),
+                candidate.UserId,
+                candidate.User.DeletedAt != null ? User.DeletedUsername : candidate.User.Username,
+                candidate.User.DeletedAt != null ? User.DeletedFullName : candidate.User.FullName),
         })
         .FirstOrDefaultAsync(cancellationToken);
 
@@ -257,5 +261,90 @@ public class PostRepository(StudyHubDbContext dbContext) : IPostRepository
       await transaction.RollbackAsync(cancellationToken);
       throw;
     }
+  }
+
+  private IQueryable<Post> BuildVisiblePostsQuery()
+  {
+    return dbContext.Posts
+        .AsNoTracking()
+        .Where(post => post.DeletedAt == null)
+        .Where(post => !post.IsHidden);
+  }
+
+  private static IQueryable<Post> ApplyTagFilter(IQueryable<Post> postsQuery, IReadOnlyCollection<string> tags)
+  {
+    if (tags.Count == 0)
+    {
+      return postsQuery;
+    }
+
+    var requiredTagCount = tags.Count;
+
+    return postsQuery.Where(post => post.PostTags
+        .Where(postTag => tags.Contains(postTag.Tag.Name))
+        .Select(postTag => postTag.Tag.Name)
+        .Distinct()
+        .Count() == requiredTagCount);
+  }
+
+  private static IQueryable<Post> ApplyFeedCursor(IQueryable<Post> postsQuery, string sort, GetFeedCursor? cursor)
+  {
+    if (cursor is null)
+    {
+      return postsQuery;
+    }
+
+    return sort switch
+    {
+      "top" or "trending" => postsQuery.Where(post =>
+          (post.Upvotes - post.Downvotes) < cursor.Score
+          || ((post.Upvotes - post.Downvotes) == cursor.Score && post.CreatedAt < cursor.CreatedAt)
+          || ((post.Upvotes - post.Downvotes) == cursor.Score && post.CreatedAt == cursor.CreatedAt && post.Id.CompareTo(cursor.Id) < 0)),
+      _ => postsQuery.Where(post =>
+          post.CreatedAt < cursor.CreatedAt
+          || (post.CreatedAt == cursor.CreatedAt && post.Id.CompareTo(cursor.Id) < 0)),
+    };
+  }
+
+  private static IOrderedQueryable<Post> ApplyFeedOrdering(IQueryable<Post> postsQuery, string sort)
+  {
+    return sort switch
+    {
+      "top" or "trending" => postsQuery
+          .OrderByDescending(post => post.Upvotes - post.Downvotes)
+          .ThenByDescending(post => post.CreatedAt)
+          .ThenByDescending(post => post.Id),
+      _ => postsQuery
+          .OrderByDescending(post => post.CreatedAt)
+          .ThenByDescending(post => post.Id),
+    };
+  }
+
+  private static IQueryable<PostFeedItem> ProjectToPostFeedItems(IQueryable<Post> postsQuery, Guid? currentUserId)
+  {
+    return postsQuery.Select(post => new PostFeedItem(
+        post.Id,
+        post.Title,
+        post.Description,
+        post.StorageUrl,
+        post.Upvotes,
+        post.Downvotes,
+        post.Upvotes - post.Downvotes,
+        post.CreatedAt,
+        post.Comments.Count,
+        post.PostTags
+            .OrderBy(postTag => postTag.Tag.Name)
+            .Select(postTag => postTag.Tag.Name)
+            .ToArray(),
+        new PostFeedUser(
+            post.UserId,
+            post.User.DeletedAt != null ? User.DeletedUsername : post.User.Username,
+            post.User.DeletedAt != null ? User.DeletedFullName : post.User.FullName),
+        currentUserId.HasValue
+            ? post.Votes
+                .Where(vote => vote.UserId == currentUserId.Value)
+                .Select(vote => (PostVoteValue?)vote.Value)
+                .FirstOrDefault()
+            : null));
   }
 }
