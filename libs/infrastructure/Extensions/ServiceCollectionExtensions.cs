@@ -2,8 +2,10 @@ using Amazon.Runtime;
 using Amazon.S3;
 using Application.Abstractions.Email;
 using Application.Auth.Abstractions;
+using Application.Comments.Abstractions;
 using Application.Posts.Abstractions;
 using Infrastructure.Auth;
+using Infrastructure.Comments;
 using Infrastructure.Email;
 using Infrastructure.Options;
 using Infrastructure.Persistence;
@@ -59,6 +61,7 @@ public static class ServiceCollectionExtensions
     services.AddScoped<IAuthRepository, AuthRepository>();
     services.AddScoped<IAuthEmailService, AuthEmailService>();
     services.AddSingleton<IAuthTokenService, AuthTokenService>();
+    services.AddScoped<ICommentRepository, CommentRepository>();
     services.AddScoped<IPostRepository, PostRepository>();
     services.AddScoped<IPostFileStorageService, CloudflareR2PostFileStorageService>();
 
