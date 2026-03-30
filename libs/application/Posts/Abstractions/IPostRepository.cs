@@ -1,3 +1,4 @@
+using Application.Posts.GetFeed;
 using Application.Posts.GetPost;
 using Application.Posts.GetPosts;
 using Domain.Entities;
@@ -8,6 +9,7 @@ public interface IPostRepository
 {
     Task<IReadOnlyList<Tag>> GetTagsByNamesAsync(IReadOnlyCollection<string> names, CancellationToken cancellationToken);
     Task<GetPostsResult> GetPostsAsync(GetPostsQuery query, CancellationToken cancellationToken);
+    Task<GetFeedResult> GetFeedAsync(GetFeedQuery query, CancellationToken cancellationToken);
     Task<GetPostResult> GetPostAsync(GetPostQuery query, CancellationToken cancellationToken);
     Task<Post?> GetPostForUpdateAsync(Guid postId, CancellationToken cancellationToken);
     Task<Post?> GetPostForDeleteAsync(Guid postId, CancellationToken cancellationToken);
