@@ -17,6 +17,8 @@ public class CommentConfiguration : IEntityTypeConfiguration<Comment>
         builder.Property(comment => comment.CreatedAt)
             .IsRequired();
 
+        builder.Property(comment => comment.DeletedAt);
+
         builder.HasOne(comment => comment.Post)
             .WithMany(post => post.Comments)
             .HasForeignKey(comment => comment.PostId)
@@ -30,7 +32,7 @@ public class CommentConfiguration : IEntityTypeConfiguration<Comment>
         builder.HasOne(comment => comment.ParentComment)
             .WithMany(comment => comment.Replies)
             .HasForeignKey(comment => comment.ParentCommentId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.NoAction);
 
         builder.HasIndex(comment => comment.PostId);
         builder.HasIndex(comment => comment.UserId);
