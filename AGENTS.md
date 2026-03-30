@@ -1,91 +1,125 @@
 # PROJECT KNOWLEDGE BASE
 
-**Generated:** 2026-03-17
+**Generated:** 2026-03-29
 
 ## OVERVIEW
-Project: **StudyHub**
-Stack: **Nx 22.5 monorepo** with **Angular 21.1** + **SSR/Express** frontend, **TypeScript 5.9**, **Tailwind CSS 4.2** + **daisyUI 5.5** for frontend styling, **ESLint 9** + **Prettier 3**, and a **.NET 10** backend/app libraries using **ASP.NET Core Minimal APIs**, **WolverineFx 5.20**, **Serilog 4.3**, **EF Core 10**, and **Npgsql 10**.
 
-This repository is an early full-stack scaffold for a student-focused exam-sharing product. Product intent is documented in `docs/PRD.md` and `docs/SPEC.md`; implementation is still mostly starter/template code.
+Project: **StudyHub**
+Stack: **Nx 22.5.4 monorepo** with an **Angular 21.1** SSR frontend (**TypeScript 5.9**, **Express**, **Tailwind CSS 4.2**, **daisyUI 5.5**, **ESLint 9**, **Prettier 3**) and a **.NET 10** backend built with **ASP.NET Core Minimal APIs**, **WolverineFx 5.20**, **FluentValidation 12**, **EF Core 10**, **Npgsql 10/PostgreSQL**, **JWT bearer auth**, **Serilog 4.3**, **SMTP email**, and **Cloudflare R2 via the AWS S3 SDK**.
+
+The repository is no longer just a blank scaffold: the backend already implements auth, feed, posts, and user-profile flows. The frontend is still mostly starter/template code and does not yet consume the API.
 
 ## STRUCTURE
-- `apps/web/`: Angular application managed by Nx.
-  - `apps/web/src/`: frontend source root.
-  - `apps/web/src/app/`: root component, app config, and route definitions.
-  - `apps/web/src/styles.css`: global stylesheet; imports Tailwind CSS and registers the daisyUI plugin.
+
+- `apps/web/`: Nx-managed Angular application.
+  - `apps/web/src/app/`: root standalone app component/config/routes.
   - `apps/web/src/server.ts`: Express-based Angular SSR entrypoint.
-  - `apps/web/project.json`: Nx targets for `build`, `serve`, `lint`, and `serve-static`.
-- `apps/api/`: ASP.NET Core Web app.
-  - `apps/api/Program.cs`: current Minimal API bootstrap; still template-level.
-  - `apps/api/Properties/launchSettings.json`: local dev URLs (`http://localhost:5046`, `https://localhost:7088`).
-  - `apps/api/Api.http`: scratch file for manual API requests.
-- `libs/domain/`: domain-layer .NET library.
-- `libs/application/`: application-layer .NET library; references `libs/domain`.
-- `libs/infrastructure/`: infrastructure-layer .NET library; references `libs/application` and adds EF Core/PostgreSQL packages.
-- `apps/Studyhub.slnx`: .NET solution containing API + shared libraries.
-- `docs/`: product and technical planning docs.
-  - `docs/PRD.md`: product goals, UX, and feature scope.
-  - `docs/SPEC.md`: planned architecture, API, and integration notes.
-- `design/`: UI reference assets with screenshots plus HTML mockups for landing, auth, upload, profile, and PDF detail pages.
-- `.vscode/extensions.json`: recommended VS Code extensions (Angular Console, Prettier, ESLint).
+  - `apps/web/src/styles.css`: global Tailwind + daisyUI setup, including custom `studyhub` and `dark` themes.
+  - `apps/web/src/app/nx-welcome.ts`: generated starter component still rendered by the app.
+  - `apps/web/project.json`: frontend build/serve/lint targets.
+- `apps/api/`: ASP.NET Core API application.
+  - `apps/api/Program.cs`: top-level bootstrap; wires Wolverine, auth, application/infrastructure services, and endpoint groups.
+  - `apps/api/Endpoints/`: grouped Minimal API route modules for `auth`, `feed`, `posts`, and `users`.
+  - `apps/api/DTOs/`: request/response DTOs for auth, posts, and users.
+  - `apps/api/Extensions/AuthenticationExtensions.cs`: JWT bearer setup with cookie token extraction.
+  - `apps/api/appsettings*.json`: non-secret config defaults; real secrets are expected from user secrets/environment.
+  - `apps/api/Api.http`: manual request examples for auth, feed, posts, and users.
+- `libs/domain/`: core domain entities and enums.
+  - `libs/domain/Entities/`: `User`, `Post`, `Comment`, vote/report/tag/auth-token entities.
+  - `libs/domain/Enums/`: roles, vote values, report reasons, auth code purposes.
+- `libs/application/`: application layer.
+  - Vertical-slice folders for `Auth`, `Posts`, and `Users`.
+  - Each slice usually contains `Command/Query`, `Validator`, `Handler`, `Outcome`, and `Result` types.
+  - `libs/application/*/Abstractions/`: repository/service interfaces consumed by handlers.
+  - `libs/application/Extensions/ServiceCollectionExtensions.cs`: validator and option registration.
+- `libs/infrastructure/`: persistence and external integrations.
+  - `libs/infrastructure/Persistence/StudyHubDbContext.cs`: EF Core DbContext.
+  - `libs/infrastructure/Persistence/Configurations/`: entity configurations.
+  - `libs/infrastructure/Persistence/Migrations/`: existing EF Core migrations; schema is already evolving.
+  - `libs/infrastructure/Auth/`: auth repository + JWT token service.
+  - `libs/infrastructure/Posts/`: post repository.
+  - `libs/infrastructure/Storage/`: Cloudflare R2 file storage service.
+  - `libs/infrastructure/Email/`: SMTP email sender + HTML/plain-text templates.
+- `apps/Studyhub.slnx`: .NET solution for API + shared libraries.
+- `docs/`: product and API planning/reference docs.
+  - `docs/PRD.md`, `docs/SPEC.md`: product + architecture intent.
+  - `docs/Posts-Endpoints.md`, `docs/Users-Endpoints.md`, `docs/RestEndpoints.md`: API planning/reference notes.
+- `design/`: HTML mockups and screenshots for landing/auth/upload/profile/PDF detail pages.
 
 ## COMMANDS
+
 | Action | Command |
-|--------|---------|
-| Install JS deps | `npm ci` |
-| Restore .NET deps | `npx nx restore Api` |
+| --- | --- |
+| Install JS dependencies | `npm ci` |
+| Restore .NET dependencies | `npx nx restore Api` |
+| Serve frontend (dev) | `npx nx serve web` |
 | Lint frontend | `npx nx lint web` |
 | Build frontend | `npx nx build web` |
-| Build backend | `npx nx build Api` |
-| Run frontend | `npx nx serve web` |
-| Run backend | `npx nx run Api` |
-| Build full .NET solution directly | `dotnet build apps/Studyhub.slnx` |
+| Run API through Nx | `npx nx run Api` |
+| Watch API | `npx nx watch Api` |
+| Build API through Nx | `npx nx build Api` |
+| Build .NET solution directly | `dotnet build apps/Studyhub.slnx` |
 | Run API directly | `dotnet run --project apps/api/Api.csproj` |
-| Test | `No automated tests are configured yet` |
+| Tests | `No automated test projects/targets are configured yet` |
 
 ## CODING STANDARDS
+
 - **Workspace style**
-  - Monorepo orchestration is done through Nx.
+  - Nx orchestrates both Angular and .NET projects.
   - `.editorconfig` enforces UTF-8, spaces, 2-space indentation, final newline, and trimmed trailing whitespace.
   - `.prettierrc` enforces single quotes.
-- **TypeScript / Angular**
-  - Angular uses the modern standalone/bootstrap style (`bootstrapApplication(...)`) rather than NgModules.
-  - Frontend is SSR-enabled with `@angular/ssr` and an Express node server.
-  - Styling is set up with Tailwind CSS v4 and daisyUI. Global registration currently lives in `apps/web/src/styles.css` via `@import 'tailwindcss';` and `@plugin "daisyui";`.
-  - Prefer Tailwind utility classes and daisyUI component classes for new frontend styling work unless a component-specific stylesheet is clearly the better fit.
-  - Flat ESLint config is used at the workspace root and extended in `apps/web/eslint.config.mjs`.
+  - Root flat ESLint config lives in `eslint.config.mjs` and is extended by `apps/web/eslint.config.mjs`.
+- **Angular / TypeScript**
+  - Uses standalone Angular bootstrapping (`bootstrapApplication(...)`), not NgModules.
+  - SSR is enabled via `@angular/ssr` with an Express Node server.
+  - Prefer Tailwind utility classes and daisyUI components for new UI work.
   - Angular selector rules are enforced:
-    - directives: attribute selectors with `app` prefix, camelCase
-    - components: element selectors with `app` prefix, kebab-case
-  - Current frontend code is minimal and generated; routes are defined in `apps/web/src/app/app.routes.ts`.
+    - directives: attribute selectors, `app` prefix, camelCase
+    - components: element selectors, `app` prefix, kebab-case
+  - Current frontend code is minimal: `appRoutes` is empty and the root component still renders the generated Nx welcome component.
 - **C# / .NET**
-  - All .NET projects target `net10.0` with nullable reference types and implicit usings enabled.
-  - Backend uses top-level statements in `Program.cs` and Minimal API patterns.
-  - Library projects currently use file-scoped namespaces and placeholder classes.
-- **Architecture**
-  - Intended layering is `Domain -> Application -> Infrastructure -> Api`.
-  - `apps/api` references `Application` and `Infrastructure`.
-  - `Infrastructure` already carries EF Core + PostgreSQL packages, but no persistence implementation exists yet.
-  - `Application` and `Api` already reference Wolverine packages, but no CQRS handlers/endpoints are implemented yet.
-- **Nx rules**
-  - `@nx/enforce-module-boundaries` is enabled, though current dependency constraints are permissive (`*` -> `*`).
+  - All .NET projects target `net10.0`, use nullable reference types, and enable implicit usings.
+  - API uses top-level statements and Minimal API endpoint grouping.
+  - Wolverine discovers handlers from the `Application` assembly; handlers are static `Handle(...)` methods.
+  - FluentValidation validators sit beside commands/queries and are invoked explicitly inside handlers.
+  - Domain entities are POCOs; EF Core configuration is centralized under `libs/infrastructure/Persistence/Configurations`.
+- **Architecture / patterns**
+  - Intended layering is active in code: `Domain -> Application -> Infrastructure -> Api`.
+  - `Application` defines abstractions; `Infrastructure` implements repositories/services.
+  - Auth uses JWT bearer auth, but access tokens are read from HTTP cookies in `AuthenticationExtensions`.
+  - Post creation uploads PDFs to Cloudflare R2 and stores metadata in PostgreSQL.
+  - Query/command slices already exist for auth, post feed/list/detail/upload/edit/delete/vote/report, and current/public user profile flows.
 
 ## WHERE TO LOOK
+
 - **Frontend source**: `apps/web/src`
-- **Backend source**: `apps/api`
-- **Shared backend libs**: `libs/domain`, `libs/application`, `libs/infrastructure`
-- **Manual API requests**: `apps/api/Api.http`
-- **Product docs**: `docs/PRD.md`, `docs/SPEC.md`
-- **Design references**: `design/*/code.html`, `design/*/screen.png`
-- **Tests**: No test directories or test targets exist yet
+- **API routes**: `apps/api/Endpoints`
+- **API DTOs**: `apps/api/DTOs`
+- **Application logic / handlers**: `libs/application`
+- **Persistence + migrations**: `libs/infrastructure/Persistence`
+- **External integrations**: `libs/infrastructure/Auth`, `libs/infrastructure/Email`, `libs/infrastructure/Storage`
+- **Domain model**: `libs/domain/Entities`, `libs/domain/Enums`
+- **Manual API examples**: `apps/api/Api.http`
+- **Product/docs context**: `docs/PRD.md`, `docs/SPEC.md`, `docs/*Endpoints.md`
+- **UI references**: `design/*/code.html`, `design/*/screen.png`
 
 ## NOTES
-- This repo is closer to a scaffold than a completed implementation.
-  - Frontend still shows the default Nx/Angular welcome component.
-  - Backend currently exposes only the template `/weatherforecast` endpoint.
-  - `libs/domain`, `libs/application`, and `libs/infrastructure` still contain placeholder classes.
-- `docs/SPEC.md` describes planned technologies such as PostgreSQL, PDF.js, S3/R2, auth flows, and REST endpoints; some of these are still not implemented in code. Trust the source tree over the spec when making changes.
-- Tailwind CSS and daisyUI are now installed and wired into the Angular app's global stylesheet, but the actual application UI is still mostly starter/template code.
-- Angular unit/e2e tests are disabled in `nx.json` generator defaults, and there are no .NET test projects yet.
-- The frontend build is server-output SSR (`outputMode: "server"`), so deployment/runtime behavior differs from a purely static SPA.
-- No pre-existing `AGENTS.md`, `CLAUDE.md`, or `.cursorrules` file was found at the repo root during this scan.
+
+- Backend status is materially ahead of the old scaffold: `/api/auth`, `/api/feed`, `/api/posts`, and `/api/users` are wired and backed by application/infrastructure code.
+- Frontend status is still early: the app currently shows a theme toggle plus the generated Nx welcome content; there are no feature routes yet.
+- Comment CRUD endpoints are not implemented yet. Comments currently appear only in post detail query results.
+- EF Core migrations already exist under `libs/infrastructure/Persistence/Migrations`; inspect existing schema/configuration before changing entities.
+- Runtime configuration is secret-heavy. The backend expects values for at least:
+  - `ConnectionString:Default`
+  - `JwtSetting:Secret`
+  - `Cloudflare:Api`
+  - `Cloudflare:AccessKeyId`
+  - `Cloudflare:SecretAccessKey`
+  - `Cloudflare:PublicBaseUrl`
+  - `EmailSetting:Username`
+  - `EmailSetting:Password`
+- Infrastructure normalizes `postgres://` / `postgresql://` URLs into Npgsql connection strings, so either format can work.
+- API launch settings use `https://localhost:5000`, while `apps/api/Api.http` still uses its own `@Api_HostAddress` placeholder; keep that file in sync when testing locally.
+- `CreatePost` accepts multipart form data, enforces a 15 MB PDF limit, validates the PDF header, and rejects password-protected PDFs.
+- Ignore generated/build artifacts during exploration: `node_modules/`, `dist/`, `apps/**/bin/`, `apps/**/obj/`, `libs/**/obj/`.
+- No root `.cursorrules` or `CLAUDE.md` file was found; `AGENTS.md` is the main agent-oriented context file.
