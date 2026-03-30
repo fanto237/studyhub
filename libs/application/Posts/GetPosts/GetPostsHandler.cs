@@ -16,7 +16,7 @@ public class GetPostsHandler
         query.Page <= 0 ? GetPostsQueryValidator.DefaultPage : query.Page,
         query.PageSize <= 0 ? GetPostsQueryValidator.DefaultPageSize : query.PageSize,
         NormalizeSearch(query.Search),
-        NormalizeTag(query.Tag),
+        PostMetadataNormalizer.NormalizeTags(query.Tags),
         query.CurrentUserId,
         query.AuthorUserId);
 
@@ -39,12 +39,5 @@ public class GetPostsHandler
   private static string? NormalizeSearch(string? search)
   {
     return string.IsNullOrWhiteSpace(search) ? null : search.Trim();
-  }
-
-  private static string? NormalizeTag(string? tag)
-  {
-    return string.IsNullOrWhiteSpace(tag)
-        ? null
-        : string.Join(' ', tag.Split([' ', '\t', '\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)).ToLowerInvariant();
   }
 }

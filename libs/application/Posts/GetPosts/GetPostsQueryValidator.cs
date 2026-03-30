@@ -7,6 +7,7 @@ public class GetPostsQueryValidator : AbstractValidator<GetPostsQuery>
     public const int DefaultPage = 1;
     public const int DefaultPageSize = 20;
     public const int MaxPageSize = 100;
+    public const int MaxTagCount = 20;
 
     private static readonly string[] AllowedSorts = ["new", "top", "trending"];
 
@@ -27,8 +28,11 @@ public class GetPostsQueryValidator : AbstractValidator<GetPostsQuery>
             .MaximumLength(200)
             .When(query => query.Search is not null);
 
-        RuleFor(query => query.Tag)
-            .MaximumLength(100)
-            .When(query => query.Tag is not null);
+        RuleFor(query => query.Tags.Count)
+            .LessThanOrEqualTo(MaxTagCount)
+            .WithMessage($"At most {MaxTagCount} tags can be selected.");
+
+        RuleForEach(query => query.Tags)
+            .MaximumLength(100);
     }
 }
