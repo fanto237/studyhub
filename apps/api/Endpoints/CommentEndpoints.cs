@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Api.DTOs.Comments;
+using Api.Responses;
 using Application.Comments.CreateComment;
 using Application.Comments.DeleteComment;
 using Application.Comments.GetPostComments;
@@ -52,9 +53,9 @@ public static class CommentEndpoints
 
     return result.Outcome switch
     {
-      GetPostCommentsOutcome.Success => Results.Ok(MapGetPostCommentsResponse(result.Items ?? [])),
-      GetPostCommentsOutcome.NotFound => Results.NotFound(new { message = result.Message }),
-      _ => Results.BadRequest(new { message = result.Message }),
+      GetPostCommentsOutcome.Success => Results.Ok(SendResponse.Success(MapGetPostCommentsResponse(result.Items ?? []))),
+      GetPostCommentsOutcome.NotFound => Results.NotFound(SendResponse.Fail(new { message = result.Message })),
+      _ => Results.BadRequest(SendResponse.Fail(new { message = result.Message })),
     };
   }
 
@@ -67,13 +68,13 @@ public static class CommentEndpoints
   {
     if (request is null)
     {
-      return Results.BadRequest(new { message = "A comment body is required." });
+      return Results.BadRequest(SendResponse.Fail(new { message = "A comment body is required." }));
     }
 
     var userIdValue = user.FindFirstValue(ClaimTypes.NameIdentifier);
     if (!Guid.TryParse(userIdValue, out var userId))
     {
-      return Results.Unauthorized();
+      return Results.Json(SendResponse.Fail(new { message = "Authentication is required." }), statusCode: StatusCodes.Status401Unauthorized);
     }
 
     var result = await bus.InvokeAsync<CreateCommentResult>(
@@ -84,9 +85,9 @@ public static class CommentEndpoints
     {
       CreateCommentOutcome.Success => Results.Created(
           $"/api/posts/{postId}/comments/{result.Item!.Id}",
-          MapCreateCommentResponse(result.Item!)),
-      CreateCommentOutcome.NotFound => Results.NotFound(new { message = result.Message }),
-      _ => Results.BadRequest(new { message = result.Message }),
+          SendResponse.Success(MapCreateCommentResponse(result.Item!))),
+      CreateCommentOutcome.NotFound => Results.NotFound(SendResponse.Fail(new { message = result.Message })),
+      _ => Results.BadRequest(SendResponse.Fail(new { message = result.Message })),
     };
   }
 
@@ -99,19 +100,19 @@ public static class CommentEndpoints
   {
     if (request is null)
     {
-      return Results.BadRequest(new { message = "A comment body is required." });
+      return Results.BadRequest(SendResponse.Fail(new { message = "A comment body is required." }));
     }
 
     var userIdValue = user.FindFirstValue(ClaimTypes.NameIdentifier);
     if (!Guid.TryParse(userIdValue, out var userId))
     {
-      return Results.Unauthorized();
+      return Results.Json(SendResponse.Fail(new { message = "Authentication is required." }), statusCode: StatusCodes.Status401Unauthorized);
     }
 
     var roleValue = user.FindFirstValue(ClaimTypes.Role);
     if (!Enum.TryParse<UserRole>(roleValue, ignoreCase: true, out var role))
     {
-      return Results.Forbid();
+      return Results.Json(SendResponse.Fail(new { message = "You do not have permission to access this resource." }), statusCode: StatusCodes.Status403Forbidden);
     }
 
     var result = await bus.InvokeAsync<UpdateCommentResult>(
@@ -120,10 +121,10 @@ public static class CommentEndpoints
 
     return result.Outcome switch
     {
-      UpdateCommentOutcome.Success => Results.Ok(MapUpdateCommentResponse(result.Item!)),
-      UpdateCommentOutcome.NotFound => Results.NotFound(new { message = result.Message }),
-      UpdateCommentOutcome.Forbidden => Results.Forbid(),
-      _ => Results.BadRequest(new { message = result.Message }),
+      UpdateCommentOutcome.Success => Results.Ok(SendResponse.Success(MapUpdateCommentResponse(result.Item!))),
+      UpdateCommentOutcome.NotFound => Results.NotFound(SendResponse.Fail(new { message = result.Message })),
+      UpdateCommentOutcome.Forbidden => Results.Json(SendResponse.Fail(new { message = result.Message }), statusCode: StatusCodes.Status403Forbidden),
+      _ => Results.BadRequest(SendResponse.Fail(new { message = result.Message })),
     };
   }
 
@@ -136,13 +137,13 @@ public static class CommentEndpoints
     var userIdValue = user.FindFirstValue(ClaimTypes.NameIdentifier);
     if (!Guid.TryParse(userIdValue, out var userId))
     {
-      return Results.Unauthorized();
+      return Results.Json(SendResponse.Fail(new { message = "Authentication is required." }), statusCode: StatusCodes.Status401Unauthorized);
     }
 
     var roleValue = user.FindFirstValue(ClaimTypes.Role);
     if (!Enum.TryParse<UserRole>(roleValue, ignoreCase: true, out var role))
     {
-      return Results.Forbid();
+      return Results.Json(SendResponse.Fail(new { message = "You do not have permission to access this resource." }), statusCode: StatusCodes.Status403Forbidden);
     }
 
     var result = await bus.InvokeAsync<DeleteCommentResult>(
@@ -152,9 +153,9 @@ public static class CommentEndpoints
     return result.Outcome switch
     {
       DeleteCommentOutcome.Success => Results.NoContent(),
-      DeleteCommentOutcome.NotFound => Results.NotFound(new { message = result.Message }),
-      DeleteCommentOutcome.Forbidden => Results.Forbid(),
-      _ => Results.BadRequest(new { message = result.Message }),
+      DeleteCommentOutcome.NotFound => Results.NotFound(SendResponse.Fail(new { message = result.Message })),
+      DeleteCommentOutcome.Forbidden => Results.Json(SendResponse.Fail(new { message = result.Message }), statusCode: StatusCodes.Status403Forbidden),
+      _ => Results.BadRequest(SendResponse.Fail(new { message = result.Message })),
     };
   }
 

@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using System.Text;
 using Api.Auth;
+using Api.Responses;
 using Application.Auth.Abstractions;
 using Application.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -66,6 +67,33 @@ public static class AuthenticationExtensions
                             AuthCookies.ClearAuthCookies(context.HttpContext);
                             context.Fail("The user account is no longer active.");
                         }
+                    },
+                    OnChallenge = async context =>
+                    {
+                        context.HandleResponse();
+
+                        if (context.Response.HasStarted)
+                        {
+                            return;
+                        }
+
+                        AuthCookies.ClearAuthCookies(context.HttpContext);
+                        await Results.Json(
+                                SendResponse.Fail(new { message = "Authentication is required." }),
+                                statusCode: StatusCodes.Status401Unauthorized)
+                            .ExecuteAsync(context.HttpContext);
+                    },
+                    OnForbidden = async context =>
+                    {
+                        if (context.Response.HasStarted)
+                        {
+                            return;
+                        }
+
+                        await Results.Json(
+                                SendResponse.Fail(new { message = "You do not have permission to access this resource." }),
+                                statusCode: StatusCodes.Status403Forbidden)
+                            .ExecuteAsync(context.HttpContext);
                     },
                 };
             });

@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Api.DTOs.Posts;
+using Api.Responses;
 using Application.Posts.GetFeed;
 using Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
@@ -31,7 +32,7 @@ public static class FeedEndpoints
         var userIdValue = user.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!Guid.TryParse(userIdValue, out var userId))
         {
-            return Results.Unauthorized();
+            return Results.Json(SendResponse.Fail(new { message = "Authentication is required." }), statusCode: StatusCodes.Status401Unauthorized);
         }
 
         var result = await bus.InvokeAsync<GetFeedResult>(
@@ -40,7 +41,7 @@ public static class FeedEndpoints
 
         return result.Outcome switch
         {
-            GetFeedOutcome.Success => Results.Ok(new GetFeedResponse(
+            GetFeedOutcome.Success => Results.Ok(SendResponse.Success(new GetFeedResponse(
                 (result.Items ?? [])
                     .Select(item => new PostFeedItemResponse(
                         item.Id,
@@ -60,8 +61,8 @@ public static class FeedEndpoints
                         MapVote(item.CurrentVote)))
                     .ToArray(),
                 result.NextCursor,
-                result.HasMore)),
-            _ => Results.BadRequest(new { message = result.Message }),
+                result.HasMore))),
+            _ => Results.BadRequest(SendResponse.Fail(new { message = result.Message })),
         };
     }
 

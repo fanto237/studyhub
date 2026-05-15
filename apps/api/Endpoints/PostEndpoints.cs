@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Api.DTOs.Posts;
+using Api.Responses;
 using Application.Posts.CreatePost;
 using Application.Posts.DeletePost;
 using Application.Posts.DownloadPost;
@@ -71,7 +72,7 @@ public static class PostEndpoints
     var userIdValue = user.FindFirstValue(ClaimTypes.NameIdentifier);
     if (!Guid.TryParse(userIdValue, out var userId))
     {
-      return Results.Unauthorized();
+      return Results.Json(SendResponse.Fail(new { message = "Authentication is required." }), statusCode: StatusCodes.Status401Unauthorized);
     }
 
     var result = await bus.InvokeAsync<GetPostsResult>(
@@ -90,7 +91,7 @@ public static class PostEndpoints
     var userIdValue = user.FindFirstValue(ClaimTypes.NameIdentifier);
     if (!Guid.TryParse(userIdValue, out var userId))
     {
-      return Results.Unauthorized();
+      return Results.Json(SendResponse.Fail(new { message = "Authentication is required." }), statusCode: StatusCodes.Status401Unauthorized);
     }
 
     var result = await bus.InvokeAsync<GetPostsResult>(
@@ -109,7 +110,7 @@ public static class PostEndpoints
     var userIdValue = user.FindFirstValue(ClaimTypes.NameIdentifier);
     if (!Guid.TryParse(userIdValue, out var userId))
     {
-      return Results.Unauthorized();
+      return Results.Json(SendResponse.Fail(new { message = "Authentication is required." }), statusCode: StatusCodes.Status401Unauthorized);
     }
 
     var result = await bus.InvokeAsync<GetPostResult>(
@@ -118,9 +119,9 @@ public static class PostEndpoints
 
     return result.Outcome switch
     {
-      GetPostOutcome.Success => Results.Ok(MapGetPostResponse(result.Item!)),
-      GetPostOutcome.NotFound => Results.NotFound(new { message = result.Message }),
-      _ => Results.BadRequest(new { message = result.Message }),
+      GetPostOutcome.Success => Results.Ok(SendResponse.Success(MapGetPostResponse(result.Item!))),
+      GetPostOutcome.NotFound => Results.NotFound(SendResponse.Fail(new { message = result.Message })),
+      _ => Results.BadRequest(SendResponse.Fail(new { message = result.Message })),
     };
   }
 
@@ -133,7 +134,7 @@ public static class PostEndpoints
     var userIdValue = user.FindFirstValue(ClaimTypes.NameIdentifier);
     if (!Guid.TryParse(userIdValue, out var userId))
     {
-      return Results.Unauthorized();
+      return Results.Json(SendResponse.Fail(new { message = "Authentication is required." }), statusCode: StatusCodes.Status401Unauthorized);
     }
 
     var result = await bus.InvokeAsync<DownloadPostResult>(
@@ -142,13 +143,13 @@ public static class PostEndpoints
 
     return result.Outcome switch
     {
-      DownloadPostOutcome.Success => Results.Ok(new DownloadPostResponse(
+      DownloadPostOutcome.Success => Results.Ok(SendResponse.Success(new DownloadPostResponse(
           result.PostId!.Value,
           result.DownloadUrl!,
           result.FileName,
-          result.Message)),
-      DownloadPostOutcome.NotFound => Results.NotFound(new { message = result.Message }),
-      _ => Results.BadRequest(new { message = result.Message }),
+          result.Message))),
+      DownloadPostOutcome.NotFound => Results.NotFound(SendResponse.Fail(new { message = result.Message })),
+      _ => Results.BadRequest(SendResponse.Fail(new { message = result.Message })),
     };
   }
 
@@ -162,13 +163,13 @@ public static class PostEndpoints
     var userIdValue = user.FindFirstValue(ClaimTypes.NameIdentifier);
     if (!Guid.TryParse(userIdValue, out var userId))
     {
-      return Results.Unauthorized();
+      return Results.Json(SendResponse.Fail(new { message = "Authentication is required." }), statusCode: StatusCodes.Status401Unauthorized);
     }
 
     var roleValue = user.FindFirstValue(ClaimTypes.Role);
     if (!Enum.TryParse<UserRole>(roleValue, ignoreCase: true, out var role))
     {
-      return Results.Forbid();
+      return Results.Json(SendResponse.Fail(new { message = "You do not have permission to access this resource." }), statusCode: StatusCodes.Status403Forbidden);
     }
 
     var command = new UpdatePostCommand(
@@ -183,10 +184,10 @@ public static class PostEndpoints
 
     return result.Outcome switch
     {
-      UpdatePostOutcome.Success => Results.Ok(MapGetPostResponse(result.Item!)),
-      UpdatePostOutcome.NotFound => Results.NotFound(new { message = result.Message }),
-      UpdatePostOutcome.Forbidden => Results.Forbid(),
-      _ => Results.BadRequest(new { message = result.Message }),
+      UpdatePostOutcome.Success => Results.Ok(SendResponse.Success(MapGetPostResponse(result.Item!))),
+      UpdatePostOutcome.NotFound => Results.NotFound(SendResponse.Fail(new { message = result.Message })),
+      UpdatePostOutcome.Forbidden => Results.Json(SendResponse.Fail(new { message = result.Message }), statusCode: StatusCodes.Status403Forbidden),
+      _ => Results.BadRequest(SendResponse.Fail(new { message = result.Message })),
     };
   }
 
@@ -199,13 +200,13 @@ public static class PostEndpoints
     var userIdValue = user.FindFirstValue(ClaimTypes.NameIdentifier);
     if (!Guid.TryParse(userIdValue, out var userId))
     {
-      return Results.Unauthorized();
+      return Results.Json(SendResponse.Fail(new { message = "Authentication is required." }), statusCode: StatusCodes.Status401Unauthorized);
     }
 
     var roleValue = user.FindFirstValue(ClaimTypes.Role);
     if (!Enum.TryParse<UserRole>(roleValue, ignoreCase: true, out var role))
     {
-      return Results.Forbid();
+      return Results.Json(SendResponse.Fail(new { message = "You do not have permission to access this resource." }), statusCode: StatusCodes.Status403Forbidden);
     }
 
     var result = await bus.InvokeAsync<DeletePostResult>(
@@ -215,9 +216,9 @@ public static class PostEndpoints
     return result.Outcome switch
     {
       DeletePostOutcome.Success => Results.NoContent(),
-      DeletePostOutcome.NotFound => Results.NotFound(new { message = result.Message }),
-      DeletePostOutcome.Forbidden => Results.Forbid(),
-      _ => Results.BadRequest(new { message = result.Message }),
+      DeletePostOutcome.NotFound => Results.NotFound(SendResponse.Fail(new { message = result.Message })),
+      DeletePostOutcome.Forbidden => Results.Json(SendResponse.Fail(new { message = result.Message }), statusCode: StatusCodes.Status403Forbidden),
+      _ => Results.BadRequest(SendResponse.Fail(new { message = result.Message })),
     };
   }
 
@@ -231,7 +232,7 @@ public static class PostEndpoints
     var userIdValue = user.FindFirstValue(ClaimTypes.NameIdentifier);
     if (!Guid.TryParse(userIdValue, out var userId))
     {
-      return Results.Unauthorized();
+      return Results.Json(SendResponse.Fail(new { message = "Authentication is required." }), statusCode: StatusCodes.Status401Unauthorized);
     }
 
     var result = await bus.InvokeAsync<VotePostResult>(
@@ -240,15 +241,15 @@ public static class PostEndpoints
 
     return result.Outcome switch
     {
-      VotePostOutcome.Success => Results.Ok(new VotePostResponse(
+      VotePostOutcome.Success => Results.Ok(SendResponse.Success(new VotePostResponse(
           result.PostId!.Value,
           result.Upvotes,
           result.Downvotes,
           result.Score,
           result.CurrentVote,
-          result.Message)),
-      VotePostOutcome.NotFound => Results.NotFound(new { message = result.Message }),
-      _ => Results.BadRequest(new { message = result.Message }),
+          result.Message))),
+      VotePostOutcome.NotFound => Results.NotFound(SendResponse.Fail(new { message = result.Message })),
+      _ => Results.BadRequest(SendResponse.Fail(new { message = result.Message })),
     };
   }
 
@@ -262,13 +263,13 @@ public static class PostEndpoints
     var userIdValue = user.FindFirstValue(ClaimTypes.NameIdentifier);
     if (!Guid.TryParse(userIdValue, out var userId))
     {
-      return Results.Unauthorized();
+      return Results.Json(SendResponse.Fail(new { message = "Authentication is required." }), statusCode: StatusCodes.Status401Unauthorized);
     }
 
     var roleValue = user.FindFirstValue(ClaimTypes.Role);
     if (!Enum.TryParse<UserRole>(roleValue, ignoreCase: true, out var role))
     {
-      return Results.Forbid();
+      return Results.Json(SendResponse.Fail(new { message = "You do not have permission to access this resource." }), statusCode: StatusCodes.Status403Forbidden);
     }
 
     var result = await bus.InvokeAsync<ReportPostResult>(
@@ -277,15 +278,15 @@ public static class PostEndpoints
 
     return result.Outcome switch
     {
-      ReportPostOutcome.Success => Results.Ok(new ReportPostResponse(
+      ReportPostOutcome.Success => Results.Ok(SendResponse.Success(new ReportPostResponse(
           result.PostId!.Value,
           result.ReportCount,
           result.IsHidden,
-          result.Message)),
-      ReportPostOutcome.NotFound => Results.NotFound(new { message = result.Message }),
-      ReportPostOutcome.AlreadyReported => Results.Conflict(new { message = result.Message }),
-      ReportPostOutcome.Forbidden => Results.Json(new { message = result.Message }, statusCode: StatusCodes.Status403Forbidden),
-      _ => Results.BadRequest(new { message = result.Message }),
+          result.Message))),
+      ReportPostOutcome.NotFound => Results.NotFound(SendResponse.Fail(new { message = result.Message })),
+      ReportPostOutcome.AlreadyReported => Results.Conflict(SendResponse.Fail(new { message = result.Message })),
+      ReportPostOutcome.Forbidden => Results.Json(SendResponse.Fail(new { message = result.Message }), statusCode: StatusCodes.Status403Forbidden),
+      _ => Results.BadRequest(SendResponse.Fail(new { message = result.Message })),
     };
   }
 
@@ -298,23 +299,23 @@ public static class PostEndpoints
     var userIdValue = user.FindFirstValue(ClaimTypes.NameIdentifier);
     if (!Guid.TryParse(userIdValue, out var userId))
     {
-      return Results.Unauthorized();
+      return Results.Json(SendResponse.Fail(new { message = "Authentication is required." }), statusCode: StatusCodes.Status401Unauthorized);
     }
 
     if (request.File is null)
     {
-      return Results.BadRequest(new { message = "A PDF file is required." });
+      return Results.BadRequest(SendResponse.Fail(new { message = "A PDF file is required." }));
     }
 
     if (request.File.Length == 0)
     {
-      return Results.BadRequest(new { message = "The uploaded PDF file cannot be empty." });
+      return Results.BadRequest(SendResponse.Fail(new { message = "The uploaded PDF file cannot be empty." }));
     }
 
     if (request.File.Length > CreatePostCommandValidator.MaxFileSizeBytes)
     {
       return Results.Json(
-          new { message = $"PDF files must be {CreatePostCommandValidator.MaxFileSizeBytes / (1024 * 1024)} MB or smaller." },
+          SendResponse.Fail(new { message = $"PDF files must be {CreatePostCommandValidator.MaxFileSizeBytes / (1024 * 1024)} MB or smaller." }),
           statusCode: StatusCodes.Status413PayloadTooLarge);
     }
 
@@ -335,7 +336,7 @@ public static class PostEndpoints
 
     return result.Outcome switch
     {
-      CreatePostOutcome.Success => Results.Created($"/api/posts/{result.PostId}", new CreatePostResponse(
+      CreatePostOutcome.Success => Results.Created($"/api/posts/{result.PostId}", SendResponse.Success(new CreatePostResponse(
           result.PostId!.Value,
           result.UserId!.Value,
           result.Title!,
@@ -343,10 +344,10 @@ public static class PostEndpoints
           result.StorageUrl!,
           result.Tags ?? [],
           result.CreatedAt!.Value,
-          result.Message)),
-      CreatePostOutcome.PayloadTooLarge => Results.Json(new { message = result.Message }, statusCode: StatusCodes.Status413PayloadTooLarge),
-      CreatePostOutcome.InvalidFile => Results.BadRequest(new { message = result.Message }),
-      _ => Results.BadRequest(new { message = result.Message }),
+          result.Message))),
+      CreatePostOutcome.PayloadTooLarge => Results.Json(SendResponse.Fail(new { message = result.Message }), statusCode: StatusCodes.Status413PayloadTooLarge),
+      CreatePostOutcome.InvalidFile => Results.BadRequest(SendResponse.Fail(new { message = result.Message })),
+      _ => Results.BadRequest(SendResponse.Fail(new { message = result.Message })),
     };
   }
 
@@ -354,7 +355,7 @@ public static class PostEndpoints
   {
     return result.Outcome switch
     {
-      GetPostsOutcome.Success => Results.Ok(new GetPostsResponse(
+      GetPostsOutcome.Success => Results.Ok(SendResponse.Success(new GetPostsResponse(
           (result.Items ?? [])
               .Select(item => new PostFeedItemResponse(
                   item.Id,
@@ -376,8 +377,8 @@ public static class PostEndpoints
           result.Page,
           result.PageSize,
           result.TotalCount,
-          result.TotalPages)),
-      _ => Results.BadRequest(new { message = result.Message }),
+          result.TotalPages))),
+      _ => Results.BadRequest(SendResponse.Fail(new { message = result.Message })),
     };
   }
 

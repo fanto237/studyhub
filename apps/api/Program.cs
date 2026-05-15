@@ -1,5 +1,6 @@
 using Api.Endpoints;
 using Api.Extensions;
+using Api.Responses;
 using Application;
 using Application.Extensions;
 using Application.Posts.CreatePost;
@@ -28,6 +29,17 @@ if (app.Environment.IsDevelopment())
 {
   app.MapOpenApi();
 }
+
+app.UseExceptionHandler(exceptionApp =>
+{
+  exceptionApp.Run(async context =>
+  {
+    await Results.Json(
+        SendResponse.Error("An unexpected error occurred."),
+        statusCode: StatusCodes.Status500InternalServerError)
+      .ExecuteAsync(context);
+  });
+});
 
 app.UseHttpsRedirection();
 app.UseAuthentication();

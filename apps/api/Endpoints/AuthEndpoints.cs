@@ -1,6 +1,7 @@
 using Api.Auth;
 using Api.DTOs.Auth;
 using Api.DTOs.Users;
+using Api.Responses;
 using Application.Auth.Login;
 using Application.Auth.LogoutSession;
 using Application.Auth.RefreshSession;
@@ -55,7 +56,7 @@ public static class AuthEndpoints
 
     return result.Outcome switch
     {
-      RegisterUserOutcome.Success => Results.Created($"/api/users/{result.UserId}", new RegisterAccountResponse(
+      RegisterUserOutcome.Success => Results.Created($"/api/users/{result.UserId}", SendResponse.Success(new RegisterAccountResponse(
           result.UserId!.Value,
           result.PrivateEmail!,
           result.Username!,
@@ -63,11 +64,11 @@ public static class AuthEndpoints
           result.SchoolEmail!,
           result.UniversityName!,
           result.IsVerified,
-          result.Message)),
-      RegisterUserOutcome.PrivateEmailAlreadyRegistered => Results.Conflict(new { message = result.Message }),
-      RegisterUserOutcome.UsernameAlreadyRegistered => Results.Conflict(new { message = result.Message }),
-      RegisterUserOutcome.SchoolEmailAlreadyRegistered => Results.Conflict(new { message = result.Message }),
-      _ => Results.BadRequest(new { message = result.Message }),
+          result.Message))),
+      RegisterUserOutcome.PrivateEmailAlreadyRegistered => Results.Conflict(SendResponse.Fail(new { message = result.Message })),
+      RegisterUserOutcome.UsernameAlreadyRegistered => Results.Conflict(SendResponse.Fail(new { message = result.Message })),
+      RegisterUserOutcome.SchoolEmailAlreadyRegistered => Results.Conflict(SendResponse.Fail(new { message = result.Message })),
+      _ => Results.BadRequest(SendResponse.Fail(new { message = result.Message })),
     };
   }
 
@@ -80,14 +81,14 @@ public static class AuthEndpoints
 
     return result.Outcome switch
     {
-      VerifyAccountOutcome.Success => Results.Ok(new VerifyAccountResponse(
+      VerifyAccountOutcome.Success => Results.Ok(SendResponse.Success(new VerifyAccountResponse(
           result.UserId!.Value,
           result.SchoolEmail!,
           result.IsVerified,
           result.LastVerifiedAt,
-          result.Message)),
-      VerifyAccountOutcome.AlreadyVerified => Results.Conflict(new { message = result.Message }),
-      _ => Results.BadRequest(new { message = result.Message }),
+          result.Message))),
+      VerifyAccountOutcome.AlreadyVerified => Results.Conflict(SendResponse.Fail(new { message = result.Message })),
+      _ => Results.BadRequest(SendResponse.Fail(new { message = result.Message })),
     };
   }
 
@@ -104,9 +105,9 @@ public static class AuthEndpoints
     return result.Outcome switch
     {
       LoginOutcome.Success => CreateAuthenticatedResult(httpContext, result),
-      LoginOutcome.AccountNotVerified => Results.Json(new { message = result.Message }, statusCode: StatusCodes.Status403Forbidden),
-      LoginOutcome.InvalidCredentials => Results.Json(new { message = result.Message }, statusCode: StatusCodes.Status404NotFound),
-      _ => Results.BadRequest(new { message = result.Message }),
+      LoginOutcome.AccountNotVerified => Results.Json(SendResponse.Fail(new { message = result.Message }), statusCode: StatusCodes.Status403Forbidden),
+      LoginOutcome.InvalidCredentials => Results.Json(SendResponse.Fail(new { message = result.Message }), statusCode: StatusCodes.Status404NotFound),
+      _ => Results.BadRequest(SendResponse.Fail(new { message = result.Message })),
     };
   }
 
@@ -130,8 +131,8 @@ public static class AuthEndpoints
 
     return result.Outcome switch
     {
-      RefreshSessionOutcome.InvalidRefreshToken => Results.Json(new { message = result.Message }, statusCode: StatusCodes.Status401Unauthorized),
-      _ => Results.Json(new { message = "The refresh token is invalid or has expired." }, statusCode: StatusCodes.Status401Unauthorized),
+      RefreshSessionOutcome.InvalidRefreshToken => Results.Json(SendResponse.Fail(new { message = result.Message }), statusCode: StatusCodes.Status401Unauthorized),
+      _ => Results.Json(SendResponse.Fail(new { message = "The refresh token is invalid or has expired." }), statusCode: StatusCodes.Status401Unauthorized),
     };
   }
 
@@ -150,8 +151,8 @@ public static class AuthEndpoints
 
     return result.Outcome switch
     {
-      LogoutSessionOutcome.Success => Results.Ok(new LogoutResponse(result.Message)),
-      _ => Results.BadRequest(new { message = result.Message }),
+      LogoutSessionOutcome.Success => Results.Ok(SendResponse.Success(new LogoutResponse(result.Message))),
+      _ => Results.BadRequest(SendResponse.Fail(new { message = result.Message })),
     };
   }
 
@@ -163,11 +164,11 @@ public static class AuthEndpoints
 
     return result.Outcome switch
     {
-      SendAuthCodeOutcome.Success => Results.Ok(result.Message),
-      SendAuthCodeOutcome.SchoolEmailNotRegistered => Results.Json(new { message = result.Message }, statusCode: StatusCodes.Status404NotFound),
-      SendAuthCodeOutcome.UserAlreadyVerified => Results.Json(new { message = result.Message }, statusCode: StatusCodes.Status409Conflict),
-      SendAuthCodeOutcome.CodeAlreadySent => Results.Json(new { message = result.Message }, statusCode: StatusCodes.Status429TooManyRequests),
-      _ => Results.BadRequest(new { message = result.Message }),
+      SendAuthCodeOutcome.Success => Results.Ok(SendResponse.Success(result.Message)),
+      SendAuthCodeOutcome.SchoolEmailNotRegistered => Results.Json(SendResponse.Fail(new { message = result.Message }), statusCode: StatusCodes.Status404NotFound),
+      SendAuthCodeOutcome.UserAlreadyVerified => Results.Json(SendResponse.Fail(new { message = result.Message }), statusCode: StatusCodes.Status409Conflict),
+      SendAuthCodeOutcome.CodeAlreadySent => Results.Json(SendResponse.Fail(new { message = result.Message }), statusCode: StatusCodes.Status429TooManyRequests),
+      _ => Results.BadRequest(SendResponse.Fail(new { message = result.Message })),
     };
   }
 
@@ -180,7 +181,7 @@ public static class AuthEndpoints
         result.RefreshToken!,
         result.RefreshTokenExpiresAt!.Value);
 
-    return Results.Ok(new AuthSessionResponse(
+    return Results.Ok(SendResponse.Success(new AuthSessionResponse(
         result.UserId!.Value,
         result.Username!,
         result.PrivateEmail!,
@@ -189,7 +190,7 @@ public static class AuthEndpoints
         result.IsVerified,
         result.AccessTokenExpiresAt.Value,
         result.RefreshTokenExpiresAt.Value,
-        result.Message));
+        result.Message)));
   }
 
   private static IResult CreateAuthenticatedResult(HttpContext httpContext, RefreshSessionResult result)
@@ -201,7 +202,7 @@ public static class AuthEndpoints
         result.RefreshToken!,
         result.RefreshTokenExpiresAt!.Value);
 
-    return Results.Ok(new AuthSessionResponse(
+    return Results.Ok(SendResponse.Success(new AuthSessionResponse(
         result.UserId!.Value,
         result.Username!,
         result.PrivateEmail!,
@@ -210,6 +211,6 @@ public static class AuthEndpoints
         result.IsVerified,
         result.AccessTokenExpiresAt.Value,
         result.RefreshTokenExpiresAt.Value,
-        result.Message));
+        result.Message)));
   }
 }

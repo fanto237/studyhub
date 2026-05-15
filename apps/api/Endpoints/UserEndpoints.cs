@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Api.Auth;
 using Api.DTOs.Posts;
 using Api.DTOs.Users;
+using Api.Responses;
 using Application.Posts.GetPosts;
 using Application.Users.DeleteUser;
 using Application.Users.GetCurrentUser;
@@ -52,7 +53,7 @@ public static class UserEndpoints
     var userIdValue = user.FindFirstValue(ClaimTypes.NameIdentifier);
     if (!Guid.TryParse(userIdValue, out var userId))
     {
-      return Results.Unauthorized();
+      return Results.Json(SendResponse.Fail(new { message = "Authentication is required." }), statusCode: StatusCodes.Status401Unauthorized);
     }
 
     var result = await bus.InvokeAsync<GetCurrentUserResult>(
@@ -61,9 +62,9 @@ public static class UserEndpoints
 
     return result.Outcome switch
     {
-      GetCurrentUserOutcome.Success => Results.Ok(MapGetCurrentUserResponse(result.Item!)),
-      GetCurrentUserOutcome.NotFound => Results.NotFound(new { message = result.Message }),
-      _ => Results.BadRequest(new { message = result.Message }),
+      GetCurrentUserOutcome.Success => Results.Ok(SendResponse.Success(MapGetCurrentUserResponse(result.Item!))),
+      GetCurrentUserOutcome.NotFound => Results.NotFound(SendResponse.Fail(new { message = result.Message })),
+      _ => Results.BadRequest(SendResponse.Fail(new { message = result.Message })),
     };
   }
 
@@ -76,7 +77,7 @@ public static class UserEndpoints
     var userIdValue = user.FindFirstValue(ClaimTypes.NameIdentifier);
     if (!Guid.TryParse(userIdValue, out var userId))
     {
-      return Results.Unauthorized();
+      return Results.Json(SendResponse.Fail(new { message = "Authentication is required." }), statusCode: StatusCodes.Status401Unauthorized);
     }
 
     var result = await bus.InvokeAsync<UpdateCurrentUserResult>(
@@ -89,11 +90,11 @@ public static class UserEndpoints
 
     return result.Outcome switch
     {
-      UpdateCurrentUserOutcome.Success => Results.Ok(MapGetCurrentUserResponse(result.Item!)),
-      UpdateCurrentUserOutcome.NotFound => Results.NotFound(new { message = result.Message }),
-      UpdateCurrentUserOutcome.UsernameAlreadyRegistered => Results.Conflict(new { message = result.Message }),
-      UpdateCurrentUserOutcome.PrivateEmailAlreadyRegistered => Results.Conflict(new { message = result.Message }),
-      _ => Results.BadRequest(new { message = result.Message }),
+      UpdateCurrentUserOutcome.Success => Results.Ok(SendResponse.Success(MapGetCurrentUserResponse(result.Item!))),
+      UpdateCurrentUserOutcome.NotFound => Results.NotFound(SendResponse.Fail(new { message = result.Message })),
+      UpdateCurrentUserOutcome.UsernameAlreadyRegistered => Results.Conflict(SendResponse.Fail(new { message = result.Message })),
+      UpdateCurrentUserOutcome.PrivateEmailAlreadyRegistered => Results.Conflict(SendResponse.Fail(new { message = result.Message })),
+      _ => Results.BadRequest(SendResponse.Fail(new { message = result.Message })),
     };
   }
 
@@ -108,9 +109,9 @@ public static class UserEndpoints
 
     return result.Outcome switch
     {
-      GetPublicUserProfileOutcome.Success => Results.Ok(MapGetPublicUserProfileResponse(result.Item!)),
-      GetPublicUserProfileOutcome.NotFound => Results.NotFound(new { message = result.Message }),
-      _ => Results.BadRequest(new { message = result.Message }),
+      GetPublicUserProfileOutcome.Success => Results.Ok(SendResponse.Success(MapGetPublicUserProfileResponse(result.Item!))),
+      GetPublicUserProfileOutcome.NotFound => Results.NotFound(SendResponse.Fail(new { message = result.Message })),
+      _ => Results.BadRequest(SendResponse.Fail(new { message = result.Message })),
     };
   }
 
@@ -124,7 +125,7 @@ public static class UserEndpoints
     var requesterUserIdValue = user.FindFirstValue(ClaimTypes.NameIdentifier);
     if (!Guid.TryParse(requesterUserIdValue, out var requesterUserId))
     {
-      return Results.Unauthorized();
+      return Results.Json(SendResponse.Fail(new { message = "Authentication is required." }), statusCode: StatusCodes.Status401Unauthorized);
     }
 
     var result = await bus.InvokeAsync<GetPostsResult>(
@@ -133,7 +134,7 @@ public static class UserEndpoints
 
     return result.Outcome switch
     {
-      GetPostsOutcome.Success => Results.Ok(new GetPostsResponse(
+      GetPostsOutcome.Success => Results.Ok(SendResponse.Success(new GetPostsResponse(
           (result.Items ?? [])
               .Select(item => new PostFeedItemResponse(
                   item.Id,
@@ -155,8 +156,8 @@ public static class UserEndpoints
           result.Page,
           result.PageSize,
           result.TotalCount,
-          result.TotalPages)),
-      _ => Results.BadRequest(new { message = result.Message }),
+          result.TotalPages))),
+      _ => Results.BadRequest(SendResponse.Fail(new { message = result.Message })),
     };
   }
 
@@ -170,12 +171,12 @@ public static class UserEndpoints
     var actorUserIdValue = user.FindFirstValue(ClaimTypes.NameIdentifier);
     if (!Guid.TryParse(actorUserIdValue, out var actorUserId))
     {
-      return Results.Unauthorized();
+      return Results.Json(SendResponse.Fail(new { message = "Authentication is required." }), statusCode: StatusCodes.Status401Unauthorized);
     }
 
     if (actorUserId != userId)
     {
-      return Results.Forbid();
+      return Results.Json(SendResponse.Fail(new { message = "You do not have permission to access this resource." }), statusCode: StatusCodes.Status403Forbidden);
     }
 
     var result = await bus.InvokeAsync<DeleteUserResult>(
@@ -190,9 +191,9 @@ public static class UserEndpoints
 
     return result.Outcome switch
     {
-      DeleteUserOutcome.NotFound => Results.NotFound(new { message = result.Message }),
-      DeleteUserOutcome.AlreadyDeleted => Results.NotFound(new { message = result.Message }),
-      _ => Results.BadRequest(new { message = result.Message }),
+      DeleteUserOutcome.NotFound => Results.NotFound(SendResponse.Fail(new { message = result.Message })),
+      DeleteUserOutcome.AlreadyDeleted => Results.NotFound(SendResponse.Fail(new { message = result.Message })),
+      _ => Results.BadRequest(SendResponse.Fail(new { message = result.Message })),
     };
   }
 
