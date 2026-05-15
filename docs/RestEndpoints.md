@@ -1,29 +1,22 @@
-### Suggested shortlist from that checklist
+Missing endpoints
 
-If you want the most practical next endpoints, I’d prioritize these first:
+### Comments
 
-#### Comments
+These are in docs/RestEndpoints.md but not fully built:
 
-- GET /api/posts/:postId/comments
-- POST /api/posts/:postId/comments
-- PATCH /api/comments/:commentId
-- DELETE /api/comments/:commentId
+- GET /api/posts/{postId}/comments
+  - Not implemented as a standalone endpoint.
+  - Current workaround: GET /api/posts/{postId} returns comments inside post detail.
+- PATCH /api/comments/{commentId}
+  - Not implemented.
+  - There is no update-comment handler/DTO yet.
 
----
+────────────────────────────────────────────────────────────────────────────────
 
-## Grouped endpoints into:
+### Optional/later post endpoints
 
-      - Must-have MVP
-      - Nice-to-have
-      - Admin / moderation
+Listed in docs/Posts-Endpoints.md as optional/later, not built yet:
 
-## Added checkbox-style endpoint inventory for:
-
-      - comments
-      - feed/discovery
-      - post interactions
-      - user profile
-      - auth verification sanity checks
-      - file/PDF handling
-
-Kept comment endpoint details and payload suggestions below the checklist
+- POST /api/posts/{postId}/download
+- POST /api/posts/upload-url
+- POST /api/posts/{postId}/restore
