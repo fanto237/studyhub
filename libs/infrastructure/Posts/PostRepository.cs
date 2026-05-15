@@ -1,4 +1,5 @@
 using Application.Posts.Abstractions;
+using Application.Posts.DownloadPost;
 using Application.Posts.GetFeed;
 using Application.Posts.GetPost;
 using Application.Posts.GetPosts;
@@ -183,6 +184,19 @@ public class PostRepository(StudyHubDbContext dbContext) : IPostRepository
             post.User,
             comments,
             post.CurrentVote));
+  }
+
+  public Task<DownloadPostItem?> GetPostForDownloadAsync(Guid postId, CancellationToken cancellationToken)
+  {
+    return dbContext.Posts
+        .AsNoTracking()
+        .Where(post => post.Id == postId)
+        .Where(post => post.DeletedAt == null)
+        .Where(post => !post.IsHidden)
+        .Select(post => new DownloadPostItem(
+            post.Id,
+            post.StorageUrl))
+        .FirstOrDefaultAsync(cancellationToken);
   }
 
   public Task<Post?> GetPostForUpdateAsync(Guid postId, CancellationToken cancellationToken)

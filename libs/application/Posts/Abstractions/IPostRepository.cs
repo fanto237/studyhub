@@ -1,3 +1,4 @@
+using Application.Posts.DownloadPost;
 using Application.Posts.GetFeed;
 using Application.Posts.GetPost;
 using Application.Posts.GetPosts;
@@ -11,6 +12,7 @@ public interface IPostRepository
     Task<GetPostsResult> GetPostsAsync(GetPostsQuery query, CancellationToken cancellationToken);
     Task<GetFeedResult> GetFeedAsync(GetFeedQuery query, CancellationToken cancellationToken);
     Task<GetPostResult> GetPostAsync(GetPostQuery query, CancellationToken cancellationToken);
+    Task<DownloadPostItem?> GetPostForDownloadAsync(Guid postId, CancellationToken cancellationToken);
     Task<Post?> GetPostForUpdateAsync(Guid postId, CancellationToken cancellationToken);
     Task<Post?> GetPostForDeleteAsync(Guid postId, CancellationToken cancellationToken);
     Task<Post?> GetPostForVotingAsync(Guid postId, Guid userId, CancellationToken cancellationToken);
