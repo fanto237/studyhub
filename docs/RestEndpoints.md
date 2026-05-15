@@ -17,6 +17,5 @@ These are in docs/RestEndpoints.md but not fully built:
 
 Listed in docs/Posts-Endpoints.md as optional/later, not built yet:
 
-- POST /api/posts/{postId}/download
 - POST /api/posts/upload-url
 - POST /api/posts/{postId}/restore

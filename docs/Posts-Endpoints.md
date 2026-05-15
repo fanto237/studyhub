@@ -7,6 +7,7 @@ Necessary MVP endpoints
 - DELETE /api/posts/{postId} — soft-delete post
 - POST /api/posts/{postId}/vote — upvote/downvote/remove vote
 - POST /api/posts/{postId}/report — moderation/reporting
+- POST /api/posts/{postId}/download — return authenticated download link payload
 
 Absolute minimum if you want to go live faster
 
@@ -20,6 +21,5 @@ Optional/later
 
 - GET /api/posts/me
 - GET /api/users/{userId}/posts
-- POST /api/posts/{postId}/download
 - POST /api/posts/upload-url
 - POST /api/posts/{postId}/restore
