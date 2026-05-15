@@ -48,3 +48,7 @@ Thumbs.db
 **/bin\Debug/
 **/obj/
 /artifacts/
+apps/api/Api.csproj.lscache
+libs/application/Application.csproj.lscache
+libs/infrastructure/Infrastructure.csproj.lscache
+libs/domain/Domain.csproj.lscache
