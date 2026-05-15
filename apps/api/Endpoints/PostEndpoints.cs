@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Api.DTOs.Posts;
 using Application.Posts.CreatePost;
 using Application.Posts.DeletePost;
+using Application.Posts.DownloadPost;
 using Application.Posts.GetPost;
 using Application.Posts.GetPosts;
 using Application.Posts.ReportPost;
@@ -48,6 +49,10 @@ public static class PostEndpoints
     group.MapPost("/{postId:guid}/report", ReportPost)
         .WithName("ReportPost")
         .WithDescription("Reports a StudyHub post for moderation review or automatic hiding.");
+
+    group.MapPost("/{postId:guid}/download", DownloadPost)
+        .WithName("DownloadPost")
+        .WithDescription("Returns a downloadable PDF URL for a visible StudyHub post.");
 
     group.MapPost(string.Empty, CreatePost)
         .WithName("CreatePost")
@@ -115,6 +120,34 @@ public static class PostEndpoints
     {
       GetPostOutcome.Success => Results.Ok(MapGetPostResponse(result.Item!)),
       GetPostOutcome.NotFound => Results.NotFound(new { message = result.Message }),
+      _ => Results.BadRequest(new { message = result.Message }),
+    };
+  }
+
+  private static async Task<IResult> DownloadPost(
+      Guid postId,
+      ClaimsPrincipal user,
+      IMessageBus bus,
+      CancellationToken cancellationToken)
+  {
+    var userIdValue = user.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (!Guid.TryParse(userIdValue, out var userId))
+    {
+      return Results.Unauthorized();
+    }
+
+    var result = await bus.InvokeAsync<DownloadPostResult>(
+        new DownloadPostCommand(postId, userId),
+        cancellationToken);
+
+    return result.Outcome switch
+    {
+      DownloadPostOutcome.Success => Results.Ok(new DownloadPostResponse(
+          result.PostId!.Value,
+          result.DownloadUrl!,
+          result.FileName,
+          result.Message)),
+      DownloadPostOutcome.NotFound => Results.NotFound(new { message = result.Message }),
       _ => Results.BadRequest(new { message = result.Message }),
     };
   }
