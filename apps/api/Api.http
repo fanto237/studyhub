@@ -105,6 +105,42 @@ Accept: application/json
 
 ###
 
+POST {{Api_HostAddress}}/api/posts/00000000-0000-0000-0000-000000000000/comments
+Content-Type: application/json
+Accept: application/json
+
+{
+  "text": "Thanks for sharing this study guide!"
+}
+
+###
+
+POST {{Api_HostAddress}}/api/posts/00000000-0000-0000-0000-000000000000/comments
+Content-Type: application/json
+Accept: application/json
+
+{
+  "text": "Replying to the first comment.",
+  "parentCommentId": "11111111-1111-1111-1111-111111111111"
+}
+
+###
+
+GET {{Api_HostAddress}}/api/posts/00000000-0000-0000-0000-000000000000/comments
+Accept: application/json
+
+###
+
+PATCH {{Api_HostAddress}}/api/comments/11111111-1111-1111-1111-111111111111
+Content-Type: application/json
+Accept: application/json
+
+{
+  "text": "Updated comment text."
+}
+
+###
+
 GET {{Api_HostAddress}}/api/posts/me?page=1&pageSize=20&sort=new
 Accept: application/json
 
