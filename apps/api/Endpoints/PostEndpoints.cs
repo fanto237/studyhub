@@ -356,7 +356,7 @@ public static class PostEndpoints
     return result.Outcome switch
     {
       GetPostsOutcome.Success => Results.Ok(SendResponse.Success(new GetPostsResponse(
-          (result.Items ?? [])
+          [.. (result.Items ?? [])
               .Select(item => new PostFeedItemResponse(
                   item.Id,
                   item.Title,
@@ -372,8 +372,7 @@ public static class PostEndpoints
                       item.User.Id,
                       item.User.Username,
                       item.User.FullName),
-                  MapVote(item.CurrentVote)))
-              .ToArray(),
+                  MapVote(item.CurrentVote)))],
           result.Page,
           result.PageSize,
           result.TotalCount,
