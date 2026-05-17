@@ -9,6 +9,13 @@ public interface IAuthEmailService
         DateTimeOffset expiresAt,
         CancellationToken cancellationToken = default);
 
+    Task SendPasswordResetCodeAsync(
+        string fullName,
+        string privateEmail,
+        string code,
+        DateTimeOffset expiresAt,
+        CancellationToken cancellationToken = default);
+
     Task SendWelcomeEmailAsync(
         string fullName,
         string privateEmail,

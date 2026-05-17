@@ -24,6 +24,20 @@ public class AuthEmailService(IOptions<EmailSetting> emailOptions) : IAuthEmailS
         return SendEmailAsync(schoolEmail, subject, htmlBody, plainTextBody, cancellationToken);
     }
 
+    public Task SendPasswordResetCodeAsync(
+        string fullName,
+        string privateEmail,
+        string code,
+        DateTimeOffset expiresAt,
+        CancellationToken cancellationToken = default)
+    {
+        var subject = "Reset your StudyHub password";
+        var htmlBody = StudyHubEmailTemplateFactory.BuildPasswordResetHtml(fullName, code, expiresAt);
+        var plainTextBody = StudyHubEmailTemplateFactory.BuildPasswordResetPlainText(fullName, code, expiresAt);
+
+        return SendEmailAsync(privateEmail, subject, htmlBody, plainTextBody, cancellationToken);
+    }
+
     public Task SendWelcomeEmailAsync(
         string fullName,
         string privateEmail,
