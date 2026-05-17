@@ -1,0 +1,159 @@
+@let postItem = post();
+
+<article
+  class="group rounded-3xl border border-base-300 bg-base-100/95 p-4 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 sm:p-5"
+>
+  <div class="flex gap-4">
+    <div
+      class="hidden w-14 shrink-0 flex-col items-center gap-1 rounded-2xl bg-base-200/80 p-1.5 sm:flex"
+      aria-label="Vote controls"
+    >
+      <button
+        class="btn btn-ghost btn-xs btn-square"
+        [class.text-primary]="postItem.currentVote === 'up'"
+        [disabled]="voting()"
+        type="button"
+        (click)="requestVote(postItem.currentVote === 'up' ? 'remove' : 'up')"
+        aria-label="Upvote post"
+      >
+        <app-icon name="arrow-up" class="size-5" />
+      </button>
+      <span class="text-sm font-black">{{ postItem.score | number }}</span>
+      <button
+        class="btn btn-ghost btn-xs btn-square"
+        [class.text-secondary]="postItem.currentVote === 'down'"
+        [disabled]="voting()"
+        type="button"
+        (click)="requestVote(postItem.currentVote === 'down' ? 'remove' : 'down')"
+        aria-label="Downvote post"
+      >
+        <app-icon name="arrow-down" class="size-5" />
+      </button>
+    </div>
+
+    <div class="min-w-0 flex-1">
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="badge badge-primary badge-sm">PDF</span>
+        @if (postItem.currentVote) {
+        <span class="badge badge-accent badge-soft badge-sm">
+          Voted {{ postItem.currentVote }}
+        </span>
+        }
+        <span
+          class="text-xs font-bold uppercase tracking-[0.18em] text-base-content/40"
+        >
+          {{ postItem.createdAt | date: 'mediumDate' }}
+        </span>
+      </div>
+
+      <h3 class="mt-3 text-xl font-black leading-tight tracking-tight sm:text-2xl">
+        <a
+          class="link-hover hover:text-primary"
+          [href]="postItem.storageUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {{ postItem.title }}
+        </a>
+      </h3>
+
+      <p class="mt-3 max-w-3xl text-sm leading-7 text-base-content/65">
+        {{ postItem.description || 'No description was added for this resource.' }}
+      </p>
+
+      @if (postItem.tags.length > 0) {
+      <div class="mt-4 flex flex-wrap gap-2" [title]="postItem.tags.join(', ')">
+        @for (tag of visibleTags(postItem.tags); track tag) {
+        <button
+          class="badge badge-outline cursor-pointer transition hover:border-primary hover:text-primary"
+          type="button"
+          (click)="selectTag(tag)"
+        >
+          {{ tag }}
+        </button>
+        } @if (extraTagCount(postItem.tags) > 0) {
+        <span class="badge badge-ghost">+{{ extraTagCount(postItem.tags) }}</span>
+        }
+      </div>
+      }
+
+      <div
+        class="mt-5 flex flex-col gap-4 border-t border-base-300 pt-4 lg:flex-row lg:items-center lg:justify-between"
+      >
+        <div class="flex min-w-0 items-center gap-3">
+          <span
+            class="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-sm font-black text-primary"
+          >
+            {{ initials(postItem.user) }}
+          </span>
+          <div class="min-w-0">
+            <p class="truncate text-sm font-bold">
+              {{ postItem.user.fullName }}
+            </p>
+            <p class="truncate text-xs text-base-content/50">
+              @{{ postItem.user.username }}
+            </p>
+          </div>
+          <div
+            class="ml-2 flex items-center gap-1 text-sm font-semibold text-base-content/55"
+          >
+            <app-icon name="message-circle" class="size-4" />
+            <span>{{ postItem.commentCount | number }}</span>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <div class="join sm:hidden">
+            <button
+              class="btn btn-outline btn-sm join-item"
+              [class.text-primary]="postItem.currentVote === 'up'"
+              [disabled]="voting()"
+              type="button"
+              (click)="requestVote(postItem.currentVote === 'up' ? 'remove' : 'up')"
+              aria-label="Upvote post"
+            >
+              <app-icon name="arrow-up" class="size-4" />
+            </button>
+            <span class="btn btn-outline btn-sm join-item pointer-events-none">
+              {{ postItem.score | number }}
+            </span>
+            <button
+              class="btn btn-outline btn-sm join-item"
+              [class.text-secondary]="postItem.currentVote === 'down'"
+              [disabled]="voting()"
+              type="button"
+              (click)="requestVote(postItem.currentVote === 'down' ? 'remove' : 'down')"
+              aria-label="Downvote post"
+            >
+              <app-icon name="arrow-down" class="size-4" />
+            </button>
+          </div>
+
+          <a
+            class="btn btn-outline btn-sm"
+            [href]="postItem.storageUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            View PDF
+          </a>
+          <button
+            class="btn btn-primary btn-sm text-primary-content"
+            [disabled]="downloading()"
+            type="button"
+            (click)="requestDownload()"
+          >
+            @if (downloading()) {
+            <span
+              class="loading loading-spinner loading-xs"
+              aria-hidden="true"
+            ></span>
+            Preparing } @else {
+            <app-icon name="download" class="size-4" />
+            Download }
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</article>
