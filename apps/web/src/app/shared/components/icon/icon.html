@@ -1,0 +1,19 @@
+<svg
+  class="block size-full"
+  [attr.viewBox]="icon().viewBox"
+  [attr.fill]="icon().fill"
+  xmlns="http://www.w3.org/2000/svg"
+  aria-hidden="true"
+  focusable="false"
+>
+  @for (path of icon().paths; track path.d) {
+  <path
+    [attr.d]="path.d"
+    [attr.fill]="path.fill"
+    [attr.stroke]="path.stroke"
+    [attr.stroke-width]="path.strokeWidth"
+    [attr.stroke-linecap]="path.strokeLinecap"
+    [attr.stroke-linejoin]="path.strokeLinejoin"
+  />
+  }
+</svg>
