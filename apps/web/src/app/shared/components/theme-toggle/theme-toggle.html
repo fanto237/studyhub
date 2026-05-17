@@ -1,0 +1,14 @@
+<button
+  class="btn btn-ghost btn-circle btn-sm sm:btn-md"
+  type="button"
+  [attr.aria-label]="label()"
+  [title]="label()"
+  (click)="toggleTheme()"
+>
+  @if (activeTheme() === 'dark') {
+  <app-icon name="sun" class="size-4 sm:size-5" />
+  } @else {
+  <app-icon name="moon" class="size-4 sm:size-5" />
+  }
+  <span class="sr-only">{{ label() }}</span>
+</button>
