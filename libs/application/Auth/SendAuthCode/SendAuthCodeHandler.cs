@@ -11,6 +11,9 @@ namespace Application.Auth.SendAuthCode;
 
 public class SendAuthCodeHandler
 {
+  private const int VerificationCodeLifetimeMinutes = 10;
+  private const int ResendCooldownMinutes = 5;
+
   public static async Task<SendAuthCodeResult> Handle(
       SendAuthCodeCommand command,
       CancellationToken cancellationToken,
@@ -39,14 +42,14 @@ public class SendAuthCodeHandler
     }
 
     var user = await authRepository.GetUserWithAuthCodesBySchoolEmailAsync(schoolEmail, cancellationToken);
-    if (user is null)
-    {
-      return new SendAuthCodeResult(
-          SendAuthCodeOutcome.SchoolEmailNotRegistered,
-          $"There is no user with the school email {schoolEmail}.");
-    }
+    // if (user is null)
+    // {
+    //   return new SendAuthCodeResult(
+    //       SendAuthCodeOutcome.SchoolEmailNotRegistered,
+    //       $"There is no user with the school email {schoolEmail}.");
+    // }
 
-    if (user.IsVerified)
+    if (user!.IsVerified)
     {
       return new SendAuthCodeResult(
           SendAuthCodeOutcome.UserAlreadyVerified,
@@ -59,16 +62,31 @@ public class SendAuthCodeHandler
         .Where(authCode => authCode.Purpose == AuthCodePurpose.SchoolEmailVerification)
         .Where(authCode => authCode.DeliveryAddress == schoolEmail)
         .Where(authCode => authCode.ConsumedAt is null)
-        .Where(authCode => now < authCode.ExpiresAt);
+        .OrderByDescending(authCode => authCode.CreatedAt)
+        .ToArray();
 
-    if (existingCodes.Any())
+    var latestCode = existingCodes.FirstOrDefault();
+    if (latestCode is not null)
     {
-      return new SendAuthCodeResult(
-          SendAuthCodeOutcome.CodeAlreadySent,
-          "The user has already received an active verification code.");
+      var resendAvailableAt = latestCode.CreatedAt.AddMinutes(ResendCooldownMinutes);
+      if (now < resendAvailableAt)
+      {
+        var remainingMinutes = Math.Max(
+            1,
+            (int)Math.Ceiling((resendAvailableAt - now).TotalMinutes));
+        var minuteLabel = remainingMinutes == 1 ? "minute" : "minutes";
+        return new SendAuthCodeResult(
+            SendAuthCodeOutcome.CodeAlreadySent,
+            $"A verification code was sent recently. Please wait {remainingMinutes} {minuteLabel} before requesting a new code.");
+      }
+
+      foreach (var existingCode in existingCodes)
+      {
+        existingCode.ConsumedAt = now;
+      }
     }
 
-    var expiresAt = now.AddMinutes(10);
+    var expiresAt = now.AddMinutes(VerificationCodeLifetimeMinutes);
     var verificationCode = GenerateVerificationCode();
 
     var authCode = new UserAuthCode
