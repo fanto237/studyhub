@@ -145,7 +145,199 @@
             </div>
           </div>
         </div>
+        } @else { @if (unverifiedAccount(); as account) { @if
+        (verifiedAccount(); as verified) {
+        <div
+          class="card border border-success/20 bg-base-100/95 shadow-2xl shadow-success/10 backdrop-blur"
+        >
+          <div class="card-body items-center p-8 text-center sm:p-10">
+            <span
+              class="flex size-16 items-center justify-center rounded-3xl bg-success text-success-content shadow-lg shadow-success/20"
+            >
+              <app-icon name="check" class="size-8" />
+            </span>
+            <p class="badge badge-success badge-soft mt-3 font-semibold">
+              Account verified
+            </p>
+            <h1
+              id="login-heading"
+              class="mt-2 text-3xl font-black tracking-tight sm:text-4xl"
+            >
+              You're ready to log in
+            </h1>
+            <p class="mt-2 max-w-sm text-base leading-7 text-base-content/70">
+              {{ verified.message }} Enter your password again to start your
+              StudyHub session.
+            </p>
+            <div class="mt-6 flex flex-wrap justify-center gap-3">
+              <button
+                class="btn btn-primary text-primary-content"
+                type="button"
+                (click)="returnToLogin()"
+              >
+                Log in now
+              </button>
+              <button
+                class="btn btn-outline"
+                type="button"
+                (click)="useDifferentAccount()"
+              >
+                Use a different account
+              </button>
+            </div>
+          </div>
+        </div>
         } @else {
+        <div
+          class="card border border-warning/20 bg-base-100/95 shadow-2xl shadow-primary/10 backdrop-blur"
+        >
+          <div class="card-body gap-6 p-6 sm:p-8">
+            <div class="text-center">
+              <span
+                class="mx-auto flex size-16 items-center justify-center rounded-3xl bg-warning text-warning-content shadow-lg shadow-warning/20"
+              >
+                <app-icon name="mail" class="size-8" />
+              </span>
+              <p class="badge badge-warning badge-soft mt-4 font-semibold">
+                Verification required
+              </p>
+              <h1
+                id="login-heading"
+                class="mt-3 text-3xl font-black tracking-tight sm:text-4xl"
+              >
+                Verify your school email
+              </h1>
+              <p class="mt-2 text-base leading-7 text-base-content/70">
+                @if (account.schoolEmail) { We can send a fresh 6-digit
+                verification code to
+                <span class="font-bold text-base-content"
+                  >{{ account.schoolEmail }}</span
+                >. } @else { Enter your school email below, then request a fresh
+                6-digit verification code. } Enter the code below to finish
+                activating your account.
+              </p>
+            </div>
+
+            @if (verificationInfoMessage(); as message) {
+            <div class="alert alert-info" role="status">
+              <app-icon name="mail" class="size-5 shrink-0" />
+              <span>{{ message }}</span>
+            </div>
+            } @if (verificationErrorMessage(); as message) {
+            <div class="alert alert-error" role="alert">
+              <app-icon name="alert-triangle" class="size-5 shrink-0" />
+              <span>{{ message }}</span>
+            </div>
+            }
+
+            <form
+              class="grid gap-5"
+              [formGroup]="verificationForm"
+              (ngSubmit)="onVerifyAccount()"
+              novalidate
+            >
+              @if (!account.schoolEmail) {
+              <label class="form-control">
+                <span class="label pb-2 font-semibold">School email</span>
+                <input
+                  class="input input-bordered w-full bg-base-100"
+                  [class.input-error]="isSchoolEmailInvalid()"
+                  formControlName="schoolEmail"
+                  autocomplete="email"
+                  placeholder="you@school.edu"
+                  type="email"
+                />
+                @if (schoolEmailError(); as error) {
+                <span class="label pt-2 text-sm text-error">{{ error }}</span>
+                }
+              </label>
+              }
+
+              <label class="form-control">
+                <span class="label pb-2 font-semibold">Verification code</span>
+                <input
+                  class="input input-bordered input-lg w-full bg-base-100 text-center text-2xl font-black tracking-[0.5em]"
+                  [class.input-error]="isVerificationCodeInvalid()"
+                  formControlName="code"
+                  autocomplete="one-time-code"
+                  inputmode="numeric"
+                  maxlength="6"
+                  pattern="[0-9]*"
+                  placeholder="000000"
+                  type="text"
+                  (input)="normalizeVerificationCode()"
+                />
+                @if (verificationCodeError(); as error) {
+                <span class="label pt-2 text-sm text-error">{{ error }}</span>
+                } @else {
+                <span class="label pt-2 text-xs text-base-content/55"
+                  >The code is exactly 6 digits and expires after 10
+                  minutes.</span
+                >
+                }
+              </label>
+
+              <button
+                class="btn btn-primary btn-lg text-primary-content"
+                [class.btn-disabled]="verificationForm.invalid || isVerifying()"
+                [disabled]="verificationForm.invalid || isVerifying()"
+                type="submit"
+              >
+                @if (isVerifying()) {
+                <span
+                  class="loading loading-spinner loading-sm"
+                  aria-hidden="true"
+                ></span>
+                Verifying... } @else { Verify account }
+              </button>
+            </form>
+
+            <div
+              class="rounded-2xl border border-base-300 bg-base-200/60 p-4 text-center"
+            >
+              <p class="text-sm text-base-content/65">
+                Need a new code? Check spam first, then request another one.
+              </p>
+              <button
+                class="btn btn-outline btn-sm mt-3"
+                [class.btn-disabled]="
+                  !canResendCode() || verificationForm.controls.schoolEmail.invalid
+                "
+                [disabled]="
+                  !canResendCode() || verificationForm.controls.schoolEmail.invalid
+                "
+                type="button"
+                (click)="onResendCode()"
+              >
+                @if (isResendingCode()) {
+                <span
+                  class="loading loading-spinner loading-xs"
+                  aria-hidden="true"
+                ></span>
+                Sending... } @else if (resendCooldownSeconds() > 0) { Resend
+                code in {{ resendCooldownText() }} } @else { Resend code }
+              </button>
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-3">
+              <button
+                class="btn btn-ghost btn-sm"
+                type="button"
+                (click)="returnToLogin()"
+              >
+                Back to login
+              </button>
+              <button
+                class="btn btn-ghost btn-sm"
+                type="button"
+                (click)="useDifferentAccount()"
+              >
+                Use a different account
+              </button>
+            </div>
+          </div>
+        </div>
+        } } @else {
         <div class="mb-8 text-center">
           <p
             class="badge badge-primary badge-soft px-4 py-3 font-semibold lg:hidden"
@@ -233,7 +425,7 @@
             </p>
           </div>
         </form>
-        }
+        } }
       </section>
     </main>
   </div>
