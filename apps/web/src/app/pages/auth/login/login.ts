@@ -2,8 +2,6 @@ import { HttpErrorResponse } from '@angular/common/http';
 import {
   ChangeDetectionStrategy,
   Component,
-  OnDestroy,
-  computed,
   inject,
   signal,
 } from '@angular/core';
@@ -19,14 +17,18 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { type ApiEnvelope } from '../../../core/api/api-envelope.model';
 import { resolveApiErrorMessage } from '../../../core/api/api-error.util';
 import { AuthApi } from '../../../core/auth/auth-api';
-import { passwordMatchValidator } from '../../../core/validators/password-match.validator';
 import {
   type AuthSessionResponse,
   type LoginRequest,
   type UnverifiedAccountLoginResponse,
-  type VerifyAccountResponse,
 } from '../../../core/auth/auth.models';
 import { Icon } from '../../../shared/components/icon/icon';
+import {
+  type LoginBackToLoginPayload,
+  type UnverifiedAccount,
+} from '../../../shared/components/login-flow.models';
+import { LoginPasswordReset } from '../../../shared/components/login-password-reset/login-password-reset';
+import { LoginVerification } from '../../../shared/components/login-verification/login-verification';
 import { SiteHeader } from '../../../shared/components/site-header/site-header';
 
 type LoginFormControls = {
@@ -34,88 +36,32 @@ type LoginFormControls = {
   password: FormControl<string>;
 };
 
-type VerificationFormControls = {
-  schoolEmail: FormControl<string>;
-  code: FormControl<string>;
-};
-
-type PasswordResetRequestFormControls = {
-  privateEmail: FormControl<string>;
-};
-
-type PasswordResetFormControls = {
-  code: FormControl<string>;
-  password: FormControl<string>;
-  confirmPassword: FormControl<string>;
-};
-
 type LoginControlName = keyof LoginFormControls;
-type PasswordResetControlName = keyof PasswordResetFormControls;
-type PasswordResetStep = 'request' | 'reset' | 'success';
-
-type UnverifiedAccount = {
-  schoolEmail: string | null;
-  username: string | null;
-  message: string;
-};
-
-const RESEND_COOLDOWN_SECONDS = 5 * 60;
 
 @Component({
   selector: 'app-login',
-  imports: [Icon, RouterLink, ReactiveFormsModule, SiteHeader],
+  imports: [
+    Icon,
+    LoginPasswordReset,
+    LoginVerification,
+    RouterLink,
+    ReactiveFormsModule,
+    SiteHeader,
+  ],
   templateUrl: './login.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Login implements OnDestroy {
+export class Login {
   private readonly fb = inject(FormBuilder);
   private readonly authApi = inject(AuthApi);
   private readonly route = inject(ActivatedRoute);
 
-  private resendCooldownTimer: ReturnType<typeof setInterval> | null = null;
-  private passwordResetCooldownTimer: ReturnType<typeof setInterval> | null =
-    null;
-
   readonly isSubmitting = signal(false);
-  readonly isVerifying = signal(false);
-  readonly isResendingCode = signal(false);
   readonly errorMessage = signal<string | null>(null);
-  readonly verificationErrorMessage = signal<string | null>(null);
-  readonly verificationInfoMessage = signal<string | null>(null);
   readonly authenticatedSession = signal<AuthSessionResponse | null>(null);
   readonly unverifiedAccount = signal<UnverifiedAccount | null>(null);
-  readonly verifiedAccount = signal<VerifyAccountResponse | null>(null);
-  readonly resendCooldownSeconds = signal(0);
   readonly isPasswordResetMode = signal(false);
-  readonly passwordResetStep = signal<PasswordResetStep>('request');
-  readonly isRequestingPasswordReset = signal(false);
-  readonly isResettingPassword = signal(false);
-  readonly passwordResetErrorMessage = signal<string | null>(null);
-  readonly passwordResetInfoMessage = signal<string | null>(null);
-  readonly passwordResetEmail = signal<string | null>(null);
-  readonly passwordResetCooldownSeconds = signal(0);
-
-  readonly resendCooldownText = computed(() =>
-    this.formatRemainingTime(this.resendCooldownSeconds()),
-  );
-
-  readonly canResendCode = computed(
-    () =>
-      this.resendCooldownSeconds() <= 0 &&
-      !this.isResendingCode() &&
-      this.verifiedAccount() === null,
-  );
-
-  readonly passwordResetCooldownText = computed(() =>
-    this.formatRemainingTime(this.passwordResetCooldownSeconds()),
-  );
-
-  readonly canRequestPasswordResetCode = computed(
-    () =>
-      this.passwordResetCooldownSeconds() <= 0 &&
-      !this.isRequestingPasswordReset() &&
-      this.passwordResetStep() !== 'success',
-  );
+  readonly passwordResetInitialPrivateEmail = signal<string | null>(null);
 
   readonly loginForm: FormGroup<LoginFormControls> = this.fb.nonNullable.group({
     usernameOrPrivateEmail: [
@@ -125,56 +71,6 @@ export class Login implements OnDestroy {
     password: ['', [Validators.required, Validators.maxLength(256)]],
   });
 
-  readonly verificationForm: FormGroup<VerificationFormControls> =
-    this.fb.nonNullable.group({
-      schoolEmail: [
-        '',
-        [Validators.required, Validators.email, Validators.maxLength(320)],
-      ],
-      code: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(6),
-          Validators.maxLength(6),
-          Validators.pattern(/^\d{6}$/),
-        ],
-      ],
-    });
-
-  readonly passwordResetRequestForm: FormGroup<PasswordResetRequestFormControls> =
-    this.fb.nonNullable.group({
-      privateEmail: [
-        '',
-        [Validators.required, Validators.email, Validators.maxLength(320)],
-      ],
-    });
-
-  readonly passwordResetForm: FormGroup<PasswordResetFormControls> =
-    this.fb.nonNullable.group(
-      {
-        code: [
-          '',
-          [
-            Validators.required,
-            Validators.minLength(6),
-            Validators.maxLength(6),
-            Validators.pattern(/^\d{6}$/),
-          ],
-        ],
-        password: [
-          '',
-          [
-            Validators.required,
-            Validators.minLength(8),
-            Validators.maxLength(256),
-          ],
-        ],
-        confirmPassword: ['', [Validators.required]],
-      },
-      { validators: passwordMatchValidator },
-    );
-
   constructor() {
     const username = this.route.snapshot.queryParamMap.get('username')?.trim();
 
@@ -183,25 +79,8 @@ export class Login implements OnDestroy {
     }
   }
 
-  ngOnDestroy(): void {
-    this.clearResendCooldownTimer();
-    this.clearPasswordResetCooldownTimer();
-  }
-
   isInvalid(controlName: LoginControlName): boolean {
     const control = this.loginForm.controls[controlName];
-
-    return control.invalid && (control.dirty || control.touched);
-  }
-
-  isVerificationCodeInvalid(): boolean {
-    const control = this.verificationForm.controls.code;
-
-    return control.invalid && (control.dirty || control.touched);
-  }
-
-  isSchoolEmailInvalid(): boolean {
-    const control = this.verificationForm.controls.schoolEmail;
 
     return control.invalid && (control.dirty || control.touched);
   }
@@ -223,151 +102,6 @@ export class Login implements OnDestroy {
       return controlName === 'password'
         ? 'Password cannot exceed 256 characters.'
         : 'Username or email cannot exceed 320 characters.';
-    }
-
-    return 'Please check this field.';
-  }
-
-  verificationCodeError(): string | null {
-    const control = this.verificationForm.controls.code;
-
-    if (!this.isVerificationCodeInvalid()) {
-      return null;
-    }
-
-    if (control.hasError('required')) {
-      return 'Enter the verification code.';
-    }
-
-    if (
-      control.hasError('minlength') ||
-      control.hasError('maxlength') ||
-      control.hasError('pattern')
-    ) {
-      return 'Enter exactly 6 numeric digits.';
-    }
-
-    return 'Please check the verification code.';
-  }
-
-  schoolEmailError(): string | null {
-    const control = this.verificationForm.controls.schoolEmail;
-
-    if (!this.isSchoolEmailInvalid()) {
-      return null;
-    }
-
-    if (control.hasError('required')) {
-      return 'Enter your school email.';
-    }
-
-    if (control.hasError('email')) {
-      return 'Enter a valid school email address.';
-    }
-
-    if (control.hasError('maxlength')) {
-      return 'School email cannot exceed 320 characters.';
-    }
-
-    return 'Please check the school email.';
-  }
-
-  isPasswordResetEmailInvalid(): boolean {
-    const control = this.passwordResetRequestForm.controls.privateEmail;
-
-    return control.invalid && (control.dirty || control.touched);
-  }
-
-  isPasswordResetCodeInvalid(): boolean {
-    const control = this.passwordResetForm.controls.code;
-
-    return control.invalid && (control.dirty || control.touched);
-  }
-
-  isPasswordResetFieldInvalid(controlName: PasswordResetControlName): boolean {
-    const control = this.passwordResetForm.controls[controlName];
-
-    return control.invalid && (control.dirty || control.touched);
-  }
-
-  passwordResetEmailError(): string | null {
-    const control = this.passwordResetRequestForm.controls.privateEmail;
-
-    if (!this.isPasswordResetEmailInvalid()) {
-      return null;
-    }
-
-    if (control.hasError('required')) {
-      return 'Enter your private email.';
-    }
-
-    if (control.hasError('email')) {
-      return 'Enter a valid private email address.';
-    }
-
-    if (control.hasError('maxlength')) {
-      return 'Private email cannot exceed 320 characters.';
-    }
-
-    return 'Please check the private email.';
-  }
-
-  passwordResetCodeError(): string | null {
-    const control = this.passwordResetForm.controls.code;
-
-    if (!this.isPasswordResetCodeInvalid()) {
-      return null;
-    }
-
-    if (control.hasError('required')) {
-      return 'Enter the password reset code.';
-    }
-
-    if (
-      control.hasError('minlength') ||
-      control.hasError('maxlength') ||
-      control.hasError('pattern')
-    ) {
-      return 'Enter exactly 6 numeric digits.';
-    }
-
-    return 'Please check the reset code.';
-  }
-
-  passwordResetFieldError(
-    controlName: Exclude<PasswordResetControlName, 'code'>,
-  ): string | null {
-    const control = this.passwordResetForm.controls[controlName];
-
-    if (controlName === 'confirmPassword') {
-      if (control.hasError('required') && (control.dirty || control.touched)) {
-        return 'Confirm your new password.';
-      }
-
-      if (
-        this.passwordResetForm.hasError('passwordMismatch') &&
-        (control.dirty || control.touched)
-      ) {
-        return 'Passwords do not match.';
-      }
-
-      return null;
-    }
-
-    if (!this.isPasswordResetFieldInvalid(controlName)) {
-      return null;
-    }
-
-    if (control.hasError('required')) {
-      return 'Enter a new password.';
-    }
-
-    if (control.hasError('minlength')) {
-      return 'Use at least 8 characters.';
-    }
-
-    if (control.hasError('maxlength')) {
-      return 'Password cannot exceed 256 characters.';
     }
 
     return 'Please check this field.';
@@ -412,240 +146,23 @@ export class Login implements OnDestroy {
     });
   }
 
-  onVerifyAccount(): void {
-    this.verificationErrorMessage.set(null);
-    this.verificationInfoMessage.set(null);
-
-    const account = this.unverifiedAccount();
-    if (!account) {
-      this.verificationErrorMessage.set(
-        'Log in first so we can find the account to verify.',
-      );
-      return;
-    }
-
-    if (this.verificationForm.invalid) {
-      this.verificationForm.markAllAsTouched();
-      return;
-    }
-
-    this.isVerifying.set(true);
-
-    this.authApi
-      .verifyAccount({
-        schoolEmail: this.resolveVerificationSchoolEmail(),
-        code: this.verificationForm.controls.code.value.trim(),
-      })
-      .subscribe({
-        next: (response) => {
-          this.verifiedAccount.set(response);
-          this.verificationInfoMessage.set(response.message);
-          this.verificationForm.reset();
-          this.clearResendCooldownTimer();
-          this.resendCooldownSeconds.set(0);
-        },
-        error: (error: unknown) => {
-          this.verificationErrorMessage.set(
-            this.resolveErrorMessage(
-              error,
-              'We could not verify your account. Check the code and try again.',
-              {
-                409: 'This account is already verified. You can log in now.',
-              },
-            ),
-          );
-          this.isVerifying.set(false);
-        },
-        complete: () => {
-          this.isVerifying.set(false);
-        },
-      });
-  }
-
-  onResendCode(): void {
-    this.verificationErrorMessage.set(null);
-    this.verificationInfoMessage.set(null);
-
-    const account = this.unverifiedAccount();
-    if (!account) {
-      this.verificationErrorMessage.set(
-        'Log in first so we can find the account to verify.',
-      );
-      return;
-    }
-
-    if (this.verificationForm.controls.schoolEmail.invalid) {
-      this.verificationForm.controls.schoolEmail.markAsTouched();
-      return;
-    }
-
-    if (!this.canResendCode()) {
-      return;
-    }
-
-    this.isResendingCode.set(true);
-
-    this.authApi
-      .sendCode({ schoolEmail: this.resolveVerificationSchoolEmail() })
-      .subscribe({
-        next: (message) => {
-          this.verificationInfoMessage.set(message);
-          this.verificationForm.controls.code.reset('');
-          this.startResendCooldown();
-        },
-        error: (error: unknown) => {
-          this.verificationErrorMessage.set(
-            this.resolveErrorMessage(
-              error,
-              'We could not send a new verification code. Please try again later.',
-              {
-                404: 'We could not find an account for that school email.',
-                409: 'This account is already verified. You can log in now.',
-                429: 'A verification code was sent recently. Please wait before requesting another one.',
-              },
-            ),
-          );
-
-          if (error instanceof HttpErrorResponse && error.status === 429) {
-            this.startResendCooldown();
-          }
-
-          this.isResendingCode.set(false);
-        },
-        complete: () => {
-          this.isResendingCode.set(false);
-        },
-      });
-  }
-
   showPasswordReset(): void {
     this.errorMessage.set(null);
     this.clearVerificationState();
     this.isPasswordResetMode.set(true);
-    this.passwordResetStep.set('request');
-    this.passwordResetErrorMessage.set(null);
-    this.passwordResetInfoMessage.set(null);
 
     const loginIdentifier =
       this.loginForm.controls.usernameOrPrivateEmail.value.trim();
-    if (this.looksLikeEmail(loginIdentifier)) {
-      this.passwordResetRequestForm.controls.privateEmail.setValue(
-        loginIdentifier,
-      );
-    }
+    this.passwordResetInitialPrivateEmail.set(
+      this.looksLikeEmail(loginIdentifier) ? loginIdentifier : null,
+    );
   }
 
-  onRequestPasswordReset(): void {
-    this.passwordResetErrorMessage.set(null);
-    this.passwordResetInfoMessage.set(null);
+  returnToLogin(payload: LoginBackToLoginPayload = {}): void {
+    const username = payload.username ?? this.unverifiedAccount()?.username;
 
-    if (this.passwordResetRequestForm.invalid) {
-      this.passwordResetRequestForm.markAllAsTouched();
-      return;
-    }
-
-    if (!this.canRequestPasswordResetCode()) {
-      return;
-    }
-
-    const privateEmail =
-      this.passwordResetRequestForm.controls.privateEmail.value.trim();
-    this.sendPasswordResetCode(privateEmail);
-  }
-
-  onResendPasswordResetCode(): void {
-    this.passwordResetErrorMessage.set(null);
-    this.passwordResetInfoMessage.set(null);
-
-    const privateEmail = this.passwordResetEmail();
-    if (!privateEmail) {
-      this.passwordResetStep.set('request');
-      this.passwordResetErrorMessage.set(
-        'Enter your private email before requesting a new reset code.',
-      );
-      return;
-    }
-
-    if (!this.canRequestPasswordResetCode()) {
-      return;
-    }
-
-    this.sendPasswordResetCode(privateEmail);
-  }
-
-  onResetPassword(): void {
-    this.passwordResetErrorMessage.set(null);
-    this.passwordResetInfoMessage.set(null);
-
-    const privateEmail = this.passwordResetEmail();
-    if (!privateEmail) {
-      this.passwordResetStep.set('request');
-      this.passwordResetErrorMessage.set(
-        'Enter your private email before setting a new password.',
-      );
-      return;
-    }
-
-    if (this.passwordResetForm.invalid) {
-      this.passwordResetForm.markAllAsTouched();
-      return;
-    }
-
-    const formValue = this.passwordResetForm.getRawValue();
-    this.isResettingPassword.set(true);
-
-    this.authApi
-      .resetPassword({
-        privateEmail,
-        code: formValue.code.trim(),
-        newPassword: formValue.password,
-      })
-      .subscribe({
-        next: (response) => {
-          this.passwordResetStep.set('success');
-          this.passwordResetInfoMessage.set(response.message);
-          this.passwordResetForm.reset();
-          this.clearPasswordResetCooldownTimer();
-          this.passwordResetCooldownSeconds.set(0);
-        },
-        error: (error: unknown) => {
-          this.passwordResetErrorMessage.set(
-            this.resolvePasswordResetErrorMessage(
-              error,
-              'We could not reset your password. Check the code and try again.',
-            ),
-          );
-          this.isResettingPassword.set(false);
-        },
-        complete: () => {
-          this.isResettingPassword.set(false);
-        },
-      });
-  }
-
-  normalizeVerificationCode(): void {
-    const control = this.verificationForm.controls.code;
-    const normalized = control.value.replace(/\D/g, '').slice(0, 6);
-
-    if (normalized !== control.value) {
-      control.setValue(normalized, { emitEvent: false });
-    }
-  }
-
-  normalizePasswordResetCode(): void {
-    const control = this.passwordResetForm.controls.code;
-    const normalized = control.value.replace(/\D/g, '').slice(0, 6);
-
-    if (normalized !== control.value) {
-      control.setValue(normalized, { emitEvent: false });
-    }
-  }
-
-  returnToLogin(): void {
-    const account = this.unverifiedAccount();
-
-    if (account?.username) {
-      this.loginForm.controls.usernameOrPrivateEmail.setValue(account.username);
+    if (username) {
+      this.loginForm.controls.usernameOrPrivateEmail.setValue(username);
     }
 
     this.loginForm.controls.password.reset('');
@@ -658,13 +175,11 @@ export class Login implements OnDestroy {
     this.clearPasswordResetState();
   }
 
-  returnToLoginFromPasswordReset(): void {
-    const privateEmail =
-      this.passwordResetEmail() ??
-      this.passwordResetRequestForm.controls.privateEmail.value.trim();
-
-    if (privateEmail) {
-      this.loginForm.controls.usernameOrPrivateEmail.setValue(privateEmail);
+  returnToLoginFromPasswordReset(payload: LoginBackToLoginPayload = {}): void {
+    if (payload.privateEmail) {
+      this.loginForm.controls.usernameOrPrivateEmail.setValue(
+        payload.privateEmail,
+      );
     }
 
     this.loginForm.controls.password.reset('');
@@ -674,13 +189,6 @@ export class Login implements OnDestroy {
   private showVerificationPanel(account: UnverifiedAccount): void {
     this.clearPasswordResetState();
     this.unverifiedAccount.set(account);
-    this.verifiedAccount.set(null);
-    this.verificationErrorMessage.set(null);
-    this.verificationInfoMessage.set(account.message);
-    this.verificationForm.reset({
-      schoolEmail: account.schoolEmail ?? '',
-      code: '',
-    });
     this.loginForm.controls.usernameOrPrivateEmail.setValue(
       account.username ?? this.loginForm.controls.usernameOrPrivateEmail.value,
     );
@@ -688,115 +196,12 @@ export class Login implements OnDestroy {
   }
 
   private clearVerificationState(): void {
-    this.clearResendCooldownTimer();
-    this.resendCooldownSeconds.set(0);
     this.unverifiedAccount.set(null);
-    this.verifiedAccount.set(null);
-    this.verificationErrorMessage.set(null);
-    this.verificationInfoMessage.set(null);
-    this.verificationForm.reset();
   }
 
   private clearPasswordResetState(): void {
-    this.clearPasswordResetCooldownTimer();
     this.isPasswordResetMode.set(false);
-    this.passwordResetStep.set('request');
-    this.isRequestingPasswordReset.set(false);
-    this.isResettingPassword.set(false);
-    this.passwordResetErrorMessage.set(null);
-    this.passwordResetInfoMessage.set(null);
-    this.passwordResetEmail.set(null);
-    this.passwordResetCooldownSeconds.set(0);
-    this.passwordResetRequestForm.reset();
-    this.passwordResetForm.reset();
-  }
-
-  private sendPasswordResetCode(privateEmail: string): void {
-    this.isRequestingPasswordReset.set(true);
-
-    this.authApi.requestPasswordReset({ privateEmail }).subscribe({
-      next: (response) => {
-        this.passwordResetEmail.set(privateEmail);
-        this.passwordResetRequestForm.controls.privateEmail.setValue(
-          privateEmail,
-        );
-        this.passwordResetStep.set('reset');
-        this.passwordResetInfoMessage.set(response.message);
-        this.passwordResetForm.reset();
-        this.startPasswordResetCooldown();
-      },
-      error: (error: unknown) => {
-        this.passwordResetErrorMessage.set(
-          this.resolvePasswordResetErrorMessage(
-            error,
-            'We could not send a password reset code. Please try again later.',
-          ),
-        );
-
-        if (error instanceof HttpErrorResponse && error.status === 429) {
-          this.startPasswordResetCooldown();
-        }
-
-        this.isRequestingPasswordReset.set(false);
-      },
-      complete: () => {
-        this.isRequestingPasswordReset.set(false);
-      },
-    });
-  }
-
-  private startResendCooldown(seconds = RESEND_COOLDOWN_SECONDS): void {
-    this.clearResendCooldownTimer();
-    this.resendCooldownSeconds.set(seconds);
-    this.resendCooldownTimer = setInterval(() => {
-      const remainingSeconds = this.resendCooldownSeconds() - 1;
-      this.resendCooldownSeconds.set(Math.max(remainingSeconds, 0));
-
-      if (remainingSeconds <= 0) {
-        this.clearResendCooldownTimer();
-      }
-    }, 1000);
-  }
-
-  private clearResendCooldownTimer(): void {
-    if (this.resendCooldownTimer) {
-      clearInterval(this.resendCooldownTimer);
-      this.resendCooldownTimer = null;
-    }
-  }
-
-  private startPasswordResetCooldown(seconds = RESEND_COOLDOWN_SECONDS): void {
-    this.clearPasswordResetCooldownTimer();
-    this.passwordResetCooldownSeconds.set(seconds);
-    this.passwordResetCooldownTimer = setInterval(() => {
-      const remainingSeconds = this.passwordResetCooldownSeconds() - 1;
-      this.passwordResetCooldownSeconds.set(Math.max(remainingSeconds, 0));
-
-      if (remainingSeconds <= 0) {
-        this.clearPasswordResetCooldownTimer();
-      }
-    }, 1000);
-  }
-
-  private clearPasswordResetCooldownTimer(): void {
-    if (this.passwordResetCooldownTimer) {
-      clearInterval(this.passwordResetCooldownTimer);
-      this.passwordResetCooldownTimer = null;
-    }
-  }
-
-  private resolveVerificationSchoolEmail(): string {
-    return (
-      this.unverifiedAccount()?.schoolEmail ??
-      this.verificationForm.controls.schoolEmail.value
-    ).trim();
-  }
-
-  private formatRemainingTime(totalSeconds: number): string {
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    this.passwordResetInitialPrivateEmail.set(null);
   }
 
   private resolveUnverifiedAccount(error: unknown): UnverifiedAccount | null {
@@ -844,20 +249,6 @@ export class Login implements OnDestroy {
         403: 'Your account must be verified before you can log in.',
         404: 'No account matches those credentials.',
         ...statusMessages,
-      },
-    });
-  }
-
-  private resolvePasswordResetErrorMessage(
-    error: unknown,
-    fallbackMessage: string,
-  ): string {
-    return resolveApiErrorMessage(error, {
-      fallbackMessage,
-      statusMessages: {
-        400: 'The reset code is invalid or expired. Request a new code and try again.',
-        429: 'A reset code was sent recently. Please wait before requesting another one.',
-        503: 'StudyHub could not send email right now. Please try again later.',
       },
     });
   }
