@@ -20,7 +20,7 @@
     </app-site-header>
 
     <main
-      class="grid flex-1 items-center gap-10 py-12 lg:grid-cols-[0.9fr_1.1fr] lg:py-16"
+      class="grid min-w-0 flex-1 items-center gap-10 py-12 lg:grid-cols-[0.9fr_1.1fr] lg:py-16"
     >
       <section
         class="hidden lg:block"
@@ -105,7 +105,7 @@
       </section>
 
       <section
-        class="mx-auto w-full max-w-2xl"
+        class="mx-auto min-w-0 w-full max-w-2xl [&_.form-control]:min-w-0 [&_.label]:break-words [&_.label]:whitespace-normal"
         aria-labelledby="signup-heading"
       >
         @if (registeredAccount(); as account) { @if (verifiedAccount(); as
