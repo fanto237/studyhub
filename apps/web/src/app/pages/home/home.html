@@ -1,0 +1,474 @@
+<div class="min-h-screen overflow-x-hidden bg-base-100 text-base-content">
+  <div
+    class="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_12%_12%,rgba(74,77,230,0.14),transparent_28%),radial-gradient(circle_at_85%_8%,rgba(236,72,153,0.10),transparent_24%),radial-gradient(circle_at_54%_92%,rgba(20,184,166,0.14),transparent_30%)]"
+    aria-hidden="true"
+  ></div>
+
+  <div
+    class="relative mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 py-5 sm:px-6 lg:px-8"
+  >
+    <app-site-header homeLink="/home">
+      <a siteHeaderNav class="btn btn-ghost btn-sm" routerLink="/home">Home</a>
+      <a siteHeaderNav class="btn btn-ghost btn-sm" href="#feed">Browse</a>
+      <a siteHeaderNav class="btn btn-ghost btn-sm" href="#contribute"
+        >Contribute</a
+      >
+
+      <a
+        siteHeaderActions
+        class="btn btn-ghost btn-sm hidden sm:inline-flex"
+        href="#feed"
+        >Browse</a
+      >
+      <a
+        siteHeaderActions
+        class="btn btn-primary btn-sm text-primary-content sm:btn-md"
+        href="#contribute"
+        >Upload</a
+      >
+      <button
+        siteHeaderActions
+        class="btn btn-ghost btn-square btn-sm sm:btn-md sm:w-auto sm:px-4"
+        [disabled]="isLoggingOut()"
+        type="button"
+        (click)="onLogout()"
+        aria-label="Log out"
+      >
+        @if (isLoggingOut()) {
+        <span
+          class="loading loading-spinner loading-sm"
+          aria-hidden="true"
+        ></span>
+        } @else {
+        <app-icon name="log-out" class="size-4" />
+        <span class="hidden sm:inline">Log out</span>
+        }
+      </button>
+    </app-site-header>
+
+    <main class="flex-1 py-8 sm:py-10">
+      @if (logoutErrorMessage(); as message) {
+      <div class="alert alert-error mb-6" role="alert">
+        <app-icon name="alert-triangle" class="size-5 shrink-0" />
+        <span>{{ message }}</span>
+      </div>
+      }
+
+      <section class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+        <div
+          class="relative overflow-hidden rounded-4xl border border-base-300 bg-base-100/90 p-6 shadow-2xl shadow-primary/10 backdrop-blur sm:p-8 lg:p-10"
+        >
+          <div
+            class="absolute -right-16 -top-16 size-56 rounded-full bg-primary/15 blur-3xl"
+            aria-hidden="true"
+          ></div>
+          <div
+            class="absolute -bottom-20 left-16 size-64 rounded-full bg-accent/15 blur-3xl"
+            aria-hidden="true"
+          ></div>
+
+          <div class="relative z-10 flex flex-col gap-8">
+            <div class="flex flex-col gap-5 lg:max-w-3xl">
+              @if (isLoadingUser()) {
+              <div class="skeleton h-8 w-44 rounded-full"></div>
+              <div class="skeleton h-14 w-full max-w-xl rounded-2xl"></div>
+              <div class="skeleton h-6 w-full max-w-2xl rounded-full"></div>
+              } @else { @if (currentUser(); as user) {
+              <p class="badge badge-primary badge-soft px-4 py-3 font-semibold">
+                Welcome back, {{ firstName(user) }}
+              </p>
+              <div>
+                <h1
+                  class="text-4xl font-black leading-tight tracking-tight sm:text-5xl lg:text-6xl"
+                >
+                  Find the right past paper faster.
+                </h1>
+                <p
+                  class="mt-4 max-w-2xl text-base leading-8 text-base-content/70 sm:text-lg"
+                >
+                  Search the authenticated StudyHub library, sort by what your
+                  classmates trust, and keep contributing resources that help
+                  everyone study smarter.
+                </p>
+              </div>
+              } @else {
+              <p class="badge badge-warning badge-soft px-4 py-3 font-semibold">
+                Session required
+              </p>
+              <div>
+                <h1
+                  class="text-4xl font-black leading-tight tracking-tight sm:text-5xl lg:text-6xl"
+                >
+                  Log in to view your StudyHub feed.
+                </h1>
+                <p
+                  class="mt-4 max-w-2xl text-base leading-8 text-base-content/70 sm:text-lg"
+                >
+                  Your home feed is only available to verified StudyHub members.
+                </p>
+              </div>
+              } }
+            </div>
+
+            @if (userErrorMessage(); as message) {
+            <div class="alert alert-warning" role="alert">
+              <app-icon name="alert-triangle" class="size-5 shrink-0" />
+              <span>{{ message }}</span>
+            </div>
+            }
+
+            <form
+              class="rounded-[1.5rem] border border-base-300 bg-base-200/70 p-3 shadow-inner"
+              (ngSubmit)="onSearchSubmit()"
+              role="search"
+            >
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <label
+                  class="input input-bordered flex h-14 min-w-0 flex-1 items-center gap-3 bg-base-100 shadow-sm"
+                >
+                  <app-icon
+                    name="search"
+                    class="size-5 shrink-0 text-primary"
+                  />
+                  <input
+                    class="min-w-0 flex-1"
+                    [formControl]="searchControl"
+                    autocomplete="off"
+                    maxlength="200"
+                    placeholder="Search by title, course, professor, or tag"
+                    type="search"
+                  />
+                </label>
+                <button
+                  class="btn btn-primary h-14 text-primary-content"
+                  type="submit"
+                >
+                  Search
+                </button>
+              </div>
+            </form>
+
+            <div class="grid gap-3 md:grid-cols-3" aria-label="Feed sorting">
+              @for (option of sortOptions; track option.value) {
+              <button
+                class="group rounded-2xl border bg-base-100/80 p-4 text-left shadow-sm ring-primary/20 transition hover:-translate-y-0.5 hover:shadow-lg"
+                [class.border-primary]="sort() === option.value"
+                [class.border-base-300]="sort() !== option.value"
+                [class.ring-2]="sort() === option.value"
+                type="button"
+                (click)="setSort(option.value)"
+              >
+                <span
+                  class="flex size-10 items-center justify-center rounded-2xl transition"
+                  [ngClass]="
+                    sort() === option.value
+                      ? 'bg-primary text-primary-content'
+                      : 'bg-primary/10 text-primary'
+                  "
+                >
+                  <app-icon [name]="option.icon" class="size-5" />
+                </span>
+                <span class="mt-3 block font-black">{{ option.label }}</span>
+                <span class="mt-1 block text-sm leading-6 text-base-content/60">
+                  {{ option.helper }}
+                </span>
+              </button>
+              }
+            </div>
+          </div>
+        </div>
+
+        <aside class="grid gap-6 lg:content-start">
+          @if (isLoadingUser()) {
+          <div class="rounded-3xl border border-base-300 bg-base-100 p-6">
+            <div class="flex items-center gap-4">
+              <div class="skeleton size-16 rounded-3xl"></div>
+              <div class="min-w-0 flex-1 space-y-3">
+                <div class="skeleton h-5 w-36"></div>
+                <div class="skeleton h-4 w-48"></div>
+              </div>
+            </div>
+            <div class="mt-6 grid grid-cols-2 gap-3">
+              <div class="skeleton h-24 rounded-2xl"></div>
+              <div class="skeleton h-24 rounded-2xl"></div>
+            </div>
+          </div>
+          } @else { @if (currentUser(); as user) {
+          <section
+            class="rounded-3xl border border-base-300 bg-base-100/90 p-6 shadow-xl shadow-primary/5 backdrop-blur"
+            aria-labelledby="profile-summary-heading"
+          >
+            <div class="flex items-center gap-4">
+              <span
+                class="flex size-16 shrink-0 items-center justify-center rounded-3xl bg-primary text-xl font-black text-primary-content shadow-lg shadow-primary/20"
+              >
+                {{ initials(user) }}
+              </span>
+              <div class="min-w-0">
+                <h2
+                  id="profile-summary-heading"
+                  class="truncate text-xl font-black"
+                >
+                  {{ user.fullName }}
+                </h2>
+                <p class="truncate text-sm font-semibold text-base-content/55">
+                  @{{ user.username }} · {{ user.universityName }}
+                </p>
+              </div>
+            </div>
+
+            <div class="mt-5 grid grid-cols-2 gap-3">
+              <div class="rounded-2xl bg-primary/10 p-4 text-primary">
+                <p class="text-2xl font-black">
+                  {{ user.karmaScore | number }}
+                </p>
+                <p class="mt-1 text-xs font-bold uppercase tracking-wide">
+                  Karma
+                </p>
+              </div>
+              <div class="rounded-2xl bg-accent/15 p-4 text-accent-content">
+                <p class="text-2xl font-black">
+                  {{ user.latestPosts.length | number }}
+                </p>
+                <p class="mt-1 text-xs font-bold uppercase tracking-wide">
+                  Recent uploads
+                </p>
+              </div>
+            </div>
+
+            <div class="mt-5 grid gap-3 text-sm">
+              <div class="flex items-center justify-between gap-3">
+                <span class="text-base-content/55">Role</span>
+                <span class="font-bold">{{ formatRole(user.role) }}</span>
+              </div>
+              <div class="flex items-center justify-between gap-3">
+                <span class="text-base-content/55">Verification</span>
+                @if (user.isVerified) {
+                <span class="badge badge-success badge-soft">Verified</span>
+                } @else {
+                <span class="badge badge-warning badge-soft">Pending</span>
+                }
+              </div>
+              <div class="flex items-center justify-between gap-3">
+                <span class="text-base-content/55">Member since</span>
+                <span class="font-bold"
+                  >{{ user.createdAt | date: 'mediumDate' }}</span
+                >
+              </div>
+            </div>
+          </section>
+          } }
+
+          <section
+            class="rounded-3xl border border-base-300 bg-base-100/90 p-6 shadow-xl shadow-accent/5 backdrop-blur"
+            aria-labelledby="popular-tags-heading"
+          >
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <p
+                  class="text-xs font-bold uppercase tracking-[0.2em] text-base-content/45"
+                >
+                  Discover
+                </p>
+                <h2 id="popular-tags-heading" class="mt-1 text-xl font-black">
+                  Popular tags
+                </h2>
+              </div>
+              <span
+                class="flex size-11 items-center justify-center rounded-2xl bg-accent/15 text-accent-content"
+              >
+                <app-icon name="filters" class="size-5" />
+              </span>
+            </div>
+
+            @if (popularTags().length > 0) {
+            <div class="mt-5 flex flex-wrap gap-2">
+              @for (tag of popularTags(); track tag) {
+              <button
+                class="badge cursor-pointer border transition hover:border-primary hover:bg-primary/10 hover:text-primary"
+                [class.badge-primary]="isTagSelected(tag)"
+                [class.badge-soft]="isTagSelected(tag)"
+                type="button"
+                (click)="toggleTag(tag)"
+              >
+                {{ tag }}
+              </button>
+              }
+            </div>
+            } @else {
+            <p class="mt-5 text-sm leading-6 text-base-content/60">
+              Tags will appear here as your feed loads study materials.
+            </p>
+            }
+          </section>
+
+          <section
+            id="contribute"
+            class="relative overflow-hidden rounded-[1.5rem] border border-primary/20 bg-primary/10 p-6 shadow-xl shadow-primary/10"
+            aria-labelledby="contribute-heading"
+          >
+            <div
+              class="absolute -right-10 -top-10 size-28 rounded-full bg-primary/20 blur-2xl"
+              aria-hidden="true"
+            ></div>
+            <div class="relative z-10">
+              <span
+                class="flex size-12 items-center justify-center rounded-2xl bg-primary text-primary-content shadow-lg shadow-primary/20"
+              >
+                <app-icon name="upload" class="size-6" />
+              </span>
+              <h2 id="contribute-heading" class="mt-4 text-xl font-black">
+                Share your next PDF
+              </h2>
+              <p class="mt-2 text-sm leading-6 text-base-content/65">
+                Upload flow is next. For now, keep collecting clear titles,
+                helpful descriptions, and searchable course tags.
+              </p>
+              <button
+                class="btn btn-primary btn-block mt-5 text-primary-content"
+                disabled
+              >
+                Upload page coming soon
+              </button>
+            </div>
+          </section>
+        </aside>
+      </section>
+
+      <section id="feed" class="mt-10" aria-labelledby="feed-heading">
+        <div
+          class="flex flex-col gap-4 border-b border-base-300 pb-5 sm:flex-row sm:items-end sm:justify-between"
+        >
+          <div>
+            <p
+              class="text-xs font-bold uppercase tracking-[0.22em] text-primary"
+            >
+              Community feed
+            </p>
+            <h2
+              id="feed-heading"
+              class="mt-2 text-3xl font-black tracking-tight sm:text-4xl"
+            >
+              Past exams and study packs
+            </h2>
+            <p class="mt-2 text-base-content/65">
+              @if (pagination().totalCount > 0) { Showing {{ posts().length |
+              number }} of {{ pagination().totalCount | number }} resources }
+              @else { Browse resources shared by verified StudyHub students. }
+            </p>
+          </div>
+
+          @if (hasActiveFilters()) {
+          <button
+            class="btn btn-outline btn-sm"
+            type="button"
+            (click)="clearFilters()"
+          >
+            Clear filters
+          </button>
+          }
+        </div>
+
+        @if (hasActiveFilters()) {
+        <div class="mt-5 flex flex-wrap items-center gap-2">
+          @if (searchTerm()) {
+          <span class="badge badge-primary badge-soft gap-2 px-3 py-3">
+            Search: {{ searchTerm() }}
+          </span>
+          } @for (tag of selectedTags(); track tag) {
+          <button
+            class="badge badge-accent badge-soft gap-2 px-3 py-3"
+            type="button"
+            (click)="removeTag(tag)"
+            [attr.aria-label]="'Remove tag ' + tag"
+          >
+            {{ tag }} <span aria-hidden="true">×</span>
+          </button>
+          }
+        </div>
+        } @if (feedErrorMessage(); as message) {
+        <div class="alert alert-error mt-6" role="alert">
+          <app-icon name="alert-triangle" class="size-5 shrink-0" />
+          <span>{{ message }}</span>
+          <button class="btn btn-sm" type="button" (click)="retryFeed()">
+            Retry
+          </button>
+        </div>
+        } @if (isLoadingPosts()) {
+        <div class="mt-6 grid gap-4">
+          @for (item of [1, 2, 3]; track item) {
+          <article class="rounded-3xl border border-base-300 bg-base-100 p-5">
+            <div class="flex gap-4">
+              <div class="skeleton hidden h-28 w-14 rounded-2xl sm:block"></div>
+              <div class="min-w-0 flex-1 space-y-4">
+                <div class="skeleton h-4 w-32"></div>
+                <div class="skeleton h-7 w-4/5"></div>
+                <div class="skeleton h-4 w-full"></div>
+                <div class="skeleton h-4 w-2/3"></div>
+              </div>
+            </div>
+          </article>
+          }
+        </div>
+        } @else { @if (posts().length > 0) {
+        <div class="mt-6 grid gap-4">
+          @for (post of posts(); track post.id) {
+          <app-post-card
+            [post]="post"
+            [voting]="isVoting(post.id)"
+            [downloading]="isDownloading(post.id)"
+            (voteRequested)="votePost($event.post, $event.vote)"
+            (tagSelected)="toggleTag($event)"
+            (downloadRequested)="downloadPost($event)"
+          />
+          }
+        </div>
+
+        @if (canLoadMore()) {
+        <div class="mt-8 flex justify-center">
+          <button
+            class="btn btn-outline btn-wide"
+            [disabled]="isLoadingMore()"
+            type="button"
+            (click)="loadMore()"
+          >
+            @if (isLoadingMore()) {
+            <span
+              class="loading loading-spinner loading-sm"
+              aria-hidden="true"
+            ></span>
+            Loading... } @else { Load more }
+          </button>
+        </div>
+        } } @else {
+        <div
+          class="mt-6 rounded-[1.5rem] border-2 border-dashed border-base-300 bg-base-100/80 p-10 text-center"
+        >
+          <span
+            class="mx-auto flex size-16 items-center justify-center rounded-3xl bg-primary/10 text-primary"
+          >
+            <app-icon name="document" class="size-8" />
+          </span>
+          <h3 class="mt-5 text-2xl font-black">No resources found</h3>
+          <p
+            class="mx-auto mt-3 max-w-lg text-base leading-7 text-base-content/65"
+          >
+            @if (hasActiveFilters()) { Try a different search phrase, remove a
+            tag, or switch the sort order. } @else { Your StudyHub feed is empty
+            right now. New uploads from classmates will appear here. }
+          </p>
+          @if (hasActiveFilters()) {
+          <button
+            class="btn btn-primary mt-5 text-primary-content"
+            type="button"
+            (click)="clearFilters()"
+          >
+            Clear filters
+          </button>
+          }
+        </div>
+        } }
+      </section>
+    </main>
+  </div>
+</div>
