@@ -12,6 +12,15 @@ export interface LoginRequest {
   password: string;
 }
 
+export interface UnverifiedAccountLoginResponse {
+  message?: string;
+  schoolEmail?: string;
+  username?: string | null;
+  Message?: string;
+  SchoolEmail?: string;
+  Username?: string | null;
+}
+
 export interface VerifyAccountRequest {
   schoolEmail: string;
   code: string;
