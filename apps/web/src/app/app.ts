@@ -1,13 +1,18 @@
-import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
-import { NxWelcome } from './nx-welcome';
+import { Component, inject } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+
+import { ThemeService } from './core/theme/theme';
 
 @Component({
-  imports: [NxWelcome, RouterModule],
+  imports: [RouterOutlet],
   selector: 'app-root',
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
 export class App {
-  protected title = 'web';
+  private readonly themeService = inject(ThemeService);
+
+  constructor() {
+    this.themeService.initialize();
+  }
 }

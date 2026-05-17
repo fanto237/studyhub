@@ -26,6 +26,159 @@ const angularApp = new AngularNodeAppEngine();
  * ```
  */
 
+// backend api proxy request
+const hopByHopHeaders = new Set([
+  'connection',
+  'content-length',
+  'host',
+  'keep-alive',
+  'proxy-authenticate',
+  'proxy-authorization',
+  'te',
+  'trailer',
+  'transfer-encoding',
+  'upgrade',
+]);
+const apiProxyTarget = createApiProxyTarget();
+
+function createApiProxyTarget(): URL {
+  const configuredTarget =
+    process.env['API_PROXY_TARGET']?.trim() || 'http://localhost:5046';
+  const normalizedTarget = configuredTarget.endsWith('/')
+    ? configuredTarget
+    : `${configuredTarget}/`;
+
+  try {
+    return new URL(normalizedTarget);
+  } catch {
+    throw new Error(`Invalid API_PROXY_TARGET: ${configuredTarget}`);
+  }
+}
+
+function createProxyUrl(originalUrl: string): URL {
+  const relativeUrl = originalUrl.startsWith('/')
+    ? originalUrl.slice(1)
+    : originalUrl;
+  return new URL(relativeUrl, apiProxyTarget);
+}
+
+function buildProxyHeaders(req: express.Request): Headers {
+  const headers = new Headers();
+
+  for (const [name, value] of Object.entries(req.headers)) {
+    if (!value || hopByHopHeaders.has(name.toLowerCase())) {
+      continue;
+    }
+
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        headers.append(name, item);
+      }
+      continue;
+    }
+
+    headers.set(name, value);
+  }
+
+  const forwardedFor = req.headers['x-forwarded-for'];
+  const forwardedForValue = Array.isArray(forwardedFor)
+    ? [...forwardedFor, req.ip].join(', ')
+    : forwardedFor
+      ? `${forwardedFor}, ${req.ip}`
+      : req.ip;
+
+  if (forwardedForValue) {
+    headers.set('x-forwarded-for', forwardedForValue);
+  }
+
+  headers.set('x-forwarded-proto', req.protocol);
+
+  const host = req.get('host');
+  if (host) {
+    headers.set('x-forwarded-host', host);
+  }
+
+  return headers;
+}
+
+function buildProxyBody(req: express.Request): Buffer | undefined {
+  if (req.method === 'GET' || req.method === 'HEAD') {
+    return undefined;
+  }
+
+  return Buffer.isBuffer(req.body) && req.body.length > 0
+    ? req.body
+    : undefined;
+}
+
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
+/**
+ * Proxy API requests to the configured backend server.
+ */
+app.use(
+  '/api',
+  express.raw({ type: () => true, limit: '15mb' }),
+  async (req, res, next) => {
+    let targetUrl: URL | undefined;
+
+    try {
+      targetUrl = createProxyUrl(req.originalUrl);
+      console.info(
+        `[api proxy] ${req.method} ${req.originalUrl} -> ${targetUrl.href}`,
+      );
+
+      const response = await fetch(targetUrl, {
+        method: req.method,
+        headers: buildProxyHeaders(req),
+        body: buildProxyBody(req) as BodyInit | undefined,
+        redirect: 'manual',
+      });
+
+      res.status(response.status);
+
+      response.headers.forEach((value, name) => {
+        if (hopByHopHeaders.has(name.toLowerCase())) {
+          return;
+        }
+
+        res.setHeader(name, value);
+      });
+
+      const responseBody = Buffer.from(await response.arrayBuffer());
+      if (responseBody.length === 0) {
+        res.end();
+        return;
+      }
+
+      res.send(responseBody);
+    } catch (error) {
+      const message = getErrorMessage(error);
+      console.error(
+        `[api proxy] Failed to proxy ${req.method} ${req.originalUrl} to ${targetUrl?.href ?? apiProxyTarget.href}: ${message}`,
+        error,
+      );
+
+      if (res.headersSent) {
+        next(error);
+        return;
+      }
+
+      res.status(502).json({
+        status: 'error',
+        message:
+          'StudyHub API is not reachable. Make sure the API server is running and API_PROXY_TARGET is correct.',
+        data: {
+          target: apiProxyTarget.origin,
+          detail: message,
+        },
+      });
+    }
+  },
+);
+
 /**
  * Serve static files from /browser
  */
