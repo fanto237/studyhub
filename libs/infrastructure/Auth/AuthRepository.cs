@@ -188,6 +188,25 @@ public class AuthRepository(StudyHubDbContext dbContext) : IAuthRepository
             cancellationToken);
   }
 
+  public Task<User?> GetUserWithAuthCodesByPrivateEmailAsync(string privateEmail, CancellationToken cancellationToken)
+  {
+    return dbContext.Users
+        .Include(user => user.AuthCodes)
+        .SingleOrDefaultAsync(
+            user => user.DeletedAt == null && user.PrivateEmail == privateEmail,
+            cancellationToken);
+  }
+
+  public Task<User?> GetUserWithPasswordResetStateByPrivateEmailAsync(string privateEmail, CancellationToken cancellationToken)
+  {
+    return dbContext.Users
+        .Include(user => user.AuthCodes)
+        .Include(user => user.RefreshTokens)
+        .SingleOrDefaultAsync(
+            user => user.DeletedAt == null && user.PrivateEmail == privateEmail,
+            cancellationToken);
+  }
+
   public Task<User?> GetUserForUpdateAsync(Guid userId, CancellationToken cancellationToken)
   {
     return dbContext.Users
