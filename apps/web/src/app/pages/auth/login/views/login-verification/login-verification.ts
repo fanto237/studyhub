@@ -18,14 +18,14 @@ import {
   Validators,
 } from '@angular/forms';
 
-import { resolveApiErrorMessage } from '../../../core/api/api-error.util';
-import { AuthApi } from '../../../core/auth/auth-api';
-import { type VerifyAccountResponse } from '../../../core/auth/auth.models';
-import { Icon } from '../icon/icon';
+import { AuthApi } from '../../../../../core/services/auth-api';
+import { resolveApiErrorMessage } from '../../../../../core/types/api-error.util';
+import { type VerifyAccountResponse } from '../../../../../core/types/auth.models';
 import {
   type LoginBackToLoginPayload,
   type UnverifiedAccount,
-} from '../login-flow.models';
+} from '../../../../../core/types/login-flow.models';
+import { Icon } from '../../../../../shared/components/icon/icon';
 
 type VerificationFormControls = {
   schoolEmail: FormControl<string>;

@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
-import { ThemeService } from './core/theme/theme';
+import { ThemeService } from './core/services/theme';
 
 @Component({
   imports: [RouterOutlet],

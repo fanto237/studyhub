@@ -15,12 +15,12 @@ import {
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
-import { resolveApiErrorMessage } from '../../../core/api/api-error.util';
-import { AuthApi } from '../../../core/auth/auth-api';
+import { resolveApiErrorMessage } from '../../../core/types/api-error.util';
+import { AuthApi } from '../../../core/services/auth-api';
 import {
   type RegisterRequest,
   type VerifyAccountResponse,
-} from '../../../core/auth/auth.models';
+} from '../../../core/types/auth.models';
 import { passwordMatchValidator } from '../../../core/validators/password-match.validator';
 import { Icon } from '../../../shared/components/icon/icon';
 import { SiteHeader } from '../../../shared/components/site-header/site-header';

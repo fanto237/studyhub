@@ -1,22 +1,22 @@
 import { Route } from '@angular/router';
-import { Landing } from './pages/landing/landing';
-import { Login } from './pages/auth/login/login';
-import { Signup } from './pages/auth/signup/signup';
 
 export const appRoutes: Route[] = [
   {
     path: '',
-    component: Landing,
+    loadComponent: () =>
+      import('./pages/landing/landing').then((module) => module.Landing),
     title: 'StudyHub',
   },
   {
     path: 'login',
-    component: Login,
+    loadComponent: () =>
+      import('./pages/auth/login/login').then((module) => module.Login),
     title: 'Log In | StudyHub',
   },
   {
     path: 'signup',
-    component: Signup,
+    loadComponent: () =>
+      import('./pages/auth/signup/signup').then((module) => module.Signup),
     title: 'Sign Up | StudyHub',
   },
 ];

@@ -8,6 +8,7 @@ Accept: application/json
   "privateEmail": "student.personal@example.com",
   "username": "studybuddy",
   "fullName": "Taylor Student",
+  "universityName": "StudyHub University",
   "password": "Pa55word!",
   "schoolEmail": "taylor@student.school.edu"
 }
@@ -32,6 +33,28 @@ Accept: application/json
 {
   "usernameOrPrivateEmail": "studybuddy",
   "password": "Pa55word!"
+}
+
+###
+
+POST {{Api_HostAddress}}/api/auth/request-password-reset
+Content-Type: application/json
+Accept: application/json
+
+{
+  "privateEmail": "student.personal@example.com"
+}
+
+###
+
+POST {{Api_HostAddress}}/api/auth/reset-password
+Content-Type: application/json
+Accept: application/json
+
+{
+  "privateEmail": "student.personal@example.com",
+  "code": "123456",
+  "newPassword": "NewPa55word!"
 }
 
 ###

@@ -5,7 +5,7 @@ import {
   input,
 } from '@angular/core';
 
-import { ICONS, type IconName } from '../../../core/icons/icon.registry';
+import { ICONS, type IconName } from './icon.registry';
 
 @Component({
   selector: 'app-icon',

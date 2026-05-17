@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { map } from 'rxjs';
 
-import { type ApiEnvelope } from '../api/api-envelope.model';
+import { type ApiEnvelope } from '../types/api-envelope.model';
 import {
   type AuthSessionResponse,
   type LoginRequest,
@@ -15,7 +15,7 @@ import {
   type SendAuthCodeRequest,
   type VerifyAccountRequest,
   type VerifyAccountResponse,
-} from './auth.models';
+} from '../types/auth.models';
 
 @Injectable({ providedIn: 'root' })
 export class AuthApi {

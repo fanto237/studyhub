@@ -18,11 +18,11 @@ import {
   Validators,
 } from '@angular/forms';
 
-import { resolveApiErrorMessage } from '../../../core/api/api-error.util';
-import { AuthApi } from '../../../core/auth/auth-api';
-import { passwordMatchValidator } from '../../../core/validators/password-match.validator';
-import { Icon } from '../icon/icon';
-import { type LoginBackToLoginPayload } from '../login-flow.models';
+import { AuthApi } from '../../../../../core/services/auth-api';
+import { resolveApiErrorMessage } from '../../../../../core/types/api-error.util';
+import { type LoginBackToLoginPayload } from '../../../../../core/types/login-flow.models';
+import { passwordMatchValidator } from '../../../../../core/validators/password-match.validator';
+import { Icon } from '../../../../../shared/components/icon/icon';
 
 type PasswordResetRequestFormControls = {
   privateEmail: FormControl<string>;

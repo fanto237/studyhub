@@ -14,22 +14,22 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
-import { type ApiEnvelope } from '../../../core/api/api-envelope.model';
-import { resolveApiErrorMessage } from '../../../core/api/api-error.util';
-import { AuthApi } from '../../../core/auth/auth-api';
+import { AuthApi } from '../../../core/services/auth-api';
+import { type ApiEnvelope } from '../../../core/types/api-envelope.model';
+import { resolveApiErrorMessage } from '../../../core/types/api-error.util';
 import {
   type AuthSessionResponse,
   type LoginRequest,
   type UnverifiedAccountLoginResponse,
-} from '../../../core/auth/auth.models';
-import { Icon } from '../../../shared/components/icon/icon';
+} from '../../../core/types/auth.models';
 import {
   type LoginBackToLoginPayload,
   type UnverifiedAccount,
-} from '../../../shared/components/login-flow.models';
-import { LoginPasswordReset } from '../../../shared/components/login-password-reset/login-password-reset';
-import { LoginVerification } from '../../../shared/components/login-verification/login-verification';
+} from '../../../core/types/login-flow.models';
+import { Icon } from '../../../shared/components/icon/icon';
 import { SiteHeader } from '../../../shared/components/site-header/site-header';
+import { LoginPasswordReset } from './views/login-password-reset/login-password-reset';
+import { LoginVerification } from './views/login-verification/login-verification';
 
 type LoginFormControls = {
   usernameOrPrivateEmail: FormControl<string>;
