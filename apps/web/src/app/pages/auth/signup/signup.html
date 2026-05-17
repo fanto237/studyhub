@@ -1,0 +1,476 @@
+<div class="min-h-screen overflow-hidden bg-base-100 text-base-content">
+  <div
+    class="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_10%_12%,rgba(74,77,230,0.18),transparent_28%),radial-gradient(circle_at_85%_8%,rgba(236,72,153,0.12),transparent_24%),radial-gradient(circle_at_55%_88%,rgba(20,184,166,0.16),transparent_30%)]"
+    aria-hidden="true"
+  ></div>
+
+  <div
+    class="relative mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 py-5 sm:px-8 lg:px-10"
+  >
+    <app-site-header>
+      <a siteHeaderActions class="btn btn-ghost btn-sm sm:btn-md" routerLink="/"
+        >Back home</a
+      >
+      <a
+        siteHeaderActions
+        class="btn btn-primary btn-sm text-primary-content sm:btn-md"
+        routerLink="/login"
+        >Log In</a
+      >
+    </app-site-header>
+
+    <main
+      class="grid flex-1 items-center gap-10 py-12 lg:grid-cols-[0.9fr_1.1fr] lg:py-16"
+    >
+      <section
+        class="hidden lg:block"
+        aria-labelledby="signup-benefits-heading"
+      >
+        <div class="max-w-xl">
+          <p class="badge badge-primary badge-soft px-4 py-3 font-semibold">
+            Student-verified access
+          </p>
+          <h1
+            id="signup-benefits-heading"
+            class="mt-5 text-5xl font-black leading-tight tracking-tight xl:text-6xl"
+          >
+            Join the exam prep community built around your school.
+          </h1>
+          <p class="mt-5 text-lg leading-8 text-base-content/70">
+            Create your account, verify your school email, and get ready to
+            share useful past papers with classmates as StudyHub grows.
+          </p>
+        </div>
+
+        <div class="mt-10 grid max-w-xl gap-4">
+          <article
+            class="rounded-3xl border border-base-300 bg-base-100/85 p-5 shadow-xl shadow-primary/5 backdrop-blur"
+          >
+            <div class="flex gap-4">
+              <span
+                class="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-content"
+              >
+                <app-icon name="search" class="size-6" />
+              </span>
+              <div>
+                <h2 class="text-lg font-black">
+                  Find relevant material faster
+                </h2>
+                <p class="mt-1 text-sm leading-6 text-base-content/65">
+                  Discover course files, past papers, and solutions organized
+                  for real study sessions.
+                </p>
+              </div>
+            </div>
+          </article>
+
+          <article
+            class="rounded-3xl border border-base-300 bg-base-100/85 p-5 shadow-xl shadow-accent/5 backdrop-blur lg:translate-x-8"
+          >
+            <div class="flex gap-4">
+              <span
+                class="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-accent text-accent-content"
+              >
+                <app-icon name="upload" class="size-6" />
+              </span>
+              <div>
+                <h2 class="text-lg font-black">Share once, help everyone</h2>
+                <p class="mt-1 text-sm leading-6 text-base-content/65">
+                  Upload practical resources that help peers prepare with more
+                  context and confidence.
+                </p>
+              </div>
+            </div>
+          </article>
+
+          <article
+            class="rounded-3xl border border-base-300 bg-base-100/85 p-5 shadow-xl shadow-secondary/5 backdrop-blur"
+          >
+            <div class="flex gap-4">
+              <span
+                class="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-secondary text-secondary-content"
+              >
+                <app-icon name="shield-check" class="size-6" />
+              </span>
+              <div>
+                <h2 class="text-lg font-black">Keep the community trusted</h2>
+                <p class="mt-1 text-sm leading-6 text-base-content/65">
+                  School email verification helps keep StudyHub focused on real
+                  students.
+                </p>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section
+        class="mx-auto w-full max-w-2xl"
+        aria-labelledby="signup-heading"
+      >
+        @if (registeredAccount(); as account) { @if (verifiedAccount(); as
+        verified) {
+        <div
+          class="card border border-success/20 bg-base-100/95 shadow-2xl shadow-success/10 backdrop-blur"
+        >
+          <div class="card-body items-center p-8 text-center sm:p-10">
+            <span
+              class="flex size-16 items-center justify-center rounded-3xl bg-success text-success-content shadow-lg shadow-success/20"
+            >
+              <app-icon name="check" class="size-8" />
+            </span>
+            <p class="badge badge-success badge-soft mt-3 font-semibold">
+              Account verified
+            </p>
+            <h1 class="mt-2 text-3xl font-black tracking-tight sm:text-4xl">
+              You're ready to log in
+            </h1>
+            <p class="mt-2 max-w-lg text-base leading-7 text-base-content/70">
+              {{ verified.message }} Redirecting you to login in
+              <span class="font-bold text-base-content"
+                >{{ redirectCountdownSeconds() }} seconds</span
+              >.
+            </p>
+            <div class="mt-6 flex flex-wrap justify-center gap-3">
+              <button
+                class="btn btn-primary text-primary-content"
+                type="button"
+                (click)="goToLoginNow()"
+              >
+                Go to login now
+              </button>
+              <button
+                class="btn btn-outline"
+                type="button"
+                (click)="onRegisterAnotherAccount()"
+              >
+                Register another account
+              </button>
+            </div>
+          </div>
+        </div>
+        } @else {
+        <div
+          class="card border border-success/20 bg-base-100/95 shadow-2xl shadow-success/10 backdrop-blur"
+        >
+          <div class="card-body gap-6 p-6 sm:p-8">
+            <div class="text-center">
+              <span
+                class="mx-auto flex size-16 items-center justify-center rounded-3xl bg-success text-success-content shadow-lg shadow-success/20"
+              >
+                <app-icon name="mail" class="size-8" />
+              </span>
+              <p class="badge badge-success badge-soft mt-4 font-semibold">
+                Account created
+              </p>
+              <h1 class="mt-3 text-3xl font-black tracking-tight sm:text-4xl">
+                Verify your school email
+              </h1>
+              <p class="mt-2 text-base leading-7 text-base-content/70">
+                We sent a 6-digit verification code to
+                <span class="font-bold text-base-content"
+                  >{{ account.schoolEmail }}</span
+                >. Enter it below before logging in to StudyHub.
+              </p>
+            </div>
+
+            @if (verificationInfoMessage(); as message) {
+            <div class="alert alert-info" role="status">
+              <app-icon name="mail" class="size-5 shrink-0" />
+              <span>{{ message }}</span>
+            </div>
+            } @if (verificationErrorMessage(); as message) {
+            <div class="alert alert-error" role="alert">
+              <app-icon name="alert-triangle" class="size-5 shrink-0" />
+              <span>{{ message }}</span>
+            </div>
+            }
+
+            <form
+              class="grid gap-5"
+              [formGroup]="verificationForm"
+              (ngSubmit)="onVerifyAccount()"
+              novalidate
+            >
+              <label class="form-control">
+                <span class="label pb-2 font-semibold">Verification code</span>
+                <input
+                  class="input input-bordered input-lg w-full bg-base-100 text-center text-2xl font-black tracking-[0.5em]"
+                  [class.input-error]="isVerificationCodeInvalid()"
+                  formControlName="code"
+                  autocomplete="one-time-code"
+                  inputmode="numeric"
+                  maxlength="6"
+                  pattern="[0-9]*"
+                  placeholder="000000"
+                  type="text"
+                  (input)="normalizeVerificationCode()"
+                />
+                @if (verificationCodeError(); as error) {
+                <span class="label pt-2 text-sm text-error">{{ error }}</span>
+                } @else {
+                <span class="label pt-2 text-xs text-base-content/55"
+                  >The code is exactly 6 digits and expires after 10
+                  minutes.</span
+                >
+                }
+              </label>
+
+              <button
+                class="btn btn-primary btn-lg text-primary-content"
+                [class.btn-disabled]="
+                  verificationForm.invalid || isVerifying()
+                "
+                [disabled]="verificationForm.invalid || isVerifying()"
+                type="submit"
+              >
+                @if (isVerifying()) {
+                <span
+                  class="loading loading-spinner loading-sm"
+                  aria-hidden="true"
+                ></span>
+                Verifying... } @else { Verify account }
+              </button>
+            </form>
+
+            <div
+              class="rounded-2xl border border-base-300 bg-base-200/60 p-4 text-center"
+            >
+              <p class="text-sm text-base-content/65">
+                Didn't receive the code? Check spam, then request a new one.
+              </p>
+              <button
+                class="btn btn-outline btn-sm mt-3"
+                [class.btn-disabled]="!canResendCode()"
+                [disabled]="!canResendCode()"
+                type="button"
+                (click)="onResendCode()"
+              >
+                @if (isResendingCode()) {
+                <span
+                  class="loading loading-spinner loading-xs"
+                  aria-hidden="true"
+                ></span>
+                Sending... } @else if (resendCooldownSeconds() > 0) { Resend
+                code in {{ resendCooldownText() }} } @else { Resend code }
+              </button>
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-3">
+              <a
+                class="btn btn-ghost btn-sm"
+                [routerLink]="['/login']"
+                [queryParams]="{ username: account.username }"
+                >Already verified? Log in</a
+              >
+              <button
+                class="btn btn-ghost btn-sm"
+                type="button"
+                (click)="onRegisterAnotherAccount()"
+              >
+                Register another account
+              </button>
+            </div>
+          </div>
+        </div>
+        } } @else {
+        <div class="mb-8 text-center lg:text-left">
+          <p
+            class="badge badge-primary badge-soft px-4 py-3 font-semibold lg:hidden"
+          >
+            Student-verified access
+          </p>
+          <h1
+            id="signup-heading"
+            class="mt-4 text-4xl font-black tracking-tight sm:text-5xl lg:mt-0"
+          >
+            Create your StudyHub account
+          </h1>
+          <p class="mt-3 text-base leading-7 text-base-content/70 sm:text-lg">
+            Sign up with your personal email and verify your school email to
+            keep the community student-focused.
+          </p>
+        </div>
+
+        <form
+          class="card border border-base-300 bg-base-100/95 shadow-2xl shadow-primary/10 backdrop-blur"
+          [formGroup]="signupForm"
+          (ngSubmit)="onSubmit()"
+          novalidate
+        >
+          <div class="card-body gap-5 p-6 sm:p-8">
+            @if (errorMessage(); as message) {
+            <div class="alert alert-error" role="alert">
+              <app-icon name="alert-triangle" class="size-5 shrink-0" />
+              <span>{{ message }}</span>
+            </div>
+            }
+
+            <div class="grid gap-4 sm:grid-cols-2">
+              <label class="form-control sm:col-span-2">
+                <span class="label pb-2 font-semibold">Full name</span>
+                <input
+                  class="input input-bordered w-full bg-base-100"
+                  [class.input-error]="isInvalid('fullName')"
+                  formControlName="fullName"
+                  autocomplete="name"
+                  placeholder="Enter your full name"
+                  type="text"
+                />
+                @if (fieldError('fullName'); as error) {
+                <span class="label pt-2 text-sm text-error">{{ error }}</span>
+                }
+              </label>
+
+              <label class="form-control sm:col-span-2">
+                <span class="label pb-2 font-semibold">Username</span>
+                <input
+                  class="input input-bordered w-full bg-base-100"
+                  [class.input-error]="isInvalid('username')"
+                  formControlName="username"
+                  autocomplete="username"
+                  placeholder="Choose a username"
+                  type="text"
+                />
+                @if (fieldError('username'); as error) {
+                <span class="label pt-2 text-sm text-error">{{ error }}</span>
+                } @else {
+                <span class="label pt-2 text-xs text-base-content/55"
+                  >3–30 characters; letters, numbers, dots, underscores, and
+                  hyphens.</span
+                >
+                }
+              </label>
+
+              <label class="form-control">
+                <span class="label pb-2 font-semibold">Private email</span>
+                <input
+                  class="input input-bordered w-full bg-base-100"
+                  [class.input-error]="isInvalid('privateEmail')"
+                  formControlName="privateEmail"
+                  autocomplete="email"
+                  placeholder="you@example.com"
+                  type="email"
+                />
+                @if (fieldError('privateEmail'); as error) {
+                <span class="label pt-2 text-sm text-error">{{ error }}</span>
+                }
+              </label>
+
+              <label class="form-control">
+                <span class="label pb-2 font-semibold">School email</span>
+                <input
+                  class="input input-bordered w-full bg-base-100"
+                  [class.input-error]="isInvalid('schoolEmail')"
+                  formControlName="schoolEmail"
+                  autocomplete="email"
+                  placeholder="name@university.edu"
+                  type="email"
+                />
+                @if (fieldError('schoolEmail'); as error) {
+                <span class="label pt-2 text-sm text-error">{{ error }}</span>
+                }
+              </label>
+
+              <label class="form-control sm:col-span-2">
+                <span class="label pb-2 font-semibold">University name</span>
+                <input
+                  class="input input-bordered w-full bg-base-100"
+                  [class.input-error]="isInvalid('universityName')"
+                  formControlName="universityName"
+                  autocomplete="organization"
+                  placeholder="e.g., University of Waterloo"
+                  type="text"
+                />
+                @if (fieldError('universityName'); as error) {
+                <span class="label pt-2 text-sm text-error">{{ error }}</span>
+                }
+              </label>
+
+              <label class="form-control">
+                <span class="label pb-2 font-semibold">Password</span>
+                <input
+                  class="input input-bordered w-full bg-base-100"
+                  [class.input-error]="isInvalid('password')"
+                  formControlName="password"
+                  autocomplete="new-password"
+                  placeholder="Create a password"
+                  type="password"
+                />
+                @if (fieldError('password'); as error) {
+                <span class="label pt-2 text-sm text-error">{{ error }}</span>
+                } @else {
+                <span class="label pt-2 text-xs text-base-content/55"
+                  >Use at least 8 characters.</span
+                >
+                }
+              </label>
+
+              <label class="form-control">
+                <span class="label pb-2 font-semibold">Confirm password</span>
+                <input
+                  class="input input-bordered w-full bg-base-100"
+                  [class.input-error]="isInvalid('confirmPassword') || (signupForm.hasError('passwordMismatch') && signupForm.controls.confirmPassword.touched)"
+                  formControlName="confirmPassword"
+                  autocomplete="new-password"
+                  placeholder="Repeat your password"
+                  type="password"
+                />
+                @if (fieldError('confirmPassword'); as error) {
+                <span class="label pt-2 text-sm text-error">{{ error }}</span>
+                }
+              </label>
+            </div>
+
+            <label
+              class="flex items-start gap-3 rounded-2xl border border-base-300 bg-base-200/60 p-4"
+            >
+              <input
+                class="checkbox checkbox-primary mt-1"
+                [class.checkbox-error]="isInvalid('termsAccepted')"
+                formControlName="termsAccepted"
+                type="checkbox"
+              />
+              <span class="text-sm leading-6 text-base-content/70">
+                I agree to the
+                <a class="link link-primary font-semibold" href="#terms"
+                  >Terms of Service</a
+                >
+                and
+                <a class="link link-primary font-semibold" href="#privacy"
+                  >Privacy Policy</a
+                >. I understand StudyHub will email my school address for
+                account verification. @if (fieldError('termsAccepted'); as
+                error) {
+                <span class="mt-1 block text-error">{{ error }}</span>
+                }
+              </span>
+            </label>
+
+            <button
+              class="btn btn-primary btn-lg mt-2 text-primary-content"
+              [class.btn-disabled]="signupForm.invalid || isSubmitting()"
+              [disabled]="signupForm.invalid || isSubmitting()"
+              type="submit"
+            >
+              @if (isSubmitting()) {
+              <span
+                class="loading loading-spinner loading-sm"
+                aria-hidden="true"
+              ></span>
+              Creating account... } @else { Create account }
+            </button>
+
+            <p class="text-center text-sm text-base-content/60">
+              Already have an account?
+              <a class="link link-primary font-semibold" routerLink="/login"
+                >Log in</a
+              >
+            </p>
+          </div>
+        </form>
+        }
+      </section>
+    </main>
+  </div>
+</div>
