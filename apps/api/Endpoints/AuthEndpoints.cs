@@ -105,7 +105,12 @@ public static class AuthEndpoints
     return result.Outcome switch
     {
       LoginOutcome.Success => CreateAuthenticatedResult(httpContext, result),
-      LoginOutcome.AccountNotVerified => Results.Json(SendResponse.Fail(new { message = result.Message }), statusCode: StatusCodes.Status403Forbidden),
+      LoginOutcome.AccountNotVerified => Results.Json(
+          SendResponse.Fail(new UnverifiedAccountLoginResponse(
+              result.Message,
+              result.SchoolEmail!,
+              result.Username)),
+          statusCode: StatusCodes.Status403Forbidden),
       LoginOutcome.InvalidCredentials => Results.Json(SendResponse.Fail(new { message = result.Message }), statusCode: StatusCodes.Status404NotFound),
       _ => Results.BadRequest(SendResponse.Fail(new { message = result.Message })),
     };

@@ -45,7 +45,9 @@ public class LoginHandler
     {
       return new LoginResult(
           LoginOutcome.AccountNotVerified,
-          "You must verify your school email before you can log in.");
+          "You must verify your school email before you can log in.",
+          Username: user.Username,
+          SchoolEmail: user.SchoolEmail);
     }
 
     var now = timeProvider.GetUtcNow();
@@ -83,6 +85,7 @@ public class LoginHandler
         user.PrivateEmail,
         user.FullName,
         user.Role,
-        user.IsVerified);
+        user.IsVerified,
+        user.SchoolEmail);
   }
 }

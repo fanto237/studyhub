@@ -14,4 +14,5 @@ public record LoginResult(
     string? PrivateEmail = null,
     string? FullName = null,
     UserRole? Role = null,
-    bool IsVerified = false);
+    bool IsVerified = false,
+    string? SchoolEmail = null);
