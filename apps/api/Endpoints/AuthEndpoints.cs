@@ -6,6 +6,8 @@ using Application.Auth.Login;
 using Application.Auth.LogoutSession;
 using Application.Auth.RefreshSession;
 using Application.Auth.Register;
+using Application.Auth.RequestPasswordReset;
+using Application.Auth.ResetPassword;
 using Application.Auth.SendAuthCode;
 using Application.Auth.VerifyAccount;
 using Wolverine;
@@ -43,7 +45,16 @@ public static class AuthEndpoints
 
     group.MapPost("/send-code", SendAuthCode)
         .WithName("SendCode")
-        .WithDescription("Send confirmation code."); ;
+        .WithDescription("Send confirmation code.");
+
+    group.MapPost("/request-password-reset", RequestPasswordReset)
+        .WithName("RequestPasswordReset")
+        .WithDescription("Sends a password reset code to the account's private email address.");
+
+    group.MapPost("/reset-password", ResetPassword)
+        .WithName("ResetPassword")
+        .WithDescription("Resets a password using a valid private email reset code.");
+
     return app;
   }
 
@@ -161,7 +172,9 @@ public static class AuthEndpoints
     };
   }
 
-  private static async Task<IResult> SendAuthCode(SendAuthCodeCommand command, IMessageBus bus, HttpContext httpContext,
+  private static async Task<IResult> SendAuthCode(
+      SendAuthCodeCommand command,
+      IMessageBus bus,
       CancellationToken cancellationToken)
   {
 
@@ -175,6 +188,46 @@ public static class AuthEndpoints
       SendAuthCodeOutcome.CodeAlreadySent => Results.Json(SendResponse.Fail(new { message = result.Message }), statusCode: StatusCodes.Status429TooManyRequests),
       _ => Results.BadRequest(SendResponse.Fail(new { message = result.Message })),
     };
+  }
+
+  private static async Task<IResult> RequestPasswordReset(
+      RequestPasswordResetCommand command,
+      IMessageBus bus,
+      CancellationToken cancellationToken)
+  {
+    var result = await bus.InvokeAsync<RequestPasswordResetResult>(command, cancellationToken);
+
+    return result.Outcome switch
+    {
+      RequestPasswordResetOutcome.Success => Results.Ok(SendResponse.Success(new RequestPasswordResetResponse(result.Message))),
+      RequestPasswordResetOutcome.CodeAlreadySent => Results.Json(SendResponse.Fail(new { message = result.Message }), statusCode: StatusCodes.Status429TooManyRequests),
+      RequestPasswordResetOutcome.EmailDeliveryFailed => Results.Json(SendResponse.Fail(new { message = result.Message }), statusCode: StatusCodes.Status503ServiceUnavailable),
+      _ => Results.BadRequest(SendResponse.Fail(new { message = result.Message })),
+    };
+  }
+
+  private static async Task<IResult> ResetPassword(
+      ResetPasswordCommand command,
+      IMessageBus bus,
+      HttpContext httpContext,
+      CancellationToken cancellationToken)
+  {
+    var result = await bus.InvokeAsync<ResetPasswordResult>(command, cancellationToken);
+
+    return result.Outcome switch
+    {
+      ResetPasswordOutcome.Success => ClearCookiesAndReturnPasswordResetSuccess(httpContext, result),
+      ResetPasswordOutcome.InvalidCode => Results.BadRequest(SendResponse.Fail(new { message = result.Message })),
+      ResetPasswordOutcome.ExpiredCode => Results.BadRequest(SendResponse.Fail(new { message = result.Message })),
+      _ => Results.BadRequest(SendResponse.Fail(new { message = result.Message })),
+    };
+  }
+
+  private static IResult ClearCookiesAndReturnPasswordResetSuccess(HttpContext httpContext, ResetPasswordResult result)
+  {
+    AuthCookies.ClearAuthCookies(httpContext);
+
+    return Results.Ok(SendResponse.Success(new ResetPasswordResponse(result.Message)));
   }
 
   private static IResult CreateAuthenticatedResult(HttpContext httpContext, LoginResult result)
