@@ -8,6 +8,10 @@ import {
   type LoginRequest,
   type RegisterAccountResponse,
   type RegisterRequest,
+  type RequestPasswordResetRequest,
+  type RequestPasswordResetResponse,
+  type ResetPasswordRequest,
+  type ResetPasswordResponse,
   type SendAuthCodeRequest,
   type VerifyAccountRequest,
   type VerifyAccountResponse,
@@ -82,6 +86,42 @@ export class AuthApi {
 
           throw new Error(
             response.message ?? 'Verification code could not be sent.',
+          );
+        }),
+      );
+  }
+
+  requestPasswordReset(request: RequestPasswordResetRequest) {
+    return this.http
+      .post<
+        ApiEnvelope<RequestPasswordResetResponse>
+      >('/api/auth/request-password-reset', request)
+      .pipe(
+        map((response) => {
+          if (response.status === 'success' && response.data) {
+            return response.data;
+          }
+
+          throw new Error(
+            response.message ?? 'Password reset code could not be sent.',
+          );
+        }),
+      );
+  }
+
+  resetPassword(request: ResetPasswordRequest) {
+    return this.http
+      .post<
+        ApiEnvelope<ResetPasswordResponse>
+      >('/api/auth/reset-password', request, { withCredentials: true })
+      .pipe(
+        map((response) => {
+          if (response.status === 'success' && response.data) {
+            return response.data;
+          }
+
+          throw new Error(
+            response.message ?? 'Password reset was not completed.',
           );
         }),
       );

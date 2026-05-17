@@ -30,6 +30,16 @@ export interface SendAuthCodeRequest {
   schoolEmail: string;
 }
 
+export interface RequestPasswordResetRequest {
+  privateEmail: string;
+}
+
+export interface ResetPasswordRequest {
+  privateEmail: string;
+  code: string;
+  newPassword: string;
+}
+
 export interface RegisterAccountResponse {
   userId: string;
   privateEmail: string;
@@ -58,5 +68,13 @@ export interface VerifyAccountResponse {
   schoolEmail: string;
   isVerified: boolean;
   lastVerifiedAt: string | null;
+  message: string;
+}
+
+export interface RequestPasswordResetResponse {
+  message: string;
+}
+
+export interface ResetPasswordResponse {
   message: string;
 }
