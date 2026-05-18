@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs';
 
 import { AuthApi } from '../../core/services/auth-api';
@@ -27,7 +27,8 @@ import { type CurrentUserResponse } from '../../core/types/users.models';
 import { Icon } from '../../shared/components/icon/icon';
 import { type IconName } from '../../shared/components/icon/icon.registry';
 import { PostCard } from '../../shared/components/post-card/post-card';
-import { SiteHeader } from '../../shared/components/site-header/site-header';
+import { ThemeToggle } from '../../shared/components/theme-toggle/theme-toggle';
+import { SidebarProfile } from './components/sidebar-profile/sidebar-profile';
 
 type FeedPagination = {
   page: number;
@@ -54,8 +55,8 @@ type InitialsSource = Pick<CurrentUserResponse, 'fullName' | 'username'>;
     NgClass,
     PostCard,
     ReactiveFormsModule,
-    RouterLink,
-    SiteHeader,
+    SidebarProfile,
+    ThemeToggle,
   ],
   templateUrl: './home.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -357,22 +358,6 @@ export class Home implements OnInit {
 
   firstName(user: CurrentUserResponse): string {
     return user.fullName.split(/\s+/).filter(Boolean)[0] ?? user.username;
-  }
-
-  formatRole(role: number | string): string {
-    if (typeof role === 'string') {
-      return role;
-    }
-
-    if (role === 1) {
-      return 'Admin';
-    }
-
-    if (role === 2) {
-      return 'Moderator';
-    }
-
-    return 'Student';
   }
 
   private loadCurrentUser(): void {
