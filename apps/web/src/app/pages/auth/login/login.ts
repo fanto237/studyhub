@@ -12,7 +12,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { AuthApi } from '../../../core/services/auth-api';
 import { type ApiEnvelope } from '../../../core/types/api-envelope.model';
@@ -55,6 +55,7 @@ export class Login {
   private readonly fb = inject(FormBuilder);
   private readonly authApi = inject(AuthApi);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
 
   readonly isSubmitting = signal(false);
   readonly errorMessage = signal<string | null>(null);
@@ -128,6 +129,7 @@ export class Login {
       next: (response) => {
         this.authenticatedSession.set(response);
         this.loginForm.reset();
+        void this.router.navigate(['/home']);
       },
       error: (error: unknown) => {
         const unverifiedAccount = this.resolveUnverifiedAccount(error);
