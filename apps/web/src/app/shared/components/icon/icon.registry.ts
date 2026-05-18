@@ -41,6 +41,16 @@ export const ICONS = {
       },
     ],
   }),
+  home: strokeIcon([
+    strokePath('M4 11.5 12 4l8 7.5', {
+      strokeLinecap: 'round',
+      strokeLinejoin: 'round',
+    }),
+    strokePath('M6 10.5V20h12v-9.5M10 20v-5h4v5', {
+      strokeLinecap: 'round',
+      strokeLinejoin: 'round',
+    }),
+  ]),
   search: strokeIcon([
     strokePath('m21 21-4.4-4.4M19 11a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z', {
       strokeLinecap: 'round',
@@ -104,6 +114,79 @@ export const ICONS = {
   'alert-triangle': strokeIcon([
     strokePath(
       'M12 8v5m0 4h.01M10.3 4.3 2.8 17a2 2 0 0 0 1.7 3h15a2 2 0 0 0 1.7-3L13.7 4.3a2 2 0 0 0-3.4 0Z',
+      {
+        strokeLinecap: 'round',
+        strokeLinejoin: 'round',
+      },
+    ),
+  ]),
+  'arrow-up': strokeIcon([
+    strokePath('M12 19V5m0 0-5 5m5-5 5 5', {
+      strokeLinecap: 'round',
+      strokeLinejoin: 'round',
+    }),
+  ]),
+  'arrow-down': strokeIcon([
+    strokePath('M12 5v14m0 0-5-5m5 5 5-5', {
+      strokeLinecap: 'round',
+      strokeLinejoin: 'round',
+    }),
+  ]),
+  'message-circle': strokeIcon([
+    strokePath(
+      'M21 11.5a8.4 8.4 0 0 1-9 8.4 8.7 8.7 0 0 1-3.8-.9L3 20l1.2-4.6A8.3 8.3 0 0 1 3 11.5a8.5 8.5 0 0 1 18 0Z',
+      {
+        strokeLinecap: 'round',
+        strokeLinejoin: 'round',
+      },
+    ),
+  ]),
+  download: strokeIcon([
+    strokePath('M12 4v11m0 0 4-4m-4 4-4-4', {
+      strokeLinecap: 'round',
+      strokeLinejoin: 'round',
+    }),
+    strokePath('M5 19h14', {
+      strokeLinecap: 'round',
+    }),
+  ]),
+  'log-out': strokeIcon([
+    strokePath('M10 17l5-5-5-5', {
+      strokeLinecap: 'round',
+      strokeLinejoin: 'round',
+    }),
+    strokePath('M15 12H3M21 5v14', {
+      strokeLinecap: 'round',
+    }),
+  ]),
+  user: strokeIcon([
+    strokePath('M16 8a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z'),
+    strokePath('M4 21a8 8 0 0 1 16 0', {
+      strokeLinecap: 'round',
+    }),
+  ]),
+  trophy: strokeIcon([
+    strokePath('M8 4h8v3a4 4 0 0 1-8 0V4Z', {
+      strokeLinejoin: 'round',
+    }),
+    strokePath(
+      'M8 6H5a2 2 0 0 0 2 4h1m8-4h3a2 2 0 0 1-2 4h-1M12 11v5m-3 4h6m-5-4h4',
+      {
+        strokeLinecap: 'round',
+        strokeLinejoin: 'round',
+      },
+    ),
+  ]),
+  clock: strokeIcon([
+    strokePath('M12 8v5l3 2', {
+      strokeLinecap: 'round',
+      strokeLinejoin: 'round',
+    }),
+    strokePath('M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z'),
+  ]),
+  flame: strokeIcon([
+    strokePath(
+      'M12 22c3.3 0 6-2.4 6-5.9 0-2.4-1.3-4.4-3.2-5.7.2 1.8-.7 3.1-1.9 3.9.2-3.4-1.4-6.2-4-8.3.4 3.2-1.7 4.8-2.9 6.6A6.6 6.6 0 0 0 5 16.1C5 19.6 8.1 22 12 22Z',
       {
         strokeLinecap: 'round',
         strokeLinejoin: 'round',
