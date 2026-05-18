@@ -35,8 +35,7 @@ public static class AuthEndpoints
 
     group.MapPost("/refresh", RefreshSession)
         .WithName("RefreshSession")
-        .WithDescription("Rotates the refresh token and issues a new access token.")
-        .RequireAuthorization();
+        .WithDescription("Rotates the refresh token and issues a new access token.");
 
     group.MapPost("/logout", Logout)
         .WithName("Logout")

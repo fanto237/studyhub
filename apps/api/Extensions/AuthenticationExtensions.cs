@@ -77,7 +77,11 @@ public static class AuthenticationExtensions
                             return;
                         }
 
-                        AuthCookies.ClearAuthCookies(context.HttpContext);
+                        if (!context.Request.Cookies.ContainsKey(AuthCookies.RefreshTokenCookieName))
+                        {
+                            AuthCookies.ClearAccessTokenCookie(context.HttpContext);
+                        }
+
                         await Results.Json(
                                 SendResponse.Fail(new { message = "Authentication is required." }),
                                 statusCode: StatusCodes.Status401Unauthorized)

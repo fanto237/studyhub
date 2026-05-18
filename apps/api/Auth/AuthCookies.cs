@@ -25,11 +25,16 @@ internal static class AuthCookies
             CreateCookieOptions(httpContext, refreshTokenExpiresAt, "/api/auth"));
     }
 
-    public static void ClearAuthCookies(HttpContext httpContext)
+    public static void ClearAccessTokenCookie(HttpContext httpContext)
     {
         httpContext.Response.Cookies.Delete(
             AccessTokenCookieName,
             CreateDeletionCookieOptions(httpContext, "/"));
+    }
+
+    public static void ClearAuthCookies(HttpContext httpContext)
+    {
+        ClearAccessTokenCookie(httpContext);
 
         httpContext.Response.Cookies.Delete(
             RefreshTokenCookieName,
