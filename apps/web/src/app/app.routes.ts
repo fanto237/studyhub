@@ -8,6 +8,12 @@ export const appRoutes: Route[] = [
     title: 'StudyHub',
   },
   {
+    path: 'home',
+    loadComponent: () =>
+      import('./pages/home/home').then((module) => module.Home),
+    title: 'Home | StudyHub',
+  },
+  {
     path: 'login',
     loadComponent: () =>
       import('./pages/auth/login/login').then((module) => module.Login),

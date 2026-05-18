@@ -62,6 +62,21 @@ function createProxyUrl(originalUrl: string): URL {
   return new URL(relativeUrl, apiProxyTarget);
 }
 
+type HeadersWithSetCookie = Headers & {
+  getSetCookie?: () => string[];
+};
+
+function getSetCookieHeaders(headers: Headers): string[] {
+  const getSetCookie = (headers as HeadersWithSetCookie).getSetCookie;
+
+  if (typeof getSetCookie === 'function') {
+    return getSetCookie.call(headers);
+  }
+
+  const setCookie = headers.get('set-cookie');
+  return setCookie ? [setCookie] : [];
+}
+
 function buildProxyHeaders(req: express.Request): Headers {
   const headers = new Headers();
 
@@ -140,12 +155,22 @@ app.use(
       res.status(response.status);
 
       response.headers.forEach((value, name) => {
-        if (hopByHopHeaders.has(name.toLowerCase())) {
+        const normalizedName = name.toLowerCase();
+
+        if (
+          hopByHopHeaders.has(normalizedName) ||
+          normalizedName === 'set-cookie'
+        ) {
           return;
         }
 
         res.setHeader(name, value);
       });
+
+      const setCookieHeaders = getSetCookieHeaders(response.headers);
+      if (setCookieHeaders.length > 0) {
+        res.setHeader('set-cookie', setCookieHeaders);
+      }
 
       const responseBody = Buffer.from(await response.arrayBuffer());
       if (responseBody.length === 0) {
