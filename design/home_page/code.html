@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>StudyHub | Deep Learning Hub</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed-dim": "#ffb596",
+                        "secondary-container": "#fd761a",
+                        "on-tertiary-container": "#ffede6",
+                        "tertiary": "#943700",
+                        "on-secondary-container": "#5c2400",
+                        "on-primary-container": "#eeefff",
+                        "outline-variant": "#c3c6d7",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface-variant": "#434655",
+                        "primary-fixed": "#dbe1ff",
+                        "secondary-fixed": "#ffdbca",
+                        "inverse-surface": "#2d3133",
+                        "surface-bright": "#f7f9fb",
+                        "surface-tint": "#0053db",
+                        "inverse-on-surface": "#eff1f3",
+                        "surface-dim": "#d8dadc",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-error": "#ffffff",
+                        "on-surface": "#191c1e",
+                        "surface": "#f7f9fb",
+                        "primary-container": "#2563eb",
+                        "on-primary": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "inverse-primary": "#b4c5ff",
+                        "tertiary-fixed": "#ffdbcd",
+                        "on-tertiary-fixed-variant": "#7d2d00",
+                        "on-secondary-fixed-variant": "#783200",
+                        "surface-container": "#eceef0",
+                        "on-tertiary-fixed": "#360f00",
+                        "on-error-container": "#93000a",
+                        "on-background": "#191c1e",
+                        "secondary": "#9d4300",
+                        "background": "#f7f9fb",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "surface-container-high": "#e6e8ea",
+                        "error-container": "#ffdad6",
+                        "error": "#ba1a1a",
+                        "outline": "#737686",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "surface-variant": "#e0e3e5",
+                        "surface-container-low": "#f2f4f6",
+                        "on-secondary-fixed": "#341100",
+                        "on-primary-fixed": "#00174b",
+                        "primary": "#004ac6",
+                        "on-secondary": "#ffffff",
+                        "tertiary-container": "#bc4800",
+                        "secondary-fixed-dim": "#ffb690"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-sm": "8px",
+                        "margin-desktop": "32px",
+                        "stack-md": "16px",
+                        "margin-mobile": "16px",
+                        "stack-lg": "32px",
+                        "base": "8px",
+                        "container-max": "1280px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Plus Jakarta Sans"],
+                        "headline-xl": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "headline-lg-mobile": ["Plus Jakarta Sans"],
+                        "body-sm": ["Plus Jakarta Sans"],
+                        "label-md": ["Plus Jakarta Sans"],
+                        "headline-xl-mobile": ["Plus Jakarta Sans"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                        "headline-xl": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                        "headline-xl-mobile": ["30px", {"lineHeight": "36px", "fontWeight": "700"}],
+                        "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-surface">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-desktop h-16 max-w-container-max mx-auto bg-surface border-b border-outline-variant shadow-sm">
+<div class="flex items-center gap-stack-lg">
+<img alt="StudyHub Logo" class="h-8 w-auto" src="https://lh3.googleusercontent.com/aida/ADBb0ug_htzG04SG1cRBOZXVK4K-sudZEK2Ymyhwibq-mBMBc5GllLIBsKUTNCUqCFVuSdhUYKtovgRuCdzUyBAMbuGxyf8MlnDpA2Y7tziZ1zn0t2nHzzdHiRi0ujA_sPsXDUlaUS5N-xW7-KrMVfR7pVxhnULEjAVENG9-HG7TfrkBpfv8oNDsr0RdWAzhL4YxJ7vD4dQ4B5C84glk9mhhk5wCdYoGtlktFOhxe02PSVCoqBuPacINLYsGd-jM"/>
+<div class="hidden md:flex items-center bg-surface-container rounded-full px-4 py-2 w-96 gap-2">
+<span class="material-symbols-outlined text-outline">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-label-md font-label-md w-full" placeholder="Search exam papers, notes..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-stack-md">
+<button class="p-2 rounded-full hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">history_edu</span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-container-highest transition-colors relative">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-secondary rounded-full"></span>
+</button>
+<div class="h-8 w-8 rounded-full overflow-hidden border border-outline-variant">
+<img alt="User profile avatar" class="h-full w-full object-cover" data-alt="A professional headshot of a smiling young university student with a bright, academic background. The lighting is soft and natural, emphasizing a high-key light mode aesthetic. The student is wearing a clean, modern navy blue sweater, matching the primary brand colors of StudyHub. The background is a slightly blurred modern library or study lounge." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2LOTAEhjCvrq7c2wVF1nNrKPRPthTyTH5KJHow5FTwumPh3fKiN9wDWXiA_6m99HzHZDlh_Qt0okYow1SgEEhqOEZy5sxu9EgTsIFGYlhol7Tx9oA87aDjoxZW6tsx62uDBrjvCUrtl2xG9Ng2e83zQG6aVUVOIzmkH1yJOKqslqGI76pZ4z7I98K4rbLSyb-CMjSih8d5lxm5oma56UerI5o1ZUuonwE6Rpc6ay1_pHmML4Y2gYVLHe4So_GAMjKhhstmSwDNwU3"/>
+</div>
+</div>
+</nav>
+<div class="max-w-container-max mx-auto pt-16 flex">
+<!-- SideNavBar -->
+<aside class="hidden lg:flex flex-col py-stack-md px-4 gap-y-base h-[calc(100vh-64px)] w-64 fixed left-0 top-16 bg-surface-container-low border-r border-outline-variant">
+<div class="px-2 mb-stack-md">
+<p class="font-headline-sm text-headline-sm font-bold text-primary">StudyHub</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Deep Learning Hub</p>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-3 text-primary font-bold bg-primary-fixed rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-md text-label-md">Home</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-label-md text-label-md">My Exams</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">groups</span>
+<span class="font-label-md text-label-md">Communities</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">bookmark</span>
+<span class="font-label-md text-label-md">Saved</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">school</span>
+<span class="font-label-md text-label-md">Study Groups</span>
+</a>
+</nav>
+<button class="mt-stack-lg mx-2 bg-primary text-on-primary py-3 px-4 rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 shadow-sm hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-[20px]">add_circle</span>
+                Share Exam Paper
+            </button>
+<div class="mt-auto pt-stack-md border-t border-outline-variant flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">trending_up</span>
+<span class="font-label-md text-label-md">Trending</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 lg:ml-64 px-gutter py-stack-lg flex gap-gutter">
+<!-- Central Feed -->
+<div class="flex-1 max-w-3xl">
+<div class="mb-stack-lg">
+<h1 class="font-headline-md text-headline-md mb-2">Morning, Alex!</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Here's what's happening in your study circles today.</p>
+</div>
+<!-- Post Stream -->
+<div class="space-y-stack-lg">
+<!-- Post Card 1 -->
+<article class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-[0_4px_20px_-2px_rgba(37,99,235,0.08)] flex overflow-hidden">
+<!-- Voting Bar -->
+<div class="w-12 bg-surface-container-low flex flex-col items-center py-4 gap-2">
+<button class="text-on-surface-variant hover:text-secondary transition-colors">
+<span class="material-symbols-outlined">arrow_upward</span>
+</button>
+<span class="font-label-md text-label-md text-secondary">242</span>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">arrow_downward</span>
+</button>
+</div>
+<div class="flex-1 p-stack-md">
+<div class="flex items-center gap-2 mb-2">
+<span class="bg-primary-fixed text-on-primary-fixed-variant px-2 py-0.5 rounded-full text-label-sm font-label-sm">CS Seniors</span>
+<span class="text-outline text-label-sm">•</span>
+<span class="text-on-surface-variant text-label-sm font-label-sm">Posted by @j_doe</span>
+<span class="text-outline text-label-sm">• 2h ago</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm mb-3">Discrete Math Final 2023 Solutions</h2>
+<div class="bg-surface-container rounded-lg p-4 mb-4 border border-outline-variant/30">
+<div class="flex items-center gap-4 mb-3">
+<span class="material-symbols-outlined text-primary text-4xl">description</span>
+<div>
+<p class="font-label-md text-label-md">discrete_math_final_v2.pdf</p>
+<p class="text-body-sm text-body-sm text-on-surface-variant">1.2 MB • PDF Document</p>
+</div>
+</div>
+<p class="text-body-md text-body-md text-on-surface-variant line-clamp-2">The solutions for the proof section were verified by Prof. Smith. Includes Venn diagrams and truth table breakdowns...</p>
+</div>
+<div class="flex items-center gap-stack-lg">
+<button class="flex items-center gap-1 text-on-surface-variant font-label-md text-label-md hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]">chat_bubble</span> 42 Comments
+                                </button>
+<button class="flex items-center gap-1 text-on-surface-variant font-label-md text-label-md hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]">share</span> Share
+                                </button>
+<button class="flex items-center gap-1 text-on-surface-variant font-label-md text-label-md hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]">bookmark</span> Save
+                                </button>
+</div>
+</div>
+</article>
+<!-- Post Card 2 -->
+<article class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-[0_4px_20px_-2px_rgba(37,99,235,0.08)] flex overflow-hidden">
+<div class="w-12 bg-surface-container-low flex flex-col items-center py-4 gap-2">
+<button class="text-on-surface-variant hover:text-secondary transition-colors">
+<span class="material-symbols-outlined">arrow_upward</span>
+</button>
+<span class="font-label-md text-label-md">86</span>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">arrow_downward</span>
+</button>
+</div>
+<div class="flex-1 p-stack-md">
+<div class="flex items-center gap-2 mb-2">
+<span class="bg-primary-fixed text-on-primary-fixed-variant px-2 py-0.5 rounded-full text-label-sm font-label-sm">Engineering</span>
+<span class="text-outline text-label-sm">•</span>
+<span class="text-on-surface-variant text-label-sm font-label-sm">Posted by @structural_stu</span>
+<span class="text-outline text-label-sm">• 5h ago</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm mb-3">Anyone want to study Fluid Dynamics tonight?</h2>
+<p class="text-body-md text-body-md text-on-surface-variant mb-4">Meeting at the main library, 3rd floor at 7 PM. Focusing on Reynolds Transport Theorem and Navier-Stokes equations.</p>
+<div class="flex items-center gap-stack-lg">
+<button class="flex items-center gap-1 text-on-surface-variant font-label-md text-label-md hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]">chat_bubble</span> 15 Comments
+                                </button>
+<button class="flex items-center gap-1 text-on-surface-variant font-label-md text-label-md hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]">share</span> Share
+                                </button>
+<button class="flex items-center gap-1 text-on-surface-variant font-label-md text-label-md hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]">bookmark</span> Save
+                                </button>
+</div>
+</div>
+</article>
+<!-- Post Card 3 (Image Focused) -->
+<article class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-[0_4px_20px_-2px_rgba(37,99,235,0.08)] flex overflow-hidden">
+<div class="w-12 bg-surface-container-low flex flex-col items-center py-4 gap-2">
+<button class="text-on-surface-variant hover:text-secondary transition-colors">
+<span class="material-symbols-outlined">arrow_upward</span>
+</button>
+<span class="font-label-md text-label-md">1.2k</span>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">arrow_downward</span>
+</button>
+</div>
+<div class="flex-1 p-stack-md">
+<div class="flex items-center gap-2 mb-2">
+<span class="bg-primary-fixed text-on-primary-fixed-variant px-2 py-0.5 rounded-full text-label-sm font-label-sm">Pre-Med Prep</span>
+<span class="text-outline text-label-sm">•</span>
+<span class="text-on-surface-variant text-label-sm font-label-sm">Posted by @bio_queen</span>
+<span class="text-outline text-label-sm">• 8h ago</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm mb-3">High-res Anatomy Cheat Sheet: Muscular System</h2>
+<img alt="Anatomy Cheat Sheet Preview" class="w-full h-48 object-cover rounded-lg mb-4 border border-outline-variant" data-alt="A detailed, clean educational graphic of human muscular anatomy designed with a modern academic aesthetic. The background is a crisp white canvas with labels in Scholar Blue. The visual is sharp and professional, suitable for medical study, with clear delineations and a bright, focused mood. The lighting is perfectly even, reminiscent of a high-end digital textbook illustration." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCrDXdBKJysaG7iKY_f1gIu3A5qndDe0bZiwqsl0f6ui4Mw2i8q9wfiIRZEFgRtUzUjhQ10n83KdweEQObHtyeLEjVZaPBod7HjlziE5jbhxW_YFyOsX3TSo9_K4pdQyv1W4NUCXLo89Cj8vrDkPULJNxtvGQLylz_-ncvWltTEaqrYbbYXJA8NhTinCF9Kt9Rp3Kf5dZE2q5Y-Zfrb7FhoVJcYGBTJn-LK31ovzwxWOhVRTmuEoCOapTgcHDmL8H5kWLCJOr0aqM0s"/>
+<div class="flex items-center gap-stack-lg">
+<button class="flex items-center gap-1 text-on-surface-variant font-label-md text-label-md hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]">chat_bubble</span> 89 Comments
+                                </button>
+<button class="flex items-center gap-1 text-on-surface-variant font-label-md text-label-md hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]">share</span> Share
+                                </button>
+<button class="flex items-center gap-1 text-on-surface-variant font-label-md text-label-md hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]">bookmark</span> Save
+                                </button>
+</div>
+</div>
+</article>
+</div>
+</div>
+<!-- Right Sidebar -->
+<aside class="hidden xl:block w-80 space-y-stack-lg">
+<!-- My Communities -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-stack-md">
+<h3 class="font-label-md text-label-md mb-stack-md uppercase tracking-wider text-outline">My Communities</h3>
+<div class="space-y-3">
+<a class="flex items-center gap-3 group" href="#">
+<div class="w-10 h-10 rounded-lg bg-primary-container text-on-primary flex items-center justify-center font-bold">P</div>
+<div class="flex-1">
+<p class="font-label-md text-label-md group-hover:text-primary transition-colors">Pre-Med Prep</p>
+<p class="text-body-sm text-body-sm text-on-surface-variant">2.4k active</p>
+</div>
+</a>
+<a class="flex items-center gap-3 group" href="#">
+<div class="w-10 h-10 rounded-lg bg-secondary-container text-on-secondary flex items-center justify-center font-bold">L</div>
+<div class="flex-1">
+<p class="font-label-md text-label-md group-hover:text-primary transition-colors">Law Hub</p>
+<p class="text-body-sm text-body-sm text-on-surface-variant">1.1k active</p>
+</div>
+</a>
+<a class="flex items-center gap-3 group" href="#">
+<div class="w-10 h-10 rounded-lg bg-tertiary-container text-on-tertiary flex items-center justify-center font-bold">E</div>
+<div class="flex-1">
+<p class="font-label-md text-label-md group-hover:text-primary transition-colors">Engineering</p>
+<p class="text-body-sm text-body-sm text-on-surface-variant">5.8k active</p>
+</div>
+</a>
+</div>
+<button class="w-full mt-4 py-2 text-primary font-label-md text-label-md hover:bg-surface-container transition-colors rounded-lg">View All</button>
+</section>
+<!-- Trending Topics / Upcoming Exams -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-stack-md">
+<div class="flex items-center justify-between mb-stack-md">
+<h3 class="font-label-md text-label-md uppercase tracking-wider text-outline">Trending Topics</h3>
+<span class="material-symbols-outlined text-outline text-[18px]">info</span>
+</div>
+<div class="flex flex-wrap gap-2">
+<a class="px-3 py-1 bg-surface-container rounded-full text-label-sm font-label-sm text-on-surface-variant hover:bg-primary-fixed hover:text-primary transition-all" href="#">#Calculus</a>
+<a class="px-3 py-1 bg-surface-container rounded-full text-label-sm font-label-sm text-on-surface-variant hover:bg-primary-fixed hover:text-primary transition-all" href="#">#Ethics</a>
+<a class="px-3 py-1 bg-surface-container rounded-full text-label-sm font-label-sm text-on-surface-variant hover:bg-primary-fixed hover:text-primary transition-all" href="#">#Finals2024</a>
+<a class="px-3 py-1 bg-surface-container rounded-full text-label-sm font-label-sm text-on-surface-variant hover:bg-primary-fixed hover:text-primary transition-all" href="#">#DataStructures</a>
+<a class="px-3 py-1 bg-surface-container rounded-full text-label-sm font-label-sm text-on-surface-variant hover:bg-primary-fixed hover:text-primary transition-all" href="#">#OrganicChemistry</a>
+</div>
+</section>
+<!-- Progress Card -->
+<section class="bg-primary text-on-primary rounded-xl p-stack-md shadow-lg">
+<div class="flex items-center justify-between mb-4">
+<p class="font-label-md text-label-md opacity-90">Weekly Study Goal</p>
+<span class="font-bold">75%</span>
+</div>
+<div class="h-2 w-full bg-on-primary/20 rounded-full mb-4">
+<div class="h-full bg-secondary-container w-3/4 rounded-full"></div>
+</div>
+<p class="text-body-sm text-body-sm">You've studied 15 hours this week. Almost at your target!</p>
+</section>
+</aside>
+</main>
+</div>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex lg:hidden justify-around items-center px-4 py-2 bg-surface shadow-lg rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-primary-container bg-primary-fixed rounded-full p-2 scale-110 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">grid_view</span>
+<span class="font-label-sm text-label-sm-mobile">Feed</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant transition-colors p-2" href="#">
+<span class="material-symbols-outlined">search</span>
+<span class="font-label-sm text-label-sm-mobile">Search</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant transition-colors p-2" href="#">
+<span class="material-symbols-outlined">add_circle</span>
+<span class="font-label-sm text-label-sm-mobile">Upload</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant transition-colors p-2" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-sm text-label-sm-mobile">Profile</span>
+</a>
+</nav>
+</body></html>
