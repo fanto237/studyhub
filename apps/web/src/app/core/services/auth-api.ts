@@ -6,6 +6,7 @@ import { type ApiEnvelope } from '../types/api-envelope.model';
 import {
   type AuthSessionResponse,
   type LoginRequest,
+  type LogoutResponse,
   type RegisterAccountResponse,
   type RegisterRequest,
   type RequestPasswordResetRequest,
@@ -53,6 +54,26 @@ export class AuthApi {
       );
 
     return responseObservable;
+  }
+
+  refreshSession() {
+    return this.http
+      .post<ApiEnvelope<AuthSessionResponse>>(
+        '/api/auth/refresh',
+        {},
+        {
+          withCredentials: true,
+        },
+      )
+      .pipe(
+        map((response) => {
+          if (response.status === 'success' && response.data) {
+            return response.data;
+          }
+
+          throw new Error(response.message ?? 'Session refresh failed.');
+        }),
+      );
   }
 
   verifyAccount(request: VerifyAccountRequest) {
@@ -123,6 +144,22 @@ export class AuthApi {
           throw new Error(
             response.message ?? 'Password reset was not completed.',
           );
+        }),
+      );
+  }
+
+  logout() {
+    return this.http
+      .post<
+        ApiEnvelope<LogoutResponse>
+      >('/api/auth/logout', {}, { withCredentials: true })
+      .pipe(
+        map((response) => {
+          if (response.status === 'success' && response.data) {
+            return response.data;
+          }
+
+          throw new Error(response.message ?? 'Logout was not completed.');
         }),
       );
   }
