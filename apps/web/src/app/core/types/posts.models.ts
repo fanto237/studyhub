@@ -41,6 +41,55 @@ export interface GetPostsParams {
   tags?: string[];
 }
 
+export interface CreatePostRequest {
+  file: File;
+  title: string;
+  description?: string | null;
+  tags: string[];
+}
+
+export interface CreatePostResponse {
+  id: string;
+  userId: string;
+  title: string;
+  description: string | null;
+  storageUrl: string;
+  tags: string[];
+  createdAt: string;
+  message: string;
+}
+
+export interface PostDetailUser {
+  id: string;
+  username: string;
+  fullName: string;
+}
+
+export interface PostDetailComment {
+  id: string;
+  parentCommentId: string | null;
+  text: string;
+  createdAt: string;
+  user: PostDetailUser;
+}
+
+export interface GetPostResponse {
+  id: string;
+  title: string;
+  description: string | null;
+  storageUrl: string;
+  upvotes: number;
+  downvotes: number;
+  score: number;
+  createdAt: string;
+  updatedAt: string | null;
+  commentCount: number;
+  tags: string[];
+  user: PostDetailUser;
+  comments: PostDetailComment[];
+  currentVote: VoteValue;
+}
+
 export interface VotePostResponse {
   postId: string;
   upvotes: number;
