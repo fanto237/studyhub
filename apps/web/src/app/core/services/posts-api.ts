@@ -4,7 +4,10 @@ import { map } from 'rxjs';
 
 import { type ApiEnvelope } from '../types/api-envelope.model';
 import {
+  type CreatePostRequest,
+  type CreatePostResponse,
   type DownloadPostResponse,
+  type GetPostResponse,
   type GetPostsParams,
   type GetPostsResponse,
   type VotePostResponse,
@@ -16,26 +19,16 @@ export class PostsApi {
   private readonly http = inject(HttpClient);
 
   getPosts(params: GetPostsParams) {
-    let httpParams = new HttpParams()
-      .set('sort', params.sort)
-      .set('page', params.page)
-      .set('pageSize', params.pageSize);
+    return this.getPostsFromUrl('/api/posts', params);
+  }
 
-    const search = params.search?.trim();
-    if (search) {
-      httpParams = httpParams.set('search', search);
-    }
+  getMyPosts(params: GetPostsParams) {
+    return this.getPostsFromUrl('/api/posts/me', params);
+  }
 
-    for (const tag of params.tags ?? []) {
-      const normalizedTag = tag.trim();
-      if (normalizedTag) {
-        httpParams = httpParams.append('tags', normalizedTag);
-      }
-    }
-
+  getPost(postId: string) {
     return this.http
-      .get<ApiEnvelope<GetPostsResponse>>('/api/posts', {
-        params: httpParams,
+      .get<ApiEnvelope<GetPostResponse>>(`/api/posts/${postId}`, {
         withCredentials: true,
       })
       .pipe(
@@ -44,9 +37,39 @@ export class PostsApi {
             return response.data;
           }
 
-          throw new Error(
-            response.message ?? 'The StudyHub feed could not load.',
-          );
+          throw new Error(response.message ?? 'The post could not be loaded.');
+        }),
+      );
+  }
+
+  createPost(request: CreatePostRequest) {
+    const formData = new FormData();
+    formData.append('File', request.file);
+    formData.append('Title', request.title);
+
+    const description = request.description?.trim();
+    if (description) {
+      formData.append('Description', description);
+    }
+
+    for (const tag of request.tags) {
+      const normalizedTag = tag.trim();
+      if (normalizedTag) {
+        formData.append('Tags', normalizedTag);
+      }
+    }
+
+    return this.http
+      .post<ApiEnvelope<CreatePostResponse>>('/api/posts', formData, {
+        withCredentials: true,
+      })
+      .pipe(
+        map((response) => {
+          if (response.status === 'success' && response.data) {
+            return response.data;
+          }
+
+          throw new Error(response.message ?? 'The PDF could not be uploaded.');
         }),
       );
   }
@@ -80,6 +103,42 @@ export class PostsApi {
 
           throw new Error(
             response.message ?? 'The download could not be prepared.',
+          );
+        }),
+      );
+  }
+
+  private getPostsFromUrl(url: string, params: GetPostsParams) {
+    let httpParams = new HttpParams()
+      .set('sort', params.sort)
+      .set('page', params.page)
+      .set('pageSize', params.pageSize);
+
+    const search = params.search?.trim();
+    if (search) {
+      httpParams = httpParams.set('search', search);
+    }
+
+    for (const tag of params.tags ?? []) {
+      const normalizedTag = tag.trim();
+      if (normalizedTag) {
+        httpParams = httpParams.append('tags', normalizedTag);
+      }
+    }
+
+    return this.http
+      .get<ApiEnvelope<GetPostsResponse>>(url, {
+        params: httpParams,
+        withCredentials: true,
+      })
+      .pipe(
+        map((response) => {
+          if (response.status === 'success' && response.data) {
+            return response.data;
+          }
+
+          throw new Error(
+            response.message ?? 'The StudyHub feed could not load.',
           );
         }),
       );
