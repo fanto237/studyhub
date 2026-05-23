@@ -2,10 +2,11 @@ import { DatePipe, DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
+  inject,
   input,
   output,
 } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 import {
   type PostFeedItem,
@@ -26,6 +27,8 @@ export type PostCardVoteRequest = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PostCard {
+  private readonly router = inject(Router);
+
   readonly post = input.required<PostFeedItem>();
   readonly voting = input(false);
   readonly downloading = input(false);
@@ -65,5 +68,40 @@ export class PostCard {
 
   requestDownload(): void {
     this.downloadRequested.emit(this.post());
+  }
+
+  openPostDetail(event: MouseEvent): void {
+    if (this.shouldIgnoreCardNavigation(event)) {
+      return;
+    }
+
+    void this.router.navigate(['/posts', this.post().id]);
+  }
+
+  handleCardKeydown(event: KeyboardEvent): void {
+    if (event.key !== 'Enter' && event.key !== ' ') {
+      return;
+    }
+
+    if (this.shouldIgnoreCardNavigation(event)) {
+      return;
+    }
+
+    event.preventDefault();
+    void this.router.navigate(['/posts', this.post().id]);
+  }
+
+  private shouldIgnoreCardNavigation(event: Event): boolean {
+    const target = event.target;
+
+    if (!(target instanceof Element)) {
+      return true;
+    }
+
+    return (
+      target.closest(
+        'a, button, input, select, textarea, label, summary, [role="button"], [role="link"], [contenteditable="true"], [data-no-card-navigation]',
+      ) !== null
+    );
   }
 }

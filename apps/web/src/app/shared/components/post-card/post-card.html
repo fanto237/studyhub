@@ -1,7 +1,11 @@
 @let postItem = post();
 
 <article
-  class="group rounded-3xl border border-base-300 bg-base-100/95 p-4 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 sm:p-5"
+  class="group cursor-pointer rounded-3xl border border-base-300 bg-base-100/95 p-4 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-base-100 sm:p-5"
+  tabindex="0"
+  [attr.aria-label]="'Open post details: ' + postItem.title"
+  (click)="openPostDetail($event)"
+  (keydown)="handleCardKeydown($event)"
 >
   <div class="flex gap-4">
     <div
