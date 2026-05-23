@@ -10,6 +10,23 @@
         >Community</a
       >
 
+      @if (authSession.isLoading()) {
+      <button
+        siteHeaderActions
+        class="btn btn-ghost btn-sm sm:btn-md"
+        type="button"
+        disabled
+      >
+        Checking...
+      </button>
+      } @else { @if (authSession.isAuthenticated()) {
+      <a
+        siteHeaderActions
+        class="btn btn-primary btn-sm text-primary-content sm:btn-md"
+        routerLink="/home"
+        >Continue to Home</a
+      >
+      } @else {
       <a
         siteHeaderActions
         class="btn btn-ghost btn-sm sm:btn-md"
@@ -22,6 +39,7 @@
         routerLink="/signup"
         >Sign Up</a
       >
+      } }
     </app-site-header>
 
     <main class="flex-1">
@@ -48,12 +66,32 @@
         </div>
 
         <div class="mt-8 flex flex-wrap justify-center gap-4">
+          @if (authSession.isLoading()) {
+          <button class="btn btn-primary btn-lg text-primary-content" disabled>
+            <span
+              class="loading loading-spinner loading-sm"
+              aria-hidden="true"
+            ></span>
+            Checking session...
+          </button>
+          } @else { @if (authSession.isAuthenticated()) {
+          <a
+            class="btn btn-primary btn-lg text-primary-content"
+            routerLink="/home"
+            >Continue to Home</a
+          >
+          @if (authSession.displayUser(); as user) {
+          <span class="self-center text-sm font-semibold text-base-content/60">
+            Signed in as &#64;{{ user.username }}
+          </span>
+          } } @else {
           <a
             class="btn btn-primary btn-lg text-primary-content"
             routerLink="/signup"
             >Sign Up for Free</a
           >
           <a class="btn btn-outline btn-lg" routerLink="/login">Log In</a>
+          } }
         </div>
 
         <div
@@ -114,7 +152,7 @@
               </div>
 
               <div
-                class="mt-5 rounded-2xl border border-primary/10 bg-gradient-to-br from-primary/10 via-base-100 to-accent/10 p-4 shadow-sm"
+                class="mt-5 rounded-2xl border border-primary/10 bg-linear-to-br from-primary/10 via-base-100 to-accent/10 p-4 shadow-sm"
               >
                 <div class="flex gap-4">
                   <span
@@ -432,11 +470,19 @@
             Join StudyHub and get ready to access a practical library of past
             papers as the platform grows.
           </p>
+          @if (authSession.isAuthenticated()) {
+          <a
+            class="btn btn-primary btn-lg mt-3 text-primary-content"
+            routerLink="/home"
+            >Continue to Home</a
+          >
+          } @else {
           <a
             class="btn btn-primary btn-lg mt-3 text-primary-content"
             routerLink="/signup"
             >Sign Up for Free</a
           >
+          }
         </div>
       </section>
     </main>

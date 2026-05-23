@@ -1,0 +1,287 @@
+<div class="min-h-screen overflow-x-hidden bg-base-200 text-base-content">
+  <div
+    class="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_8%_10%,rgba(37,99,235,0.10),transparent_26%),radial-gradient(circle_at_92%_14%,rgba(20,184,166,0.10),transparent_24%),radial-gradient(circle_at_58%_92%,rgba(236,72,153,0.08),transparent_30%)]"
+    aria-hidden="true"
+  ></div>
+
+  <header
+    class="sticky top-0 z-40 border-b border-base-300 bg-base-100/90 px-4 py-3 shadow-sm backdrop-blur sm:px-6 lg:px-8"
+  >
+    <div class="mx-auto flex max-w-7xl items-center justify-between gap-3">
+      <a class="flex items-center gap-3" routerLink="/home" aria-label="StudyHub home">
+        <span
+          class="flex size-11 items-center justify-center rounded-2xl bg-primary text-primary-content shadow-lg shadow-primary/20"
+        >
+          <app-icon name="studyhub-file" class="size-6" />
+        </span>
+        <span>
+          <span class="block text-xl font-black leading-none text-primary">
+            StudyHub
+          </span>
+          <span class="text-xs font-bold text-base-content/50">
+            Resource detail
+          </span>
+        </span>
+      </a>
+
+      <nav class="hidden items-center gap-2 sm:flex" aria-label="Resource navigation">
+        <a class="btn btn-ghost btn-sm gap-2" routerLink="/home">
+          <app-icon name="home" class="size-4" />
+          Home
+        </a>
+        <a class="btn btn-ghost btn-sm gap-2" routerLink="/upload">
+          <app-icon name="upload" class="size-4" />
+          Upload
+        </a>
+        <a class="btn btn-ghost btn-sm gap-2" routerLink="/profile">
+          <app-icon name="user" class="size-4" />
+          Profile
+        </a>
+      </nav>
+
+      <div class="flex items-center gap-2">
+        <app-theme-toggle />
+        <a class="btn btn-ghost btn-circle btn-sm sm:hidden" routerLink="/home" aria-label="Back home">
+          <app-icon name="home" class="size-4" />
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+    @if (isLoading()) {
+    <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+      <section class="rounded-[2rem] border border-base-300 bg-base-100/85 p-5 shadow-xl shadow-base-300/30 sm:p-7">
+        <div class="skeleton h-6 w-40 rounded-full"></div>
+        <div class="skeleton mt-5 h-12 w-full max-w-3xl rounded-2xl"></div>
+        <div class="skeleton mt-4 h-5 w-full max-w-2xl rounded-full"></div>
+        <div class="skeleton mt-8 h-52 rounded-[2rem]"></div>
+      </section>
+      <aside class="rounded-[2rem] border border-base-300 bg-base-100/85 p-5 shadow-xl shadow-base-300/30 sm:p-6">
+        <div class="skeleton h-12 w-12 rounded-2xl"></div>
+        <div class="skeleton mt-5 h-6 w-48 rounded-full"></div>
+        <div class="skeleton mt-4 h-20 rounded-2xl"></div>
+      </aside>
+    </div>
+    } @else if (errorMessage(); as message) {
+    <section class="mx-auto max-w-2xl rounded-[2rem] border border-base-300 bg-base-100/90 p-8 text-center shadow-xl shadow-base-300/30">
+      <span class="mx-auto flex size-16 items-center justify-center rounded-3xl bg-warning/15 text-warning-content">
+        <app-icon name="alert-triangle" class="size-8" />
+      </span>
+      <p class="badge badge-warning badge-soft mt-5 font-bold">
+        @if (isNotFound()) { Not found } @else { Resource unavailable }
+      </p>
+      <h1 class="mt-3 text-3xl font-black tracking-tight">
+        @if (isNotFound()) { This post is unavailable } @else { We couldn't load this post }
+      </h1>
+      <p class="mt-3 text-base leading-7 text-base-content/65">{{ message }}</p>
+      <div class="mt-6 flex flex-wrap justify-center gap-3">
+        @if (!isNotFound()) {
+        <button class="btn btn-primary text-primary-content" type="button" (click)="retry()">
+          Retry
+        </button>
+        }
+        <a class="btn btn-outline" routerLink="/home">Back to feed</a>
+      </div>
+    </section>
+    } @else { @if (post(); as postItem) {
+    <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+      <article class="min-w-0 space-y-6">
+        <section
+          class="rounded-[2rem] border border-base-300 bg-base-100/85 p-5 shadow-xl shadow-base-300/30 backdrop-blur sm:p-7"
+          aria-labelledby="post-detail-heading"
+        >
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="badge badge-primary badge-sm">PDF</span>
+            @if (postItem.currentVote) {
+            <span class="badge badge-accent badge-soft badge-sm">
+              Voted {{ postItem.currentVote }}
+            </span>
+            }
+            <span class="text-xs font-bold uppercase tracking-[0.18em] text-base-content/40">
+              {{ postItem.createdAt | date: 'mediumDate' }}
+            </span>
+          </div>
+
+          <h1 id="post-detail-heading" class="mt-4 text-3xl font-black leading-tight tracking-tight sm:text-4xl lg:text-5xl">
+            {{ postItem.title }}
+          </h1>
+
+          <div class="mt-5 flex flex-wrap items-center gap-3">
+            <span class="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-sm font-black text-primary">
+              {{ initials(postItem.user) }}
+            </span>
+            <div class="min-w-0">
+              <p class="truncate text-sm font-bold">{{ postItem.user.fullName }}</p>
+              <p class="truncate text-xs text-base-content/50">@{{ postItem.user.username }}</p>
+            </div>
+          </div>
+
+          <p class="mt-6 whitespace-pre-line text-base leading-8 text-base-content/70">
+            {{ postItem.description || 'No description was added for this resource.' }}
+          </p>
+
+          @if (postItem.tags.length > 0) {
+          <div class="mt-6 flex flex-wrap gap-2" aria-label="Post tags">
+            @for (tag of postItem.tags; track tag) {
+            <span class="badge badge-outline px-3 py-3">{{ tag }}</span>
+            }
+          </div>
+          }
+
+          <div class="mt-8 grid gap-3 border-t border-base-300 pt-6 sm:grid-cols-3">
+            <div class="rounded-2xl bg-primary/10 p-4 text-primary">
+              <p class="text-2xl font-black">{{ postItem.score | number }}</p>
+              <p class="mt-1 text-xs font-bold uppercase tracking-wide">Score</p>
+            </div>
+            <div class="rounded-2xl bg-base-200/80 p-4">
+              <p class="text-2xl font-black">{{ postItem.upvotes | number }}</p>
+              <p class="mt-1 text-xs font-bold uppercase tracking-wide text-base-content/45">Upvotes</p>
+            </div>
+            <div class="rounded-2xl bg-base-200/80 p-4">
+              <p class="text-2xl font-black">{{ postItem.commentCount | number }}</p>
+              <p class="mt-1 text-xs font-bold uppercase tracking-wide text-base-content/45">Comments</p>
+            </div>
+          </div>
+        </section>
+
+        <section
+          class="rounded-[2rem] border border-base-300 bg-base-100/85 p-5 shadow-xl shadow-base-300/30 backdrop-blur sm:p-7"
+          aria-labelledby="comments-heading"
+        >
+          <div class="flex items-center justify-between gap-3">
+            <div>
+              <p class="text-xs font-black uppercase tracking-[0.22em] text-primary">Discussion</p>
+              <h2 id="comments-heading" class="mt-2 text-2xl font-black tracking-tight">
+                Existing comments
+              </h2>
+            </div>
+            <span class="badge badge-ghost">Read-only</span>
+          </div>
+
+          @if (postItem.comments.length === 0) {
+          <div class="mt-6 rounded-3xl border border-dashed border-base-300 bg-base-200/55 p-8 text-center">
+            <app-icon name="message-circle" class="mx-auto size-10 text-base-content/35" />
+            <p class="mt-3 font-bold">No comments yet.</p>
+            <p class="mt-1 text-sm text-base-content/55">Commenting can be added in a follow-up flow.</p>
+          </div>
+          } @else {
+          <div class="mt-6 space-y-5">
+            @for (comment of topLevelComments(); track comment.id) {
+            <article class="rounded-3xl border border-base-300 bg-base-200/50 p-4">
+              <div class="flex items-start gap-3">
+                <span class="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-xs font-black text-primary">
+                  {{ initials(comment.user) }}
+                </span>
+                <div class="min-w-0 flex-1">
+                  <div class="flex flex-wrap items-center justify-between gap-2">
+                    <p class="font-bold">{{ comment.user.fullName }}</p>
+                    <time class="text-xs font-semibold text-base-content/45">
+                      {{ comment.createdAt | date: 'mediumDate' }}
+                    </time>
+                  </div>
+                  <p class="mt-2 whitespace-pre-line text-sm leading-6 text-base-content/70">{{ comment.text }}</p>
+                </div>
+              </div>
+            </article>
+
+            @for (reply of repliesFor(comment); track reply.id) {
+            <article class="ml-6 rounded-3xl border border-base-300 bg-base-100/80 p-4 sm:ml-12">
+              <div class="flex items-start gap-3">
+                <span class="flex size-9 shrink-0 items-center justify-center rounded-2xl bg-accent/15 text-xs font-black text-accent-content">
+                  {{ initials(reply.user) }}
+                </span>
+                <div class="min-w-0 flex-1">
+                  <div class="flex flex-wrap items-center justify-between gap-2">
+                    <p class="font-bold">{{ reply.user.fullName }}</p>
+                    <time class="text-xs font-semibold text-base-content/45">
+                      {{ reply.createdAt | date: 'mediumDate' }}
+                    </time>
+                  </div>
+                  <p class="mt-2 whitespace-pre-line text-sm leading-6 text-base-content/70">{{ reply.text }}</p>
+                </div>
+              </div>
+            </article>
+            }
+            }
+          </div>
+          }
+        </section>
+      </article>
+
+      <aside class="space-y-6 lg:sticky lg:top-24 lg:self-start" aria-label="Resource actions">
+        @if (actionErrorMessage(); as inlineMessage) {
+        <div class="alert alert-error" role="alert">
+          <app-icon name="alert-triangle" class="size-5 shrink-0" />
+          <span>{{ inlineMessage }}</span>
+        </div>
+        }
+
+        <section class="rounded-[2rem] border border-base-300 bg-base-100/85 p-5 shadow-xl shadow-base-300/30 backdrop-blur sm:p-6">
+          <h2 class="text-xl font-black">Resource actions</h2>
+
+          <div class="mt-5 flex items-center justify-center gap-2 rounded-3xl bg-base-200/80 p-3" aria-label="Vote controls">
+            <button
+              class="btn btn-ghost btn-square"
+              [class.text-primary]="postItem.currentVote === 'up'"
+              [disabled]="isVoting()"
+              type="button"
+              (click)="votePost(postItem.currentVote === 'up' ? 'remove' : 'up')"
+              aria-label="Upvote post"
+            >
+              <app-icon name="arrow-up" class="size-5" />
+            </button>
+            <div class="min-w-16 text-center">
+              <p class="text-2xl font-black">{{ postItem.score | number }}</p>
+              <p class="text-[0.65rem] font-bold uppercase tracking-wide text-base-content/45">score</p>
+            </div>
+            <button
+              class="btn btn-ghost btn-square"
+              [class.text-secondary]="postItem.currentVote === 'down'"
+              [disabled]="isVoting()"
+              type="button"
+              (click)="votePost(postItem.currentVote === 'down' ? 'remove' : 'down')"
+              aria-label="Downvote post"
+            >
+              <app-icon name="arrow-down" class="size-5" />
+            </button>
+          </div>
+
+          <div class="mt-5 grid gap-3">
+            <a class="btn btn-outline" [href]="postItem.storageUrl" target="_blank" rel="noopener noreferrer">
+              View PDF
+            </a>
+            <button class="btn btn-primary text-primary-content" [disabled]="isDownloading()" type="button" (click)="downloadPost()">
+              @if (isDownloading()) {
+              <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+              Preparing } @else {
+              <app-icon name="download" class="size-5" />
+              Download }
+            </button>
+          </div>
+        </section>
+
+        <section class="rounded-[2rem] border border-base-300 bg-base-100/85 p-5 shadow-xl shadow-base-300/30 backdrop-blur sm:p-6">
+          <p class="text-xs font-black uppercase tracking-[0.22em] text-base-content/45">Details</p>
+          <dl class="mt-4 space-y-3">
+            <div class="rounded-2xl bg-base-200/70 p-4">
+              <dt class="text-xs font-bold uppercase tracking-wide text-base-content/45">Uploaded</dt>
+              <dd class="mt-1 font-bold">{{ postItem.createdAt | date: 'medium' }}</dd>
+            </div>
+            @if (postItem.updatedAt) {
+            <div class="rounded-2xl bg-base-200/70 p-4">
+              <dt class="text-xs font-bold uppercase tracking-wide text-base-content/45">Updated</dt>
+              <dd class="mt-1 font-bold">{{ postItem.updatedAt | date: 'medium' }}</dd>
+            </div>
+            }
+            <div class="rounded-2xl bg-base-200/70 p-4">
+              <dt class="text-xs font-bold uppercase tracking-wide text-base-content/45">Downvotes</dt>
+              <dd class="mt-1 font-bold">{{ postItem.downvotes | number }}</dd>
+            </div>
+          </dl>
+        </section>
+      </aside>
+    </div>
+    } }
+  </main>
+</div>
