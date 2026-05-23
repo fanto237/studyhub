@@ -111,7 +111,7 @@
       </section>
 
       <section class="mx-auto w-full max-w-md" aria-labelledby="login-heading">
-        @if (authenticatedSession(); as session) {
+        @if (isCheckingExistingSession() || isAuthenticated()) {
         <div
           class="card border border-success/20 bg-base-100/95 shadow-2xl shadow-success/10 backdrop-blur"
         >
@@ -119,29 +119,37 @@
             <span
               class="flex size-16 items-center justify-center rounded-3xl bg-success text-success-content shadow-lg shadow-success/20"
             >
+              @if (isCheckingExistingSession()) {
+              <span
+                class="loading loading-spinner loading-md"
+                aria-hidden="true"
+              ></span>
+              } @else {
               <app-icon name="check" class="size-8" />
+              }
             </span>
             <p class="badge badge-success badge-soft mt-3 font-semibold">
-              Logged in
+              @if (isCheckingExistingSession()) { Checking session } @else {
+              Logged in }
             </p>
             <h1 class="mt-2 text-3xl font-black tracking-tight sm:text-4xl">
-              Welcome back, {{ session.fullName }}
+              @if (sessionUser(); as user) { Welcome back, {{ user.fullName }} }
+              @else { Checking your StudyHub session... }
             </h1>
             <p class="mt-2 max-w-sm text-base leading-7 text-base-content/70">
-              Your StudyHub session is active. You can keep exploring study
-              resources as {{ session.username }}.
+              @if (sessionUser(); as user) { You are already signed in as {{
+              user.username }}. Taking you back to your dashboard. } @else {
+              Please wait while we verify whether your cookie-backed session is
+              still active. }
             </p>
             <div class="mt-6 flex flex-wrap justify-center gap-3">
-              <a class="btn btn-primary text-primary-content" routerLink="/home"
-                >Continue</a
+              <a
+                class="btn btn-primary text-primary-content"
+                routerLink="/home"
+                [class.btn-disabled]="isCheckingExistingSession()"
+                [attr.aria-disabled]="isCheckingExistingSession()"
+                >Continue to Home</a
               >
-              <button
-                class="btn btn-outline"
-                type="button"
-                (click)="authenticatedSession.set(null)"
-              >
-                Log in another account
-              </button>
             </div>
           </div>
         </div>

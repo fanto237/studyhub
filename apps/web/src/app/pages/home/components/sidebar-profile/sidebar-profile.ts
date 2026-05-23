@@ -31,20 +31,4 @@ export class SidebarProfile {
 
     return fallback.slice(0, 2).toUpperCase();
   }
-
-  formatRole(role: number | string): string {
-    if (typeof role === 'string') {
-      return role;
-    }
-
-    if (role === 1) {
-      return 'Admin';
-    }
-
-    if (role === 2) {
-      return 'Moderator';
-    }
-
-    return 'Student';
-  }
 }

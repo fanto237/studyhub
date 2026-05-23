@@ -10,10 +10,10 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs';
 
-import { AuthApi } from '../../core/services/auth-api';
+import { AuthSessionStore } from '../../core/services/auth-session-store';
 import { PostsApi } from '../../core/services/posts-api';
 import { UsersApi } from '../../core/services/users-api';
 import { resolveApiErrorMessage } from '../../core/types/api-error.util';
@@ -55,6 +55,7 @@ type InitialsSource = Pick<CurrentUserResponse, 'fullName' | 'username'>;
     NgClass,
     PostCard,
     ReactiveFormsModule,
+    RouterLink,
     SidebarProfile,
     ThemeToggle,
   ],
@@ -62,7 +63,7 @@ type InitialsSource = Pick<CurrentUserResponse, 'fullName' | 'username'>;
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Home implements OnInit {
-  private readonly authApi = inject(AuthApi);
+  private readonly authSession = inject(AuthSessionStore);
   private readonly postsApi = inject(PostsApi);
   private readonly usersApi = inject(UsersApi);
   private readonly router = inject(Router);
@@ -305,12 +306,13 @@ export class Home implements OnInit {
     this.logoutErrorMessage.set(null);
     this.isLoggingOut.set(true);
 
-    this.authApi.logout().subscribe({
+    this.authSession.logout().subscribe({
       next: () => {
         void this.router.navigate(['/']);
       },
       error: (error: unknown) => {
         if (this.isUnauthorized(error)) {
+          this.authSession.clearLocalSession();
           void this.router.navigate(['/']);
           return;
         }
@@ -481,6 +483,7 @@ export class Home implements OnInit {
       return false;
     }
 
+    this.authSession.clearLocalSession();
     void this.router.navigate(['/login'], {
       queryParams: { returnUrl: '/home' },
     });

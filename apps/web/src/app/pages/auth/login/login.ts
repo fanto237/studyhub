@@ -2,6 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import {
   ChangeDetectionStrategy,
   Component,
+  OnInit,
   inject,
   signal,
 } from '@angular/core';
@@ -14,11 +15,10 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
-import { AuthApi } from '../../../core/services/auth-api';
+import { AuthSessionStore } from '../../../core/services/auth-session-store';
 import { type ApiEnvelope } from '../../../core/types/api-envelope.model';
 import { resolveApiErrorMessage } from '../../../core/types/api-error.util';
 import {
-  type AuthSessionResponse,
   type LoginRequest,
   type UnverifiedAccountLoginResponse,
 } from '../../../core/types/auth.models';
@@ -51,15 +51,17 @@ type LoginControlName = keyof LoginFormControls;
   templateUrl: './login.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Login {
+export class Login implements OnInit {
   private readonly fb = inject(FormBuilder);
-  private readonly authApi = inject(AuthApi);
+  private readonly authSession = inject(AuthSessionStore);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
   readonly isSubmitting = signal(false);
+  readonly isCheckingExistingSession = signal(true);
   readonly errorMessage = signal<string | null>(null);
-  readonly authenticatedSession = signal<AuthSessionResponse | null>(null);
+  readonly isAuthenticated = this.authSession.isAuthenticated;
+  readonly sessionUser = this.authSession.displayUser;
   readonly unverifiedAccount = signal<UnverifiedAccount | null>(null);
   readonly isPasswordResetMode = signal(false);
   readonly passwordResetInitialPrivateEmail = signal<string | null>(null);
@@ -78,6 +80,27 @@ export class Login {
     if (username) {
       this.loginForm.controls.usernameOrPrivateEmail.setValue(username);
     }
+  }
+
+  ngOnInit(): void {
+    if (
+      this.authSession.hasCheckedSession() &&
+      !this.authSession.isAuthenticated()
+    ) {
+      this.isCheckingExistingSession.set(false);
+      return;
+    }
+
+    this.authSession.checkSession().subscribe({
+      next: () => {
+        if (this.authSession.isAuthenticated()) {
+          void this.navigateAfterAuthentication();
+        }
+      },
+      complete: () => {
+        this.isCheckingExistingSession.set(false);
+      },
+    });
   }
 
   isInvalid(controlName: LoginControlName): boolean {
@@ -125,11 +148,10 @@ export class Login {
 
     this.isSubmitting.set(true);
 
-    this.authApi.login(request).subscribe({
-      next: (response) => {
-        this.authenticatedSession.set(response);
+    this.authSession.login(request).subscribe({
+      next: () => {
         this.loginForm.reset();
-        void this.router.navigate(['/home']);
+        void this.navigateAfterAuthentication();
       },
       error: (error: unknown) => {
         const unverifiedAccount = this.resolveUnverifiedAccount(error);
@@ -186,6 +208,32 @@ export class Login {
 
     this.loginForm.controls.password.reset('');
     this.clearPasswordResetState();
+  }
+
+  private navigateAfterAuthentication(): Promise<boolean> {
+    return this.router.navigateByUrl(this.resolveSafeReturnUrl() ?? '/home');
+  }
+
+  private resolveSafeReturnUrl(): string | null {
+    const returnUrl = this.route.snapshot.queryParamMap
+      .get('returnUrl')
+      ?.trim();
+
+    if (
+      !returnUrl ||
+      !returnUrl.startsWith('/') ||
+      returnUrl.startsWith('//')
+    ) {
+      return null;
+    }
+
+    const pathWithoutQuery = returnUrl.split('?', 1)[0].replace(/\/$/, '');
+
+    if (pathWithoutQuery === '/login' || pathWithoutQuery === '/signup') {
+      return null;
+    }
+
+    return returnUrl;
   }
 
   private showVerificationPanel(account: UnverifiedAccount): void {
