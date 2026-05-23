@@ -4,6 +4,13 @@ export type VoteValue = 'up' | 'down' | null;
 
 export type VoteRequestValue = 'up' | 'down' | 'remove';
 
+export type ReportPostReason =
+  | 'spam'
+  | 'copyright'
+  | 'abusive'
+  | 'wrong-content'
+  | 'other';
+
 export interface PostFeedUser {
   id: string;
   username: string;
@@ -103,5 +110,17 @@ export interface DownloadPostResponse {
   postId: string;
   downloadUrl: string;
   fileName: string | null;
+  message: string;
+}
+
+export interface ReportPostRequest {
+  reason: ReportPostReason;
+  details?: string | null;
+}
+
+export interface ReportPostResponse {
+  postId: string;
+  reportCount: number;
+  isHidden: boolean;
   message: string;
 }
