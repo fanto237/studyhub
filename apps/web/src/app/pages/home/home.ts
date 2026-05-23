@@ -26,6 +26,7 @@ import {
 import { type CurrentUserResponse } from '../../core/types/users.models';
 import { Icon } from '../../shared/components/icon/icon';
 import { type IconName } from '../../shared/components/icon/icon.registry';
+import { MobileDock } from '../../shared/components/mobile-dock/mobile-dock';
 import { PostCard } from '../../shared/components/post-card/post-card';
 import { ThemeToggle } from '../../shared/components/theme-toggle/theme-toggle';
 import { SidebarProfile } from './components/sidebar-profile/sidebar-profile';
@@ -51,6 +52,7 @@ type InitialsSource = Pick<CurrentUserResponse, 'fullName' | 'username'>;
   imports: [
     DecimalPipe,
     Icon,
+    MobileDock,
     NgClass,
     PostCard,
     ReactiveFormsModule,

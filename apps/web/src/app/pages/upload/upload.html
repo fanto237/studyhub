@@ -24,7 +24,7 @@
         </span>
       </a>
 
-      <nav class="hidden items-center gap-2 sm:flex" aria-label="Upload navigation">
+      <nav class="hidden items-center gap-2 lg:flex" aria-label="Upload navigation">
         <a class="btn btn-ghost btn-sm gap-2" routerLink="/home">
           <app-icon name="home" class="size-4" />
           Home
@@ -41,14 +41,11 @@
 
       <div class="flex items-center gap-2">
         <app-theme-toggle />
-        <a class="btn btn-ghost btn-circle btn-sm sm:hidden" routerLink="/home" aria-label="Back home">
-          <app-icon name="home" class="size-4" />
-        </a>
       </div>
     </div>
   </header>
 
-  <main class="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+  <main class="relative mx-auto max-w-7xl px-4 pb-24 pt-6 sm:px-6 lg:px-8 lg:py-8">
     <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
       <section
         class="rounded-[2rem] border border-base-300 bg-base-100/85 p-5 shadow-xl shadow-base-300/30 backdrop-blur sm:p-7"
@@ -303,4 +300,6 @@
       </aside>
     </div>
   </main>
+
+  <app-mobile-dock />
 </div>

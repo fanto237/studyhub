@@ -22,6 +22,7 @@ import { AuthSessionStore } from '../../core/services/auth-session-store';
 import { PostsApi } from '../../core/services/posts-api';
 import { resolveApiErrorMessage } from '../../core/types/api-error.util';
 import { Icon } from '../../shared/components/icon/icon';
+import { MobileDock } from '../../shared/components/mobile-dock/mobile-dock';
 import { ThemeToggle } from '../../shared/components/theme-toggle/theme-toggle';
 
 type UploadFormControls = {
@@ -37,7 +38,7 @@ const MAX_TAG_LENGTH = 100;
 
 @Component({
   selector: 'app-upload',
-  imports: [Icon, ReactiveFormsModule, RouterLink, ThemeToggle],
+  imports: [Icon, MobileDock, ReactiveFormsModule, RouterLink, ThemeToggle],
   templateUrl: './upload.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
