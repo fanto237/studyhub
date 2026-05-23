@@ -10,6 +10,8 @@ import {
   type GetPostResponse,
   type GetPostsParams,
   type GetPostsResponse,
+  type ReportPostRequest,
+  type ReportPostResponse,
   type VotePostResponse,
   type VoteRequestValue,
 } from '../types/posts.models';
@@ -104,6 +106,22 @@ export class PostsApi {
           throw new Error(
             response.message ?? 'The download could not be prepared.',
           );
+        }),
+      );
+  }
+
+  reportPost(postId: string, request: ReportPostRequest) {
+    return this.http
+      .post<
+        ApiEnvelope<ReportPostResponse>
+      >(`/api/posts/${postId}/report`, request, { withCredentials: true })
+      .pipe(
+        map((response) => {
+          if (response.status === 'success' && response.data) {
+            return response.data;
+          }
+
+          throw new Error(response.message ?? 'This report could not be sent.');
         }),
       );
   }
