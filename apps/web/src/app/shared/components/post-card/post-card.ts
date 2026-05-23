@@ -5,6 +5,7 @@ import {
   input,
   output,
 } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 import {
   type PostFeedItem,
@@ -20,7 +21,7 @@ export type PostCardVoteRequest = {
 
 @Component({
   selector: 'app-post-card',
-  imports: [DatePipe, DecimalPipe, Icon],
+  imports: [DatePipe, DecimalPipe, Icon, RouterLink],
   templateUrl: './post-card.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

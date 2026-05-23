@@ -1,5 +1,10 @@
 import { Route } from '@angular/router';
 
+import {
+  redirectAuthenticatedGuard,
+  requireAuthSessionGuard,
+} from './core/guards/auth-session.guard';
+
 export const appRoutes: Route[] = [
   {
     path: '',
@@ -9,18 +14,44 @@ export const appRoutes: Route[] = [
   },
   {
     path: 'home',
+    canActivate: [requireAuthSessionGuard],
     loadComponent: () =>
       import('./pages/home/home').then((module) => module.Home),
     title: 'Home | StudyHub',
   },
   {
+    path: 'profile',
+    canActivate: [requireAuthSessionGuard],
+    loadComponent: () =>
+      import('./pages/profile/profile').then((module) => module.Profile),
+    title: 'Profile | StudyHub',
+  },
+  {
+    path: 'upload',
+    canActivate: [requireAuthSessionGuard],
+    loadComponent: () =>
+      import('./pages/upload/upload').then((module) => module.Upload),
+    title: 'Upload | StudyHub',
+  },
+  {
+    path: 'posts/:postId',
+    canActivate: [requireAuthSessionGuard],
+    loadComponent: () =>
+      import('./pages/post-detail/post-detail').then(
+        (module) => module.PostDetail,
+      ),
+    title: 'Resource | StudyHub',
+  },
+  {
     path: 'login',
+    canActivate: [redirectAuthenticatedGuard],
     loadComponent: () =>
       import('./pages/auth/login/login').then((module) => module.Login),
     title: 'Log In | StudyHub',
   },
   {
     path: 'signup',
+    canActivate: [redirectAuthenticatedGuard],
     loadComponent: () =>
       import('./pages/auth/signup/signup').then((module) => module.Signup),
     title: 'Sign Up | StudyHub',
