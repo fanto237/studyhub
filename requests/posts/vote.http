@@ -1,0 +1,27 @@
+POST {{Api_HostAddress}}/api/posts/00000000-0000-0000-0000-000000000000/vote
+Content-Type: application/json
+Accept: application/json
+
+{
+  "vote": "up"
+}
+
+###
+
+POST {{Api_HostAddress}}/api/posts/00000000-0000-0000-0000-000000000000/vote
+Content-Type: application/json
+Accept: application/json
+
+{
+  "vote": "down"
+}
+
+###
+
+POST {{Api_HostAddress}}/api/posts/00000000-0000-0000-0000-000000000000/vote
+Content-Type: application/json
+Accept: application/json
+
+{
+  "vote": "remove"
+}

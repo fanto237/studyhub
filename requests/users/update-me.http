@@ -1,0 +1,9 @@
+PATCH {{Api_HostAddress}}/api/users/me
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username": "studybuddy-updated",
+  "fullName": "Taylor Student Updated",
+  "privateEmail": "student.personal.updated@example.com"
+}

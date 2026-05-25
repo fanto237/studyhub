@@ -1,0 +1,8 @@
+POST {{Api_HostAddress}}/api/auth/verify-account
+Content-Type: application/json
+Accept: application/json
+
+{
+  "schoolEmail": "taylor@student.school.edu",
+  "code": "123456"
+}

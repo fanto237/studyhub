@@ -1,0 +1,2 @@
+POST {{Api_HostAddress}}/api/posts/00000000-0000-0000-0000-000000000000/download
+Accept: application/json

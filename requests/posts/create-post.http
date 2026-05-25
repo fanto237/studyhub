@@ -1,0 +1,26 @@
+POST {{Api_HostAddress}}/api/posts
+Content-Type: multipart/form-data; boundary=StudyHubBoundary
+Accept: application/json
+
+--StudyHubBoundary
+Content-Disposition: form-data; name="title"
+
+Calculus I Final Exam 2024
+--StudyHubBoundary
+Content-Disposition: form-data; name="description"
+
+Past final exam with integrals and limits.
+--StudyHubBoundary
+Content-Disposition: form-data; name="tags"
+
+calculus
+--StudyHubBoundary
+Content-Disposition: form-data; name="tags"
+
+final-exam
+--StudyHubBoundary
+Content-Disposition: form-data; name="file"; filename="calculus-final.pdf"
+Content-Type: application/pdf
+
+< ./sample-data/calculus-final.pdf
+--StudyHubBoundary--

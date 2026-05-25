@@ -1,0 +1,7 @@
+PATCH {{Api_HostAddress}}/api/comments/11111111-1111-1111-1111-111111111111
+Content-Type: application/json
+Accept: application/json
+
+{
+  "text": "Updated comment text."
+}

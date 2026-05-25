@@ -1,0 +1,7 @@
+POST {{Api_HostAddress}}/api/posts/00000000-0000-0000-0000-000000000000/comments
+Content-Type: application/json
+Accept: application/json
+
+{
+  "text": "Thanks for sharing this study guide!"
+}

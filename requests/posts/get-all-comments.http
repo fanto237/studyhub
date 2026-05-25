@@ -1,0 +1,2 @@
+GET {{Api_HostAddress}}/api/posts/00000000-0000-0000-0000-000000000000/comments
+Accept: application/json

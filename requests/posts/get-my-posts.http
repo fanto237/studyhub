@@ -1,0 +1,2 @@
+GET {{Api_HostAddress}}/api/posts/me?page=1&pageSize=20&sort=new
+Accept: application/json

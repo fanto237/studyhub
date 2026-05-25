@@ -1,0 +1,2 @@
+POST {{Api_HostAddress}}/api/auth/logout
+Accept: application/json

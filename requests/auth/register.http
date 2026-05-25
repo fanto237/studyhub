@@ -1,0 +1,12 @@
+POST {{Api_HostAddress}}/api/auth/register
+Content-Type: application/json
+Accept: application/json
+
+{
+  "privateEmail": "student.personal@example.com",
+  "username": "studybuddy",
+  "fullName": "Taylor Student",
+  "universityName": "StudyHub University",
+  "password": "Pa55word!",
+  "schoolEmail": "taylor@student.school.edu"
+}
