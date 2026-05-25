@@ -25,3 +25,5 @@
 
 
 ###
+GET {{Api_HostAddress}}/api/posts/{{PostId}}
+Accept: application/json
