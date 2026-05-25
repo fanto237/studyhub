@@ -26,7 +26,7 @@ Backend routes and application slices are implemented for auth, feed/posts, comm
   - `apps/api/DTOs/`: request/response DTOs for auth, posts, comments, and users.
   - `apps/api/Responses/SendResponse.cs`: standard API response envelope used by endpoints.
   - `apps/api/Extensions/AuthenticationExtensions.cs`: JWT bearer setup with token extraction from cookies.
-  - `apps/api/Api.http`: manual request examples for auth, posts, comments, and users.
+  - API smoke/manual request examples live in `requests/**/*.http` (there is no `apps/api/Api.http` file in the current tree).
 - `libs/domain/`: core POCO entities and enums (`User`, `Post`, `Comment`, votes, reports, tags, auth codes/tokens).
 - `libs/application/`: application layer with vertical-slice folders for `Auth`, `Posts`, `Comments`, and `Users`.
   - Typical slice contents: `Command`/`Query`, `Validator`, `Handler`, `Outcome`, `Result`.
@@ -39,6 +39,7 @@ Backend routes and application slices are implemented for auth, feed/posts, comm
   - `Storage/CloudflareR2PostFileStorageService.cs`: PDF storage integration.
   - `Email/`: SMTP auth-email service and templates.
 - `apps/Studyhub.slnx`: .NET solution for API + shared libraries.
+- `requests/`: REST Client `.http` request examples for auth, posts/comments, and users. These use a `{{Api_HostAddress}}` variable.
 - `docs/`: product/API planning and reference docs (`PRD.md`, `SPEC.md`, `*Endpoints.md`).
 - `design/`: HTML mockups and screenshots for landing/auth/upload/profile/PDF detail/home pages.
 - `plans/`: planning workspace (currently empty/ephemeral).
@@ -112,7 +113,7 @@ Notes:
 - **Persistence + migrations**: `libs/infrastructure/Persistence/`
 - **External integrations**: `libs/infrastructure/Email/`, `libs/infrastructure/Storage/`
 - **Domain model**: `libs/domain/Entities/`, `libs/domain/Enums/`
-- **Manual API examples**: `apps/api/Api.http`
+- **Manual API examples**: `requests/**/*.http`
 - **Product/docs context**: `docs/PRD.md`, `docs/SPEC.md`, `docs/*Endpoints.md`
 - **UI references**: `design/*/code.html`, `design/*/screen.png`
 
@@ -129,7 +130,7 @@ Notes:
   - `EmailSetting:Password`
 - Development defaults in `apps/api/appsettings.Development.json` include JWT issuer/audience/lifetimes, email sender/server, and Cloudflare bucket name, but not secrets.
 - Infrastructure normalizes `postgres://` / `postgresql://` URLs into Npgsql connection strings, so either format can work.
-- API launch settings expose `http://localhost:5046` and `https://localhost:5000`; `apps/api/Api.http` currently targets `http://localhost:5046`.
+- API launch settings expose `http://localhost:5046` and `https://localhost:5000`; `requests/**/*.http` examples expect an `Api_HostAddress` value such as `http://localhost:5046`.
 - Auth is cookie-based. Frontend requests should use `withCredentials` or go through the interceptor; backend JWT bearer auth reads access tokens from cookies. The refresh cookie is scoped to `/api/auth`.
 - `CreatePost` accepts multipart form data, enforces a 15 MB PDF limit, validates the `%PDF-` header, rejects password-protected PDFs, uploads to R2, and cleans up uploaded objects on failure.
 - The SSR proxy uses `express.raw({ limit: '15mb' })` for `/api`, matching the upload limit; increase both proxy and backend limits together if upload size changes.
@@ -138,3 +139,4 @@ Notes:
 - User deletion anonymizes accounts and clears auth cookies. Public user profiles are served by `/api/users/{userId}` and `/api/users/{userId}/posts`; the frontend route is `/users/:userId`.
 - Feed/post list APIs support sort (`new`, `top`, `trending`), pagination, search, and tag filters. Current `top` and `trending` ordering are similar in the repository implementation. `/api/feed` also offers cursor pagination.
 - No root `.cursorrules`, `CLAUDE.md`, or README file was found; `AGENTS.md` is the main agent-oriented context file.
+- Manual REST examples are under `requests/`; configure your REST client/environment with `Api_HostAddress` (for example `http://localhost:5046`).
