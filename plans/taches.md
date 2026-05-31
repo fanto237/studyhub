@@ -1,0 +1,7 @@
+- ajouter le support de l'ia pour permettre la generation de la description et du titre document apres l'upload sur la page /upload et aussi proposition de tag correspondant a ce dernier
+- implementer la modification des donnees d'un utilisateur.
+- ajouter le support de plusieurs langues (_francais_, _anglais_, _allemand_)
+- ajouter un facteur de double authentification (_TOTP_)
+- extraire le domain des universites allemandes avec une get requetes au (*http://universities.hipolabs.com/search?country=Germany*) puis les sauvegarder dans un german-universities.json
+- presenter les universites dans une liste deroulante provenant du fichier german-universities.json pendant la creation du compte _/register_
+- examiner le domain de l'addresse d'universite entree par l'utilisateur et valider si il correspond a celui de l'universite qu'a choisit l'utilisateur
