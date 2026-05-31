@@ -110,6 +110,12 @@ export class PostsApi {
       );
   }
 
+  deletePost(postId: string) {
+    return this.http.delete<void>(`/api/posts/${postId}`, {
+      withCredentials: true,
+    });
+  }
+
   reportPost(postId: string, request: ReportPostRequest) {
     return this.http
       .post<
