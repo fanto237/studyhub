@@ -1,4 +1,9 @@
-import { DatePipe, DecimalPipe } from '@angular/common';
+import {
+  DatePipe,
+  DecimalPipe,
+  NgClass,
+  NgTemplateOutlet,
+} from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import {
   ChangeDetectionStrategy,
@@ -37,6 +42,8 @@ import { ThemeToggle } from '../../shared/components/theme-toggle/theme-toggle';
 
 const MAX_COMMENT_LENGTH = 4000;
 const MAX_REPORT_DETAILS_LENGTH = 2000;
+const MAX_VISUAL_COMMENT_DEPTH = 3;
+const COMMENT_INDENT_REM = 0.75;
 
 type CommentFormControls = {
   text: FormControl<string>;
@@ -47,9 +54,13 @@ type ReportFormControls = {
   details: FormControl<string>;
 };
 
-type ThreadedComment = {
+type CommentThreadNode = {
   comment: PostDetailComment;
+  parent: PostDetailComment | null;
+  children: CommentThreadNode[];
   depth: number;
+  visualDepth: number;
+  replyCount: number;
 };
 
 @Component({
@@ -57,6 +68,8 @@ type ThreadedComment = {
   imports: [
     DatePipe,
     DecimalPipe,
+    NgClass,
+    NgTemplateOutlet,
     Icon,
     ReactiveFormsModule,
     RouterLink,
@@ -86,6 +99,7 @@ export class PostDetail implements OnInit {
 
   readonly maxCommentLength = MAX_COMMENT_LENGTH;
   readonly maxReportDetailsLength = MAX_REPORT_DETAILS_LENGTH;
+  readonly maxVisualCommentDepth = MAX_VISUAL_COMMENT_DEPTH;
 
   readonly reportReasons: ReadonlyArray<{
     value: ReportPostReason;
@@ -132,6 +146,7 @@ export class PostDetail implements OnInit {
   readonly deletingCommentId = signal<string | null>(null);
   readonly activeReplyCommentId = signal<string | null>(null);
   readonly activeEditCommentId = signal<string | null>(null);
+  readonly expandedCommentIds = signal<ReadonlySet<string>>(new Set<string>());
   readonly errorMessage = signal<string | null>(null);
   readonly actionErrorMessage = signal<string | null>(null);
   readonly reportErrorMessage = signal<string | null>(null);
@@ -158,30 +173,68 @@ export class PostDetail implements OnInit {
 
   readonly comments = computed(() => this.post()?.comments ?? []);
 
-  readonly topLevelComments = computed(() => {
+  readonly commentThread = computed<CommentThreadNode[]>(() => {
     const comments = this.comments();
-    const ids = new Set(comments.map((comment) => comment.id));
+    const nodes = new Map<string, CommentThreadNode>();
+    const roots: CommentThreadNode[] = [];
 
-    return comments.filter(
-      (comment) =>
-        !comment.parentCommentId || !ids.has(comment.parentCommentId),
-    );
-  });
+    for (const comment of comments) {
+      nodes.set(comment.id, {
+        comment,
+        parent: null,
+        children: [],
+        depth: 0,
+        visualDepth: 0,
+        replyCount: 0,
+      });
+    }
 
-  readonly commentsByParent = computed(() => {
-    const grouped = new Map<string, PostDetailComment[]>();
-
-    for (const comment of this.comments()) {
-      if (!comment.parentCommentId) {
+    for (const comment of comments) {
+      const node = nodes.get(comment.id);
+      if (!node) {
         continue;
       }
 
-      const existing = grouped.get(comment.parentCommentId) ?? [];
-      existing.push(comment);
-      grouped.set(comment.parentCommentId, existing);
+      const parentNode = comment.parentCommentId
+        ? nodes.get(comment.parentCommentId)
+        : null;
+
+      if (parentNode && parentNode !== node) {
+        node.parent = parentNode.comment;
+        parentNode.children.push(node);
+      } else {
+        roots.push(node);
+      }
     }
 
-    return grouped;
+    const visited = new Set<string>();
+    const applyDepth = (node: CommentThreadNode, depth: number): number => {
+      if (visited.has(node.comment.id)) {
+        return 0;
+      }
+
+      visited.add(node.comment.id);
+      node.depth = depth;
+      node.visualDepth = Math.min(depth, MAX_VISUAL_COMMENT_DEPTH);
+      node.replyCount = node.children.reduce(
+        (total, child) => total + 1 + applyDepth(child, depth + 1),
+        0,
+      );
+      return node.replyCount;
+    };
+
+    for (const root of roots) {
+      applyDepth(root, 0);
+    }
+
+    for (const node of nodes.values()) {
+      if (!visited.has(node.comment.id)) {
+        roots.push(node);
+        applyDepth(node, 0);
+      }
+    }
+
+    return roots;
   });
 
   readonly currentUser = computed(
@@ -607,19 +660,48 @@ export class PostDetail implements OnInit {
     return form;
   }
 
-  threadedRepliesFor(comment: PostDetailComment): ThreadedComment[] {
-    const grouped = this.commentsByParent();
-    const threaded: ThreadedComment[] = [];
+  toggleReplies(commentId: string): void {
+    this.expandedCommentIds.update((expandedIds) => {
+      const nextIds = new Set(expandedIds);
 
-    const collect = (parentId: string, depth: number): void => {
-      for (const child of grouped.get(parentId) ?? []) {
-        threaded.push({ comment: child, depth });
-        collect(child.id, Math.min(depth + 1, 4));
+      if (nextIds.has(commentId)) {
+        nextIds.delete(commentId);
+      } else {
+        nextIds.add(commentId);
       }
-    };
 
-    collect(comment.id, 1);
-    return threaded;
+      return nextIds;
+    });
+  }
+
+  isCollapsed(commentId: string): boolean {
+    return !this.expandedCommentIds().has(commentId);
+  }
+
+  commentIndent(node: CommentThreadNode): string {
+    return `${node.visualDepth * COMMENT_INDENT_REM}rem`;
+  }
+
+  replyRailPosition(node: CommentThreadNode): string {
+    const childVisualDepth = Math.min(node.depth + 1, MAX_VISUAL_COMMENT_DEPTH);
+    const railPosition = Math.max(
+      0.35,
+      childVisualDepth * COMMENT_INDENT_REM - 0.35,
+    );
+    return `${railPosition}rem`;
+  }
+
+  commentRepliesId(commentId: string): string {
+    return `comment-replies-${commentId}`;
+  }
+
+  replyToggleLabel(node: CommentThreadNode): string {
+    if (this.isCollapsed(node.comment.id)) {
+      const count = node.replyCount;
+      return `Show ${count} ${count === 1 ? 'reply' : 'replies'}`;
+    }
+
+    return 'Hide replies';
   }
 
   canManageComment(comment: PostDetailComment): boolean {
@@ -689,14 +771,6 @@ export class PostDetail implements OnInit {
 
   initials(source: PostDetailUser): string {
     const fallback = source.username || 'SH';
-    const parts = (source.fullName || fallback)
-      .split(/\s+/)
-      .filter((part) => part.length > 0);
-
-    if (parts.length >= 2) {
-      return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-    }
-
     return fallback.slice(0, 2).toUpperCase();
   }
 
@@ -708,6 +782,7 @@ export class PostDetail implements OnInit {
     this.commentErrorMessage.set(null);
     this.reportErrorMessage.set(null);
     this.post.set(null);
+    this.expandedCommentIds.set(new Set<string>());
 
     this.postsApi.getPost(postId).subscribe({
       next: (post) => {
