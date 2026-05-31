@@ -6,6 +6,10 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Client,
   },
   {
+    path: 'profile/edit',
+    renderMode: RenderMode.Client,
+  },
+  {
     path: 'profile',
     renderMode: RenderMode.Client,
   },

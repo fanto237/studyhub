@@ -20,6 +20,15 @@ export const appRoutes: Route[] = [
     title: 'Home | StudyHub',
   },
   {
+    path: 'profile/edit',
+    canActivate: [requireAuthSessionGuard],
+    loadComponent: () =>
+      import('./pages/profile-edit/profile-edit').then(
+        (module) => module.ProfileEdit,
+      ),
+    title: 'Account Settings | StudyHub',
+  },
+  {
     path: 'profile',
     canActivate: [requireAuthSessionGuard],
     loadComponent: () =>
