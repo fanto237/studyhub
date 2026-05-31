@@ -150,6 +150,18 @@ export const ICONS = {
       strokeLinecap: 'round',
     }),
   ]),
+  trash: strokeIcon([
+    strokePath('M4 7h16', {
+      strokeLinecap: 'round',
+    }),
+    strokePath('M10 11v6m4-6v6', {
+      strokeLinecap: 'round',
+    }),
+    strokePath('M6 7l1 14h10l1-14M9 7V4h6v3', {
+      strokeLinecap: 'round',
+      strokeLinejoin: 'round',
+    }),
+  ]),
   'log-out': strokeIcon([
     strokePath('M10 17l5-5-5-5', {
       strokeLinecap: 'round',

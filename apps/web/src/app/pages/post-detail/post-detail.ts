@@ -139,6 +139,8 @@ export class PostDetail implements OnInit {
   readonly isRefreshingComments = signal(false);
   readonly isVoting = signal(false);
   readonly isDownloading = signal(false);
+  readonly isDeletingPost = signal(false);
+  readonly isDeletePostModalOpen = signal(false);
   readonly isReporting = signal(false);
   readonly isCreatingComment = signal(false);
   readonly replyingCommentId = signal<string | null>(null);
@@ -337,6 +339,62 @@ export class PostDetail implements OnInit {
     if (storageUrl) {
       this.openInNewTab(storageUrl);
     }
+  }
+
+  openDeletePostModal(): void {
+    const post = this.post();
+    if (!post || !this.canManagePost(post) || this.isDeletingPost()) {
+      return;
+    }
+
+    this.actionErrorMessage.set(null);
+    this.isDeletePostModalOpen.set(true);
+  }
+
+  closeDeletePostModal(): void {
+    if (this.isDeletingPost()) {
+      return;
+    }
+
+    this.isDeletePostModalOpen.set(false);
+  }
+
+  confirmDeletePost(): void {
+    const post = this.post();
+    if (!post || !this.canManagePost(post) || this.isDeletingPost()) {
+      return;
+    }
+
+    this.actionErrorMessage.set(null);
+    this.isDeletingPost.set(true);
+
+    this.postsApi.deletePost(post.id).subscribe({
+      next: () => {
+        this.isDeletePostModalOpen.set(false);
+        void this.router.navigate(['/home']);
+      },
+      error: (error: unknown) => {
+        if (this.redirectToLoginIfUnauthorized(error)) {
+          this.isDeletingPost.set(false);
+          return;
+        }
+
+        this.actionErrorMessage.set(
+          resolveApiErrorMessage(error, {
+            fallbackMessage:
+              'This resource could not be deleted. Please try again.',
+            statusMessages: {
+              403: 'You do not have permission to delete this resource.',
+              404: 'This resource was not found or has already been deleted.',
+            },
+          }),
+        );
+        this.isDeletingPost.set(false);
+      },
+      complete: () => {
+        this.isDeletingPost.set(false);
+      },
+    });
   }
 
   reportPost(): void {
@@ -704,6 +762,15 @@ export class PostDetail implements OnInit {
     return 'Hide replies';
   }
 
+  canManagePost(post: GetPostResponse): boolean {
+    const user = this.currentUser();
+    if (!user) {
+      return false;
+    }
+
+    return user.id === post.user.id || this.isModeratorRole(user.role);
+  }
+
   canManageComment(comment: PostDetailComment): boolean {
     if (this.isDeletedComment(comment)) {
       return false;
@@ -781,6 +848,7 @@ export class PostDetail implements OnInit {
     this.actionErrorMessage.set(null);
     this.commentErrorMessage.set(null);
     this.reportErrorMessage.set(null);
+    this.isDeletePostModalOpen.set(false);
     this.post.set(null);
     this.expandedCommentIds.set(new Set<string>());
 
