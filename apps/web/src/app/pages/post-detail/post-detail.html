@@ -63,15 +63,15 @@
     @if (isLoading()) {
     <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
       <section
-        class="rounded-[2rem] border border-base-300 bg-base-100/85 p-5 shadow-xl shadow-base-300/30 sm:p-7"
+        class="rounded-4xl border border-base-300 bg-base-100/85 p-5 shadow-xl shadow-base-300/30 sm:p-7"
       >
         <div class="skeleton h-6 w-40 rounded-full"></div>
         <div class="skeleton mt-5 h-12 w-full max-w-3xl rounded-2xl"></div>
         <div class="skeleton mt-4 h-5 w-full max-w-2xl rounded-full"></div>
-        <div class="skeleton mt-8 h-[34rem] rounded-[2rem]"></div>
+        <div class="skeleton mt-8 h-136 rounded-4xl"></div>
       </section>
       <aside
-        class="rounded-[2rem] border border-base-300 bg-base-100/85 p-5 shadow-xl shadow-base-300/30 sm:p-6"
+        class="rounded-4xl border border-base-300 bg-base-100/85 p-5 shadow-xl shadow-base-300/30 sm:p-6"
       >
         <div class="skeleton h-12 w-12 rounded-2xl"></div>
         <div class="skeleton mt-5 h-6 w-48 rounded-full"></div>
@@ -80,7 +80,7 @@
     </div>
     } @else if (errorMessage(); as message) {
     <section
-      class="mx-auto max-w-2xl rounded-[2rem] border border-base-300 bg-base-100/90 p-8 text-center shadow-xl shadow-base-300/30"
+      class="mx-auto max-w-2xl rounded-4xl border border-base-300 bg-base-100/90 p-8 text-center shadow-xl shadow-base-300/30"
     >
       <span
         class="mx-auto flex size-16 items-center justify-center rounded-3xl bg-warning/15 text-warning-content"
@@ -276,12 +276,6 @@
             (ngSubmit)="submitTopLevelComment()"
           >
             <label class="form-control">
-              <!-- <span class="label pb-2">
-                <span class="label-text font-bold">Add to the discussion</span>
-                <span class="label-text-alt text-base-content/50">
-                  {{ formTextLength(commentForm) }}/{{ maxCommentLength }}
-                </span>
-              </span> -->
               <textarea
                 class="textarea textarea-bordered min-h-36 resize-y bg-base-100 w-full"
                 formControlName="text"
@@ -336,7 +330,7 @@
             <ng-template #commentNode let-node>
               @let comment = node.comment;
               <article
-                class="relative rounded-3xl border border-base-300 p-4 transition-colors ml-[var(--comment-indent)] sm:ml-[calc(var(--comment-indent)*1.35)]"
+                class="relative rounded-3xl border border-base-300 p-4 transition-colors ml-(--comment-indent) sm:ml-[calc(var(--comment-indent)*1.35)]"
                 [ngClass]="node.depth === 0 ? 'bg-base-200/60 shadow-sm' : 'bg-base-100/90'"
                 [style.--comment-indent]="commentIndent(node)"
               >
@@ -550,7 +544,7 @@
                 [style.--reply-rail-left]="replyRailPosition(node)"
               >
                 <span
-                  class="pointer-events-none absolute bottom-2 top-0 w-px bg-base-300 left-[var(--reply-rail-left)] sm:left-[calc(var(--reply-rail-left)*1.35)]"
+                  class="pointer-events-none absolute bottom-2 top-0 w-px bg-base-300 left-(--reply-rail-left) sm:left-[calc(var(--reply-rail-left)*1.35)]"
                   aria-hidden="true"
                 ></span>
                 @for (child of node.children; track child.comment.id) {
@@ -586,7 +580,7 @@
         }
 
         <section
-          class="rounded-[2rem] border border-base-300 bg-base-100/90 p-5 shadow-xl shadow-base-300/30 backdrop-blur sm:p-6"
+          class="rounded-4xl border border-base-300 bg-base-100/90 p-5 shadow-xl shadow-base-300/30 backdrop-blur sm:p-6"
         >
           <h2 class="text-xl font-black">Resource actions</h2>
 
@@ -669,76 +663,8 @@
           </div>
         </section>
 
-        <!-- <section
-          class="rounded-[2rem] border border-base-300 bg-base-100/90 p-5 shadow-xl shadow-base-300/30 backdrop-blur sm:p-6"
-        >
-          <p
-            class="text-xs font-black uppercase tracking-[0.22em] text-base-content/45"
-          >
-            Details
-          </p>
-          <dl class="mt-4 space-y-3">
-            <div class="rounded-2xl bg-base-200/70 p-4">
-              <dt
-                class="text-xs font-bold uppercase tracking-wide text-base-content/45"
-              >
-                Uploaded
-              </dt>
-              <dd class="mt-1 font-bold">
-                {{ postItem.createdAt | date: 'medium' }}
-              </dd>
-            </div>
-            @if (postItem.updatedAt) {
-            <div class="rounded-2xl bg-base-200/70 p-4">
-              <dt
-                class="text-xs font-bold uppercase tracking-wide text-base-content/45"
-              >
-                Updated
-              </dt>
-              <dd class="mt-1 font-bold">
-                {{ postItem.updatedAt | date: 'medium' }}
-              </dd>
-            </div>
-            }
-            <div class="grid grid-cols-3 gap-2">
-              <div
-                class="rounded-2xl bg-primary/10 p-3 text-center text-primary"
-              >
-                <dd class="text-xl font-black">
-                  {{ postItem.upvotes | number }}
-                </dd>
-                <dt
-                  class="mt-1 text-[0.65rem] font-bold uppercase tracking-wide"
-                >
-                  Up
-                </dt>
-              </div>
-              <div class="rounded-2xl bg-base-200/70 p-3 text-center">
-                <dd class="text-xl font-black">
-                  {{ postItem.downvotes | number }}
-                </dd>
-                <dt
-                  class="mt-1 text-[0.65rem] font-bold uppercase tracking-wide text-base-content/45"
-                >
-                  Down
-                </dt>
-              </div>
-              <div class="rounded-2xl bg-base-200/70 p-3 text-center">
-                <dd class="text-xl font-black">
-                  {{ postItem.commentCount | number }}
-                </dd>
-                <dt
-                  class="mt-1 text-[0.65rem] font-bold uppercase tracking-wide text-base-content/45"
-                >
-                  Talk
-                </dt>
-              </div>
-            </div>
-          </dl>
-        </section> -->
-
         <section
-          class="rounded-[2rem] border border-base-300 bg-base-100/90 p-5 shadow-xl shadow-base-300/30 backdrop-blur sm:p-6"
+          class="rounded-4xl border border-base-300 bg-base-100/90 p-5 shadow-xl shadow-base-300/30 backdrop-blur sm:p-6"
         >
           <p class="text-xs font-black uppercase tracking-[0.22em] text-error">
             Report
