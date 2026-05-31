@@ -1,0 +1,501 @@
+<div class="min-h-screen overflow-x-hidden bg-base-200 text-base-content">
+  <div
+    class="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_8%_10%,rgba(37,99,235,0.10),transparent_26%),radial-gradient(circle_at_92%_14%,rgba(20,184,166,0.10),transparent_24%),radial-gradient(circle_at_58%_92%,rgba(236,72,153,0.08),transparent_30%)]"
+    aria-hidden="true"
+  ></div>
+
+  <header
+    class="sticky top-0 z-40 border-b border-base-300 bg-base-100/90 px-4 py-3 shadow-sm backdrop-blur sm:px-6 lg:px-8"
+  >
+    <div class="mx-auto flex max-w-7xl items-center justify-between gap-3">
+      <a
+        class="flex items-center gap-3"
+        routerLink="/home"
+        aria-label="StudyHub home"
+      >
+        <span
+          class="flex size-11 items-center justify-center rounded-2xl bg-primary text-primary-content shadow-lg shadow-primary/20"
+        >
+          <app-icon name="studyhub-file" class="size-6" />
+        </span>
+        <span>
+          <span class="block text-xl font-black leading-none text-primary">
+            StudyHub
+          </span>
+          <span class="text-xs font-bold text-base-content/50">
+            Account settings
+          </span>
+        </span>
+      </a>
+
+      <nav
+        class="hidden items-center gap-2 lg:flex"
+        aria-label="Settings navigation"
+      >
+        <a class="btn btn-ghost btn-sm gap-2" routerLink="/home">
+          <app-icon name="home" class="size-4" />
+          Home
+        </a>
+        <a class="btn btn-ghost btn-sm gap-2" routerLink="/upload">
+          <app-icon name="upload" class="size-4" />
+          Upload
+        </a>
+        <a class="btn btn-ghost btn-sm gap-2" routerLink="/profile">
+          <app-icon name="user" class="size-4" />
+          Profile
+        </a>
+        <a
+          class="btn btn-primary btn-sm gap-2 text-primary-content"
+          routerLink="/profile/edit"
+        >
+          <app-icon name="shield-check" class="size-4" />
+          Settings
+        </a>
+      </nav>
+
+      <div class="flex items-center gap-2">
+        <app-theme-toggle />
+      </div>
+    </div>
+  </header>
+
+  <main
+    class="relative mx-auto max-w-7xl px-4 pb-24 pt-6 sm:px-6 lg:px-8 lg:py-8"
+  >
+    <section
+      class="rounded-4xl border border-base-300 bg-base-100/85 p-5 shadow-xl shadow-base-300/30 backdrop-blur sm:p-7"
+      aria-labelledby="settings-heading"
+    >
+      <div
+        class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between"
+      >
+        <div>
+          <p
+            class="text-sm font-black uppercase tracking-[0.22em] text-primary"
+          >
+            Account settings
+          </p>
+          <h1
+            id="settings-heading"
+            class="mt-3 text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl"
+          >
+            Edit your StudyHub profile.
+          </h1>
+          <p class="mt-3 max-w-2xl text-base leading-7 text-base-content/65">
+            Update the public account details that are supported today.
+            University identity fields stay read-only because changing them
+            requires a separate verification flow.
+          </p>
+        </div>
+
+        <a
+          class="btn btn-ghost gap-2 self-start lg:self-auto"
+          routerLink="/profile"
+        >
+          <app-icon name="chevron-left" class="size-4" />
+          Back to profile
+        </a>
+      </div>
+    </section>
+
+    @if (isLoadingUser()) {
+    <div class="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_24rem]">
+      <section
+        class="rounded-4xl border border-base-300 bg-base-100/85 p-5 shadow-xl shadow-base-300/30 sm:p-7"
+      >
+        <div class="skeleton h-7 w-48 rounded-full"></div>
+        <div class="mt-6 grid gap-4">
+          <div class="skeleton h-20 rounded-2xl"></div>
+          <div class="skeleton h-20 rounded-2xl"></div>
+          <div class="skeleton h-20 rounded-2xl"></div>
+        </div>
+        <div class="mt-7 flex justify-end gap-3">
+          <div class="skeleton h-12 w-28 rounded-full"></div>
+          <div class="skeleton h-12 w-36 rounded-full"></div>
+        </div>
+      </section>
+
+      <aside class="space-y-6">
+        <section
+          class="rounded-4xl border border-base-300 bg-base-100/85 p-6 shadow-xl shadow-base-300/30"
+        >
+          <div class="skeleton mx-auto size-24 rounded-4xl"></div>
+          <div class="skeleton mx-auto mt-5 h-6 w-48 rounded-full"></div>
+          <div class="skeleton mx-auto mt-3 h-4 w-36 rounded-full"></div>
+          <div class="mt-6 space-y-3">
+            <div class="skeleton h-14 rounded-2xl"></div>
+            <div class="skeleton h-14 rounded-2xl"></div>
+            <div class="skeleton h-14 rounded-2xl"></div>
+          </div>
+        </section>
+      </aside>
+    </div>
+    } @else if (loadErrorMessage(); as message) {
+    <section
+      class="mt-6 rounded-4xl border border-warning/20 bg-warning/10 p-6 text-warning-content shadow-xl"
+    >
+      <div class="flex items-start gap-3">
+        <app-icon name="alert-triangle" class="mt-0.5 size-5 shrink-0" />
+        <div>
+          <h2 class="font-black">Settings unavailable</h2>
+          <p class="mt-1 text-sm leading-6 opacity-80">{{ message }}</p>
+        </div>
+      </div>
+      <button
+        class="btn btn-warning btn-sm mt-5"
+        type="button"
+        (click)="retryProfile()"
+      >
+        Retry settings
+      </button>
+    </section>
+    } @else { @if (currentUser(); as user) {
+    <div class="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_24rem]">
+      <section
+        class="rounded-4xl border border-base-300 bg-base-100/85 p-5 shadow-xl shadow-base-300/30 backdrop-blur sm:p-7"
+        aria-labelledby="editable-profile-heading"
+      >
+        <div
+          class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
+        >
+          <div>
+            <p
+              class="text-sm font-black uppercase tracking-[0.22em] text-primary"
+            >
+              Editable profile
+            </p>
+            <h2
+              id="editable-profile-heading"
+              class="mt-2 text-2xl font-black tracking-tight"
+            >
+              Public account details
+            </h2>
+            <p class="mt-2 max-w-2xl text-sm leading-6 text-base-content/60">
+              These values are saved through the existing StudyHub user endpoint
+              and update your local session immediately after a successful save.
+            </p>
+          </div>
+          @if (hasChanges()) {
+          <span class="badge badge-warning badge-soft font-bold min-w-fit"
+            >Unsaved changes</span
+          >
+          } @else {
+          <span class="badge badge-success badge-soft font-bold min-w-fit"
+            >Up to date</span
+          >
+          }
+        </div>
+
+        @if (saveErrorMessage(); as message) {
+        <div class="alert alert-error mt-6" role="alert">
+          <app-icon name="alert-triangle" class="size-5 shrink-0" />
+          <span class="min-w-0 flex-1">{{ message }}</span>
+        </div>
+        } @if (successMessage(); as message) {
+        <div class="alert alert-success mt-6" role="status">
+          <app-icon name="check" class="size-5 shrink-0" />
+          <span class="min-w-0 flex-1">{{ message }}</span>
+        </div>
+        }
+
+        <form
+          class="mt-7 space-y-5"
+          [formGroup]="profileForm"
+          (ngSubmit)="onSubmit()"
+          novalidate
+        >
+          <label class="form-control w-full">
+            <span class="label pb-2">
+              <span class="label-text text-sm font-black">Full name</span>
+              <span class="label-text-alt text-base-content/45"
+                >2–120 characters</span
+              >
+            </span>
+            <input
+              class="input input-bordered w-full rounded-2xl bg-base-100"
+              [class.input-error]="isInvalid('fullName')"
+              formControlName="fullName"
+              autocomplete="name"
+              maxlength="120"
+              placeholder="Your full name"
+              [readOnly]="isSaving()"
+            />
+            @if (fieldError('fullName'); as error) {
+            <span class="label pt-2">
+              <span class="label-text-alt text-error">{{ error }}</span>
+            </span>
+            }
+          </label>
+
+          <div class="form-control w-full mt-8">
+            <span class="label pb-2">
+              <span class="label-text text-sm font-black">Username</span>
+              <span class="label-text-alt text-base-content/45"
+                >3–30 characters</span
+              >
+            </span>
+            <label
+              class="input input-bordered flex items-center w-full gap-2 rounded-2xl bg-base-100"
+              [class.input-error]="isInvalid('username')"
+            >
+              <span class="font-black text-base-content/35">@</span>
+              <input
+                class="grow bg-transparent outline-none w-full"
+                formControlName="username"
+                autocomplete="username"
+                maxlength="30"
+                placeholder="username"
+                [readOnly]="isSaving()"
+              />
+            </label>
+            @if (fieldError('username'); as error) {
+            <span class="label pt-2">
+              <span
+                class="label-text-alt block text-error whitespace-normal wrap-break-word"
+              >
+                {{ error }}
+              </span>
+            </span>
+            } @else {
+            <span class="label pt-2">
+              <span
+                class="label-text-alt text-base-content/45 whitespace-normal wrap-break-word"
+              >
+                Letters, numbers, dots, underscores, and hyphens. Start and end
+                with a letter or number.
+              </span>
+            </span>
+            }
+          </div>
+
+          <label class="form-control w-full">
+            <span class="label pb-2">
+              <span class="label-text text-sm font-black">Private email</span>
+              <span class="label-text-alt text-base-content/45"
+                >Max 320 characters</span
+              >
+            </span>
+            <input
+              class="input input-bordered w-full rounded-2xl bg-base-100"
+              [class.input-error]="isInvalid('privateEmail')"
+              formControlName="privateEmail"
+              autocomplete="email"
+              maxlength="320"
+              placeholder="you@example.com"
+              type="email"
+              [readOnly]="isSaving()"
+            />
+            @if (fieldError('privateEmail'); as error) {
+            <span class="label pt-2">
+              <span class="label-text-alt text-error">{{ error }}</span>
+            </span>
+            }
+          </label>
+
+          <div
+            class="flex flex-col-reverse gap-3 border-t border-base-300 pt-6 sm:flex-row sm:justify-end"
+          >
+            <a class="btn btn-ghost" routerLink="/profile">Cancel</a>
+            <button
+              class="btn btn-primary min-w-40 text-primary-content"
+              type="submit"
+              [disabled]="!canSave()"
+            >
+              @if (isSaving()) {
+              <span
+                class="loading loading-spinner loading-sm"
+                aria-hidden="true"
+              ></span>
+              Saving } @else { Save changes }
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <aside
+        class="space-y-6 lg:sticky lg:top-24 lg:self-start"
+        aria-label="Account overview"
+      >
+        <section
+          class="rounded-4xl border border-base-300 bg-base-100/85 p-5 shadow-xl shadow-base-300/30 backdrop-blur sm:p-6"
+          aria-labelledby="account-overview-heading"
+        >
+          <div class="flex flex-col items-center text-center">
+            <span
+              class="flex size-24 items-center justify-center rounded-4xl bg-primary text-3xl font-black text-primary-content shadow-xl shadow-primary/20"
+            >
+              {{ initials(user) }}
+            </span>
+            <div class="mt-5 min-w-0">
+              <p
+                class="text-[0.7rem] font-black uppercase tracking-[0.24em] text-primary"
+              >
+                Signed-in account
+              </p>
+              <h2
+                id="account-overview-heading"
+                class="mt-2 text-2xl font-black tracking-tight"
+              >
+                {{ user.fullName }}
+              </h2>
+              <p class="mt-1 text-sm font-semibold text-base-content/55">
+                @{{ user.username }}
+              </p>
+            </div>
+          </div>
+
+          <div class="mt-6 flex flex-wrap justify-center gap-2">
+            <span class="badge badge-primary badge-soft font-bold">
+              {{ formatRole(user.role) }}
+            </span>
+            @if (user.isVerified) {
+            <span class="badge badge-success badge-soft font-bold">
+              <app-icon name="shield-check" class="size-3.5" />
+              Verified
+            </span>
+            } @else {
+            <span class="badge badge-warning badge-soft font-bold"
+              >Pending verification</span
+            >
+            }
+          </div>
+
+          <dl class="mt-6 space-y-3">
+            <div class="rounded-2xl border border-base-300 bg-base-200/65 p-4">
+              <dt
+                class="text-[0.65rem] font-black uppercase tracking-[0.2em] text-base-content/45"
+              >
+                School email
+              </dt>
+              <dd class="mt-1 break-all text-sm font-bold">
+                {{ user.schoolEmail }}
+              </dd>
+            </div>
+            <div class="rounded-2xl border border-base-300 bg-base-200/65 p-4">
+              <dt
+                class="text-[0.65rem] font-black uppercase tracking-[0.2em] text-base-content/45"
+              >
+                University
+              </dt>
+              <dd class="mt-1 text-sm font-bold">{{ user.universityName }}</dd>
+            </div>
+            <div class="rounded-2xl border border-base-300 bg-base-200/65 p-4">
+              <dt
+                class="text-[0.65rem] font-black uppercase tracking-[0.2em] text-base-content/45"
+              >
+                Verification status
+              </dt>
+              <dd class="mt-1 text-sm font-bold">
+                {{ user.isVerified ? 'Verified' : 'Pending verification' }}
+              </dd>
+            </div>
+            <div class="rounded-2xl border border-base-300 bg-base-200/65 p-4">
+              <dt
+                class="text-[0.65rem] font-black uppercase tracking-[0.2em] text-base-content/45"
+              >
+                Role
+              </dt>
+              <dd class="mt-1 text-sm font-bold">
+                {{ formatRole(user.role) }}
+              </dd>
+            </div>
+            <div class="rounded-2xl border border-base-300 bg-base-200/65 p-4">
+              <dt
+                class="text-[0.65rem] font-black uppercase tracking-[0.2em] text-base-content/45"
+              >
+                Joined
+              </dt>
+              <dd class="mt-1 text-sm font-bold">
+                {{ user.createdAt | date: 'mediumDate' }}
+              </dd>
+            </div>
+            <div class="rounded-2xl border border-base-300 bg-base-200/65 p-4">
+              <dt
+                class="text-[0.65rem] font-black uppercase tracking-[0.2em] text-base-content/45"
+              >
+                Last verified
+              </dt>
+              <dd class="mt-1 text-sm font-bold">
+                @if (user.lastVerifiedAt) { {{ user.lastVerifiedAt | date:
+                'mediumDate' }} } @else { Not verified yet }
+              </dd>
+            </div>
+          </dl>
+        </section>
+
+        <section
+          class="rounded-4xl border border-base-300 bg-base-100/85 p-5 shadow-xl shadow-base-300/30 backdrop-blur sm:p-6"
+          aria-labelledby="totp-heading"
+        >
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex items-start gap-3">
+              <span
+                class="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-secondary/15 text-secondary"
+              >
+                <app-icon name="shield-check" class="size-6" />
+              </span>
+              <div>
+                <p
+                  class="text-[0.68rem] font-black uppercase tracking-[0.22em] text-secondary"
+                >
+                  Security
+                </p>
+                <h2 id="totp-heading" class="mt-1 text-xl font-black">
+                  Authenticator app (TOTP)
+                </h2>
+              </div>
+            </div>
+            <span class="badge badge-neutral badge-soft font-bold"
+              >Coming soon</span
+            >
+          </div>
+
+          <p class="mt-4 text-sm leading-6 text-base-content/60">
+            Two-factor authentication is planned, but setup is not implemented
+            in this iteration. No secret, QR code, recovery code, or TOTP API is
+            created from this placeholder.
+          </p>
+
+          <div
+            class="mt-5 rounded-3xl border border-dashed border-base-300 bg-base-200/60 p-4"
+          >
+            <div class="flex items-center justify-between gap-4">
+              <div>
+                <p class="text-sm font-black">Status</p>
+                <p class="mt-1 text-xs font-semibold text-base-content/50">
+                  Not configured
+                </p>
+              </div>
+              <input
+                class="toggle toggle-primary"
+                type="checkbox"
+                disabled
+                aria-label="TOTP is not available yet"
+              />
+            </div>
+
+            <div class="mt-5 grid gap-2">
+              <button
+                class="btn btn-disabled btn-sm justify-start"
+                type="button"
+                disabled
+              >
+                Set up authenticator
+              </button>
+              <button
+                class="btn btn-disabled btn-sm justify-start"
+                type="button"
+                disabled
+              >
+                Generate recovery codes
+              </button>
+            </div>
+          </div>
+        </section>
+      </aside>
+    </div>
+    } }
+  </main>
+
+  <app-mobile-dock />
+</div>
