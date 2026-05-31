@@ -150,6 +150,23 @@ export class AuthSessionStore {
     );
   }
 
+  updateCurrentUser(user: CurrentUserResponse): void {
+    this.currentUserSignal.set(user);
+    this.authenticatedSessionSignal.update((session) =>
+      session
+        ? {
+            ...session,
+            username: user.username,
+            fullName: user.fullName,
+            privateEmail: user.privateEmail,
+            role: user.role,
+            isVerified: user.isVerified,
+          }
+        : session,
+    );
+    this.hasCheckedSessionSignal.set(true);
+  }
+
   clearLocalSession(): void {
     this.authenticatedSessionSignal.set(null);
     this.currentUserSignal.set(null);
