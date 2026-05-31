@@ -75,6 +75,7 @@ export class Home implements OnInit {
   readonly searchTerm = signal('');
   readonly selectedTags = signal<string[]>([]);
   readonly sort = signal<FeedSort>('trending');
+  readonly isSidebarCollapsed = signal(false);
 
   readonly currentUser = signal<CurrentUserResponse | null>(null);
   readonly posts = signal<PostFeedItem[]>([]);
@@ -236,6 +237,10 @@ export class Home implements OnInit {
 
   retryFeed(): void {
     this.loadPosts(true);
+  }
+
+  toggleSidebar(): void {
+    this.isSidebarCollapsed.update((isCollapsed) => !isCollapsed);
   }
 
   votePost(post: PostFeedItem, vote: VoteRequestValue): void {
