@@ -32,6 +32,7 @@ export class PostCard {
   readonly post = input.required<PostFeedItem>();
   readonly voting = input(false);
   readonly downloading = input(false);
+  readonly descriptionMaxLength = input<number | null>(null);
 
   readonly voteRequested = output<PostCardVoteRequest>();
   readonly tagSelected = output<string>();
@@ -45,16 +46,24 @@ export class PostCard {
     return Math.max(tags.length - 4, 0);
   }
 
-  initials(source: PostFeedUser): string {
-    const fallback = source.username || 'SH';
-    const parts = (source.fullName || fallback)
-      .split(/\s+/)
-      .filter((part) => part.length > 0);
+  descriptionText(description: string | null): string {
+    const fallback = 'No description was added for this resource.';
+    const text = description?.trim() || fallback;
+    const maxLength = this.descriptionMaxLength();
 
-    if (parts.length >= 2) {
-      return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+    if (maxLength === null || text.length <= maxLength) {
+      return text;
     }
 
+    if (maxLength <= 1) {
+      return text.slice(0, Math.max(maxLength, 0));
+    }
+
+    return `${text.slice(0, maxLength - 1).trimEnd()}…`;
+  }
+
+  initials(source: PostFeedUser): string {
+    const fallback = source.username || 'SH';
     return fallback.slice(0, 2).toUpperCase();
   }
 
