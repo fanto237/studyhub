@@ -26,6 +26,12 @@ export interface CurrentUserResponse {
   latestPosts: CurrentUserLatestPost[];
 }
 
+export interface UpdateCurrentUserRequest {
+  username: string;
+  fullName: string;
+  privateEmail: string;
+}
+
 export interface PublicUserLatestPost {
   id: string;
   title: string;

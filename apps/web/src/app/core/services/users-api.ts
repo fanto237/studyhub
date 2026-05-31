@@ -10,6 +10,7 @@ import {
 import {
   type CurrentUserResponse,
   type PublicUserProfileResponse,
+  type UpdateCurrentUserRequest,
 } from '../types/users.models';
 
 @Injectable({ providedIn: 'root' })
@@ -29,6 +30,24 @@ export class UsersApi {
 
           throw new Error(
             response.message ?? 'Your StudyHub profile could not load.',
+          );
+        }),
+      );
+  }
+
+  updateCurrentUser(request: UpdateCurrentUserRequest) {
+    return this.http
+      .patch<ApiEnvelope<CurrentUserResponse>>('/api/users/me', request, {
+        withCredentials: true,
+      })
+      .pipe(
+        map((response) => {
+          if (response.status === 'success' && response.data) {
+            return response.data;
+          }
+
+          throw new Error(
+            response.message ?? 'Your StudyHub profile could not be updated.',
           );
         }),
       );
