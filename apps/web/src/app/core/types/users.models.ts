@@ -25,3 +25,28 @@ export interface CurrentUserResponse {
   createdAt: string;
   latestPosts: CurrentUserLatestPost[];
 }
+
+export interface PublicUserLatestPost {
+  id: string;
+  title: string;
+  description: string | null;
+  storageUrl: string;
+  upvotes: number;
+  downvotes: number;
+  score: number;
+  createdAt: string;
+  commentCount: number;
+  tags: string[];
+}
+
+export interface PublicUserProfileResponse {
+  id: string;
+  username: string;
+  universityName: string;
+  isVerified: boolean;
+  karmaScore: number;
+  createdAt: string;
+  totalUploads: number;
+  totalUpvotesReceived: number;
+  latestPosts: PublicUserLatestPost[];
+}
