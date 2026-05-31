@@ -1,0 +1,449 @@
+@let scoreTotals = visibleUploadScore();
+
+<div class="min-h-screen overflow-x-hidden bg-base-200 text-base-content">
+  <div
+    class="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_8%_10%,rgba(37,99,235,0.10),transparent_26%),radial-gradient(circle_at_92%_14%,rgba(20,184,166,0.10),transparent_24%),radial-gradient(circle_at_58%_92%,rgba(236,72,153,0.08),transparent_30%)]"
+    aria-hidden="true"
+  ></div>
+
+  <header
+    class="sticky top-0 z-40 border-b border-base-300 bg-base-100/90 px-4 py-3 shadow-sm backdrop-blur sm:px-6 lg:px-8"
+  >
+    <div class="mx-auto flex max-w-7xl items-center justify-between gap-3">
+      <a
+        class="flex items-center gap-3"
+        routerLink="/home"
+        aria-label="StudyHub home"
+      >
+        <span
+          class="flex size-11 items-center justify-center rounded-2xl bg-primary text-primary-content shadow-lg shadow-primary/20"
+        >
+          <app-icon name="studyhub-file" class="size-6" />
+        </span>
+        <span>
+          <span class="block text-xl font-black leading-none text-primary">
+            StudyHub
+          </span>
+          <span class="text-xs font-bold text-base-content/50">
+            Contributor profile
+          </span>
+        </span>
+      </a>
+
+      <nav class="hidden items-center gap-2 lg:flex" aria-label="Profile navigation">
+        <a class="btn btn-ghost btn-sm gap-2" routerLink="/home">
+          <app-icon name="home" class="size-4" />
+          Home
+        </a>
+        <a class="btn btn-ghost btn-sm gap-2" routerLink="/upload">
+          <app-icon name="upload" class="size-4" />
+          Upload
+        </a>
+        <a class="btn btn-ghost btn-sm gap-2" routerLink="/profile">
+          <app-icon name="user" class="size-4" />
+          Profile
+        </a>
+      </nav>
+
+      <div class="flex items-center gap-2">
+        <app-theme-toggle />
+      </div>
+    </div>
+  </header>
+
+  <main class="relative mx-auto max-w-7xl px-4 pb-24 pt-6 sm:px-6 lg:px-8 lg:py-8">
+    @if (isLoadingProfile()) {
+    <div class="grid gap-6 xl:grid-cols-[22rem_minmax(0,1fr)]">
+      <aside class="space-y-6">
+        <section class="rounded-[2rem] border border-base-300 bg-base-100/85 p-6 shadow-xl shadow-base-300/30">
+          <div class="flex flex-col items-center text-center">
+            <div class="skeleton size-24 rounded-[2rem]"></div>
+            <div class="skeleton mt-5 h-6 w-44 rounded-full"></div>
+            <div class="skeleton mt-3 h-4 w-56 rounded-full"></div>
+          </div>
+          <div class="mt-6 grid grid-cols-2 gap-3">
+            <div class="skeleton h-20 rounded-2xl"></div>
+            <div class="skeleton h-20 rounded-2xl"></div>
+          </div>
+          <div class="mt-4 space-y-3">
+            <div class="skeleton h-14 rounded-2xl"></div>
+            <div class="skeleton h-14 rounded-2xl"></div>
+          </div>
+        </section>
+      </aside>
+      <section class="rounded-[2rem] border border-base-300 bg-base-100/85 p-7 shadow-xl shadow-base-300/30">
+        <div class="skeleton h-5 w-44 rounded-full"></div>
+        <div class="skeleton mt-4 h-12 w-full max-w-3xl rounded-2xl"></div>
+        <div class="skeleton mt-4 h-5 w-full max-w-2xl rounded-full"></div>
+        <div class="mt-8 grid gap-4">
+          @for (placeholder of [1, 2, 3]; track placeholder) {
+          <div class="skeleton h-44 rounded-3xl"></div>
+          }
+        </div>
+      </section>
+    </div>
+    } @else if (profileErrorMessage() && !profile()) {
+    <section
+      class="mx-auto max-w-2xl rounded-[2rem] border border-base-300 bg-base-100/90 p-8 text-center shadow-xl shadow-base-300/30"
+    >
+      <span
+        class="mx-auto flex size-16 items-center justify-center rounded-3xl bg-warning/15 text-warning-content"
+      >
+        <app-icon name="alert-triangle" class="size-8" />
+      </span>
+      <p class="badge badge-warning badge-soft mt-5 font-bold">
+        @if (isNotFound()) { Not found } @else { Profile unavailable }
+      </p>
+      <h1 class="mt-3 text-3xl font-black tracking-tight">
+        @if (isNotFound()) { This contributor is unavailable } @else { We couldn't load this profile }
+      </h1>
+      <p class="mt-3 text-base leading-7 text-base-content/65">
+        {{ profileErrorMessage() }}
+      </p>
+      <div class="mt-6 flex flex-wrap justify-center gap-3">
+        @if (!isNotFound()) {
+        <button
+          class="btn btn-primary text-primary-content"
+          type="button"
+          (click)="retryProfile()"
+        >
+          Retry
+        </button>
+        }
+        <a class="btn btn-outline" routerLink="/home">Back to feed</a>
+      </div>
+    </section>
+    } @else { @if (profile(); as user) {
+    <div class="grid gap-6 xl:grid-cols-[22rem_minmax(0,1fr)]">
+      <aside class="space-y-6 xl:sticky xl:top-24 xl:self-start" aria-label="Contributor summary">
+        <section
+          class="rounded-[2rem] border border-base-300 bg-base-100/85 p-5 shadow-xl shadow-base-300/30 backdrop-blur sm:p-6"
+        >
+          <div class="flex flex-col items-center text-center">
+            <span
+              class="flex size-24 items-center justify-center rounded-[2rem] bg-primary text-3xl font-black text-primary-content shadow-xl shadow-primary/20"
+            >
+              {{ initials(user) }}
+            </span>
+            <div class="mt-5 min-w-0">
+              <p class="text-[0.7rem] font-black uppercase tracking-[0.24em] text-primary">
+                Contributor
+              </p>
+              <h1 class="mt-2 text-2xl font-black tracking-tight">
+                @{{ user.username }}
+              </h1>
+              <p class="mt-2 text-sm font-semibold leading-6 text-base-content/65">
+                {{ user.universityName }}
+              </p>
+            </div>
+          </div>
+
+          <div class="mt-6 flex flex-wrap justify-center gap-2">
+            @if (user.isVerified) {
+            <span class="badge badge-success badge-soft font-bold">
+              <app-icon name="shield-check" class="size-3.5" />
+              Verified student
+            </span>
+            } @else {
+            <span class="badge badge-warning badge-soft font-bold">
+              Verification pending
+            </span>
+            }
+            <span class="badge badge-primary badge-soft font-bold">
+              {{ user.karmaScore | number }} karma
+            </span>
+          </div>
+
+          <div class="mt-6 grid grid-cols-2 gap-3">
+            <div class="rounded-2xl bg-primary/10 p-4 text-primary">
+              <p class="text-2xl font-black">{{ user.totalUploads | number }}</p>
+              <p class="mt-1 text-[0.65rem] font-bold uppercase tracking-wide">
+                Uploads
+              </p>
+            </div>
+            <div class="rounded-2xl bg-accent/15 p-4 text-accent-content">
+              <p class="text-2xl font-black">{{ user.totalUpvotesReceived | number }}</p>
+              <p class="mt-1 text-[0.65rem] font-bold uppercase tracking-wide">
+                Upvotes
+              </p>
+            </div>
+          </div>
+
+          <dl class="mt-5 space-y-3">
+            <div class="rounded-2xl border border-base-300 bg-base-200/65 p-4">
+              <dt class="text-[0.65rem] font-black uppercase tracking-[0.2em] text-base-content/45">
+                Joined
+              </dt>
+              <dd class="mt-1 text-sm font-bold">
+                {{ user.createdAt | date: 'mediumDate' }}
+              </dd>
+            </div>
+            <div class="rounded-2xl border border-base-300 bg-base-200/65 p-4">
+              <dt class="text-[0.65rem] font-black uppercase tracking-[0.2em] text-base-content/45">
+                Privacy
+              </dt>
+              <dd class="mt-1 text-sm font-semibold leading-6 text-base-content/65">
+                StudyHub only shows contributor activity and public trust signals here.
+              </dd>
+            </div>
+          </dl>
+        </section>
+
+        <section
+          class="rounded-[2rem] border border-base-300 bg-base-100/85 p-5 shadow-xl shadow-base-300/30 backdrop-blur sm:p-6"
+          aria-labelledby="visible-stats-heading"
+        >
+          <p id="visible-stats-heading" class="text-sm font-black uppercase tracking-[0.22em] text-base-content/45">
+            Visible page stats
+          </p>
+          <div class="mt-4 grid grid-cols-3 gap-2">
+            <div class="rounded-2xl bg-base-200/80 p-3 text-center">
+              <p class="text-lg font-black text-primary">{{ scoreTotals.upvotes | number }}</p>
+              <p class="mt-1 text-[0.62rem] font-bold uppercase tracking-wide text-base-content/45">
+                Upvotes
+              </p>
+            </div>
+            <div class="rounded-2xl bg-base-200/80 p-3 text-center">
+              <p class="text-lg font-black text-secondary">{{ scoreTotals.downvotes | number }}</p>
+              <p class="mt-1 text-[0.62rem] font-bold uppercase tracking-wide text-base-content/45">
+                Down
+              </p>
+            </div>
+            <div class="rounded-2xl bg-base-200/80 p-3 text-center">
+              <p class="text-lg font-black">{{ scoreTotals.score | number }}</p>
+              <p class="mt-1 text-[0.62rem] font-bold uppercase tracking-wide text-base-content/45">
+                Score
+              </p>
+            </div>
+          </div>
+          <p class="mt-3 text-xs leading-5 text-base-content/50">
+            These totals are for the loaded upload list, not private account data.
+          </p>
+        </section>
+
+        <section
+          class="rounded-[2rem] border border-base-300 bg-base-100/85 p-5 shadow-sm backdrop-blur sm:p-6"
+          aria-labelledby="profile-tags-heading"
+        >
+          <p class="text-xs font-black uppercase tracking-[0.22em] text-base-content/45">
+            Topics
+          </p>
+          <h2 id="profile-tags-heading" class="mt-1 text-xl font-black">
+            Popular tags
+          </h2>
+
+          @if (popularTags().length > 0) {
+          <div class="mt-5 flex flex-wrap gap-2">
+            @for (tag of popularTags(); track tag) {
+            <button
+              class="badge cursor-pointer border transition hover:border-primary hover:bg-primary/10 hover:text-primary"
+              [class.badge-primary]="isTagSelected(tag)"
+              [class.badge-soft]="isTagSelected(tag)"
+              type="button"
+              (click)="selectTag(tag)"
+            >
+              {{ tag }}
+            </button>
+            }
+          </div>
+          } @else {
+          <p class="mt-5 text-sm leading-6 text-base-content/60">
+            Tags will appear after this contributor's uploads load.
+          </p>
+          }
+        </section>
+      </aside>
+
+      <div class="min-w-0 space-y-6">
+        <section
+          class="rounded-[2rem] border border-base-300 bg-base-100/85 p-5 shadow-xl shadow-base-300/30 backdrop-blur sm:p-7"
+          aria-labelledby="profile-heading"
+        >
+          <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p class="text-sm font-black uppercase tracking-[0.22em] text-primary">
+                Public uploads
+              </p>
+              <h2 id="profile-heading" class="mt-3 text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl">
+                Resources shared by @{{ user.username }}.
+              </h2>
+              <p class="mt-3 max-w-2xl text-base leading-7 text-base-content/65">
+                Review this contributor's visible StudyHub materials, trust signals, and community feedback without exposing private account details.
+              </p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 sm:min-w-80">
+              <div class="rounded-2xl bg-primary p-4 text-primary-content shadow-lg shadow-primary/20">
+                <span class="text-2xl font-black">{{ user.totalUploads | number }}</span>
+                <span class="mt-1 block text-xs font-bold uppercase tracking-wide opacity-80">
+                  Total uploads
+                </span>
+              </div>
+              <div class="rounded-2xl bg-base-200 p-4">
+                <span class="text-2xl font-black">{{ uploads().length | number }}</span>
+                <span class="mt-1 block text-xs font-bold uppercase tracking-wide text-base-content/55">
+                  Visible now
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section
+          class="rounded-[2rem] border border-base-300 bg-base-100/85 p-5 shadow-xl shadow-base-300/30 backdrop-blur sm:p-6"
+          aria-labelledby="upload-controls-heading"
+        >
+          <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <h3 id="upload-controls-heading" class="text-lg font-black">
+                Browse uploads
+              </h3>
+              <p class="mt-1 text-sm font-semibold text-base-content/55">
+                Sort and filter this contributor's paginated upload history.
+              </p>
+            </div>
+
+            <div class="flex flex-wrap gap-2" aria-label="Upload sort options">
+              @for (option of sortOptions; track option.value) {
+              <button
+                class="btn btn-sm gap-2"
+                [ngClass]="sort() === option.value ? 'btn-primary text-primary-content' : 'btn-ghost'"
+                type="button"
+                (click)="setSort(option.value)"
+                [attr.aria-pressed]="sort() === option.value"
+                [title]="option.helper"
+              >
+                <app-icon [name]="option.icon" class="size-4" />
+                {{ option.label }}
+              </button>
+              }
+            </div>
+          </div>
+
+          @if (hasUploadFilters()) {
+          <div class="mt-5 flex flex-wrap items-center gap-2 border-t border-base-300 pt-4">
+            <span class="text-xs font-black uppercase tracking-[0.18em] text-base-content/45">
+              Tags
+            </span>
+            @for (tag of selectedTags(); track tag) {
+            <button
+              class="badge badge-primary badge-soft cursor-pointer font-bold"
+              type="button"
+              (click)="removeTag(tag)"
+              title="Remove tag filter"
+            >
+              {{ tag }} ×
+            </button>
+            }
+            <button class="btn btn-ghost btn-xs" type="button" (click)="clearUploadFilters()">
+              Clear filters
+            </button>
+          </div>
+          }
+        </section>
+
+        @if (uploadsErrorMessage(); as message) {
+        <div class="alert alert-error" role="alert">
+          <app-icon name="alert-triangle" class="size-5 shrink-0" />
+          <span class="min-w-0 flex-1">{{ message }}</span>
+          <button class="btn btn-sm" type="button" (click)="retryUploads()">
+            Retry
+          </button>
+        </div>
+        }
+
+        @if (isLoadingUploads()) {
+        <div class="grid gap-4">
+          @for (placeholder of [1, 2, 3]; track placeholder) {
+          <article class="rounded-3xl border border-base-300 bg-base-100/95 p-5 shadow-sm">
+            <div class="flex gap-4">
+              <div class="hidden w-14 shrink-0 rounded-2xl bg-base-200/80 p-1.5 sm:block">
+                <div class="skeleton h-full min-h-28 rounded-xl"></div>
+              </div>
+              <div class="min-w-0 flex-1 space-y-4">
+                <div class="flex gap-2">
+                  <div class="skeleton h-5 w-14 rounded-full"></div>
+                  <div class="skeleton h-5 w-28 rounded-full"></div>
+                </div>
+                <div class="skeleton h-8 w-full max-w-xl rounded-2xl"></div>
+                <div class="skeleton h-4 w-full rounded-full"></div>
+                <div class="skeleton h-4 w-4/5 rounded-full"></div>
+                <div class="flex flex-wrap gap-2">
+                  <div class="skeleton h-6 w-20 rounded-full"></div>
+                  <div class="skeleton h-6 w-24 rounded-full"></div>
+                  <div class="skeleton h-6 w-16 rounded-full"></div>
+                </div>
+              </div>
+            </div>
+          </article>
+          }
+        </div>
+        } @else if (uploads().length > 0) {
+        <div class="grid gap-4">
+          @for (post of uploads(); track post.id) {
+          <app-post-card
+            [post]="post"
+            [voting]="isVoting(post.id)"
+            [downloading]="isDownloading(post.id)"
+            [descriptionMaxLength]="300"
+            (voteRequested)="votePost($event.post, $event.vote)"
+            (downloadRequested)="downloadPost($event)"
+            (tagSelected)="selectTag($event)"
+          />
+          }
+        </div>
+
+        <div class="mt-6 flex justify-center">
+          @if (canLoadMore()) {
+          <button
+            class="btn btn-primary min-w-44 text-primary-content"
+            [disabled]="isLoadingMore()"
+            type="button"
+            (click)="loadMore()"
+          >
+            @if (isLoadingMore()) {
+            <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+            Loading } @else { Load more }
+          </button>
+          } @else {
+          <p class="rounded-full bg-base-100/80 px-4 py-2 text-sm font-bold text-base-content/55">
+            You have reached the end of @{{ user.username }}'s uploads.
+          </p>
+          }
+        </div>
+        } @else {
+        <section
+          class="rounded-[2rem] border-2 border-dashed border-base-300 bg-base-100/85 p-10 text-center shadow-sm"
+          aria-label="No uploads"
+        >
+          <span
+            class="mx-auto flex size-16 items-center justify-center rounded-3xl bg-primary/10 text-primary"
+          >
+            <app-icon name="document" class="size-8" />
+          </span>
+          <h3 class="mt-5 text-2xl font-black">No public uploads found.</h3>
+          <p class="mx-auto mt-3 max-w-md text-sm leading-6 text-base-content/60">
+            @if (hasUploadFilters()) { Remove a tag filter to see more resources from this contributor. } @else { This contributor has not shared visible resources yet. }
+          </p>
+          @if (hasUploadFilters()) {
+          <button
+            class="btn btn-primary mt-6 text-primary-content"
+            type="button"
+            (click)="clearUploadFilters()"
+          >
+            Clear filters
+          </button>
+          } @else {
+          <a class="btn btn-primary mt-6 text-primary-content" routerLink="/home">
+            Browse StudyHub
+          </a>
+          }
+        </section>
+        }
+      </div>
+    </div>
+    } }
+  </main>
+
+  <app-mobile-dock />
+</div>
