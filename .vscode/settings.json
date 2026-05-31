@@ -1,1 +1,25 @@
-{}
+{
+  "rest-client.environmentVariables": {
+    "$shared": {
+      "Api_HostAddress": "http://localhost:5046",
+      "PostId": "ec27cdf0-19aa-4f3d-b991-256b70bb5183"
+    }
+  },
+  "sqltools.connections": [
+    {
+      "pgOptions": {
+        "ssl": {
+          "rejectUnauthorized": true
+        }
+      },
+      "ssh": "Disabled",
+      "previewLimit": 50,
+      "server": "ep-falling-moon-a9oiraw2-pooler.gwc.azure.neon.tech",
+      "port": 5432,
+      "driver": "PostgreSQL",
+      "name": "Neon-Dev",
+      "database": "neondb",
+      "username": "neondb_owner"
+    }
+  ]
+}

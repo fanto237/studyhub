@@ -18,7 +18,8 @@
       // "env": {
       //   "API_PROXY_TARGET": "https://stagingapi.afroschool.cloud"
       // }
-      "preLaunchTask": "nx: nx run web:serve"
+      "preLaunchTask": "nx: nx run web:serve",
+      "runtimeExecutable": "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser"
     }
   ]
 }
