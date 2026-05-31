@@ -43,6 +43,15 @@ export const appRoutes: Route[] = [
     title: 'Resource | StudyHub',
   },
   {
+    path: 'users/:userId',
+    canActivate: [requireAuthSessionGuard],
+    loadComponent: () =>
+      import('./pages/user-profile/user-profile').then(
+        (module) => module.UserProfile,
+      ),
+    title: 'Contributor | StudyHub',
+  },
+  {
     path: 'login',
     canActivate: [redirectAuthenticatedGuard],
     loadComponent: () =>

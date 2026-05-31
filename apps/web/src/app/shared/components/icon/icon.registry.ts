@@ -159,6 +159,18 @@ export const ICONS = {
       strokeLinecap: 'round',
     }),
   ]),
+  'chevron-left': strokeIcon([
+    strokePath('m15 18-6-6 6-6', {
+      strokeLinecap: 'round',
+      strokeLinejoin: 'round',
+    }),
+  ]),
+  'chevron-right': strokeIcon([
+    strokePath('m9 18 6-6-6-6', {
+      strokeLinecap: 'round',
+      strokeLinejoin: 'round',
+    }),
+  ]),
   user: strokeIcon([
     strokePath('M16 8a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z'),
     strokePath('M4 21a8 8 0 0 1 16 0', {

@@ -74,7 +74,45 @@ function getSetCookieHeaders(headers: Headers): string[] {
   }
 
   const setCookie = headers.get('set-cookie');
-  return setCookie ? [setCookie] : [];
+  return setCookie ? splitCombinedSetCookieHeader(setCookie) : [];
+}
+
+function splitCombinedSetCookieHeader(header: string): string[] {
+  const cookies: string[] = [];
+  let start = 0;
+  let inExpiresAttribute = false;
+
+  for (let index = 0; index < header.length; index += 1) {
+    const current = header[index];
+
+    if (
+      current === ',' &&
+      (!inExpiresAttribute || startsNextCookie(header.slice(index + 1)))
+    ) {
+      cookies.push(header.slice(start, index).trim());
+      start = index + 1;
+      inExpiresAttribute = false;
+      continue;
+    }
+
+    if (current === ';') {
+      inExpiresAttribute = false;
+      continue;
+    }
+
+    const remainingHeader = header.slice(index).toLowerCase();
+    if (remainingHeader.startsWith('expires=')) {
+      inExpiresAttribute = true;
+    }
+  }
+
+  cookies.push(header.slice(start).trim());
+
+  return cookies.filter(Boolean);
+}
+
+function startsNextCookie(headerFragment: string): boolean {
+  return /^\s*[^=;,\s]+=/.test(headerFragment);
 }
 
 function buildProxyHeaders(req: express.Request): Headers {
