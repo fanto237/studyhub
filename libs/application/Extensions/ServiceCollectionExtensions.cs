@@ -21,6 +21,14 @@ public static class ServiceCollectionExtensions
             .Validate(settings => settings.RefreshTokenLifetimeDays > 0, $"{JwtSetting.SectionName}:RefreshTokenLifetimeDays must be greater than zero.")
             .ValidateOnStart();
 
+        services.AddOptions<TotpSetting>()
+            .BindConfiguration(TotpSetting.SectionName)
+            .Validate(settings => !string.IsNullOrWhiteSpace(settings.Issuer), $"{TotpSetting.SectionName}:Issuer is required.")
+            .Validate(settings => settings.SetupLifetimeMinutes > 0, $"{TotpSetting.SectionName}:SetupLifetimeMinutes must be greater than zero.")
+            .Validate(settings => settings.LoginChallengeLifetimeMinutes > 0, $"{TotpSetting.SectionName}:LoginChallengeLifetimeMinutes must be greater than zero.")
+            .Validate(settings => settings.MaxLoginAttempts > 0, $"{TotpSetting.SectionName}:MaxLoginAttempts must be greater than zero.")
+            .ValidateOnStart();
+
         return services;
     }
 }
