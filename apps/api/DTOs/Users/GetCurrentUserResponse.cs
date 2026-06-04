@@ -12,6 +12,8 @@ public record GetCurrentUserResponse(
     UserRole Role,
     bool IsVerified,
     DateTimeOffset? LastVerifiedAt,
+    bool IsTotpEnabled,
+    DateTimeOffset? TotpEnabledAt,
     int KarmaScore,
     DateTimeOffset CreatedAt,
     IReadOnlyList<CurrentUserLatestPostResponse> LatestPosts);
