@@ -46,6 +46,13 @@ public class DeleteUserHandler
             authRepository.RemoveAuthCodes(user.AuthCodes.ToArray());
             authRepository.RemoveRefreshTokens(user.RefreshTokens.ToArray());
 
+            user.IsTotpEnabled = false;
+            user.TotpSecret = null;
+            user.TotpEnabledAt = null;
+            user.TotpLastUsedTimeStep = null;
+            user.TotpPendingSecret = null;
+            user.TotpPendingSecretCreatedAt = null;
+
             user.PrivateEmail = $"deleted+{user.Id:D}@deleted.studyhub.local";
             user.SchoolEmail = $"deleted-school+{user.Id:D}@deleted.studyhub.local";
             user.Username = $"{User.DeletedUsername}-{user.Id:N}";

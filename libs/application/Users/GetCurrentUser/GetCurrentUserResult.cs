@@ -17,6 +17,8 @@ public record CurrentUserProfile(
     UserRole Role,
     bool IsVerified,
     DateTimeOffset? LastVerifiedAt,
+    bool IsTotpEnabled,
+    DateTimeOffset? TotpEnabledAt,
     int KarmaScore,
     DateTimeOffset CreatedAt,
     IReadOnlyList<CurrentUserLatestPost> LatestPosts);
