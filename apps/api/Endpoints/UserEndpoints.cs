@@ -209,6 +209,8 @@ public static class UserEndpoints
         item.Role,
         item.IsVerified,
         item.LastVerifiedAt,
+        item.IsTotpEnabled,
+        item.TotpEnabledAt,
         item.KarmaScore,
         item.CreatedAt,
         item.LatestPosts
