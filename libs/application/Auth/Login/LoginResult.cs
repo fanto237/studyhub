@@ -15,4 +15,6 @@ public record LoginResult(
     string? FullName = null,
     UserRole? Role = null,
     bool IsVerified = false,
-    string? SchoolEmail = null);
+    string? SchoolEmail = null,
+    Guid? TwoFactorChallengeId = null,
+    DateTimeOffset? TwoFactorChallengeExpiresAt = null);
