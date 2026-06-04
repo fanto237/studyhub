@@ -18,10 +18,15 @@ public interface IAuthRepository
     Task<User?> GetUserWithPasswordResetStateByPrivateEmailAsync(string privateEmail, CancellationToken cancellationToken);
     Task<User?> GetUserForUpdateAsync(Guid userId, CancellationToken cancellationToken);
     Task<User?> GetUserForDeletionAsync(Guid userId, CancellationToken cancellationToken);
+    Task<User?> GetUserForTotpSetupAsync(Guid userId, CancellationToken cancellationToken);
+    Task<User?> GetUserForTotpEnableAsync(Guid userId, CancellationToken cancellationToken);
+    Task<User?> GetUserForTotpDisableAsync(Guid userId, CancellationToken cancellationToken);
     Task<UserRefreshToken?> GetRefreshTokenWithUserByHashAsync(string tokenHash, CancellationToken cancellationToken);
+    Task<UserTotpLoginChallenge?> GetTotpLoginChallengeWithUserAsync(Guid challengeId, CancellationToken cancellationToken);
     void AddUser(User user);
     void AddAuthCode(UserAuthCode authCode);
     void AddRefreshToken(UserRefreshToken refreshToken);
+    void AddTotpLoginChallenge(UserTotpLoginChallenge challenge);
     void RemoveAuthCodes(IEnumerable<UserAuthCode> authCodes);
     void RemoveRefreshTokens(IEnumerable<UserRefreshToken> refreshTokens);
     Task SaveChangesAsync(CancellationToken cancellationToken);

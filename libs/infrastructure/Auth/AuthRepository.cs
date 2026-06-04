@@ -64,6 +64,8 @@ public class AuthRepository(StudyHubDbContext dbContext) : IAuthRepository
             candidate.Role,
             candidate.IsVerified,
             candidate.LastVerifiedAt,
+            candidate.IsTotpEnabled,
+            candidate.TotpEnabledAt,
             candidate.KarmaScore,
             candidate.CreatedAt,
             candidate.Posts
@@ -169,6 +171,11 @@ public class AuthRepository(StudyHubDbContext dbContext) : IAuthRepository
     dbContext.UserRefreshTokens.Add(refreshToken);
   }
 
+  public void AddTotpLoginChallenge(UserTotpLoginChallenge challenge)
+  {
+    dbContext.UserTotpLoginChallenges.Add(challenge);
+  }
+
   public void RemoveAuthCodes(IEnumerable<UserAuthCode> authCodes)
   {
     dbContext.UserAuthCodes.RemoveRange(authCodes);
@@ -220,7 +227,34 @@ public class AuthRepository(StudyHubDbContext dbContext) : IAuthRepository
     return dbContext.Users
         .Include(user => user.AuthCodes)
         .Include(user => user.RefreshTokens)
+        .Include(user => user.TotpLoginChallenges)
         .SingleOrDefaultAsync(user => user.Id == userId, cancellationToken);
+  }
+
+  public Task<User?> GetUserForTotpSetupAsync(Guid userId, CancellationToken cancellationToken)
+  {
+    return dbContext.Users
+        .SingleOrDefaultAsync(
+            user => user.Id == userId && user.DeletedAt == null,
+            cancellationToken);
+  }
+
+  public Task<User?> GetUserForTotpEnableAsync(Guid userId, CancellationToken cancellationToken)
+  {
+    return dbContext.Users
+        .Include(user => user.RefreshTokens)
+        .SingleOrDefaultAsync(
+            user => user.Id == userId && user.DeletedAt == null,
+            cancellationToken);
+  }
+
+  public Task<User?> GetUserForTotpDisableAsync(Guid userId, CancellationToken cancellationToken)
+  {
+    return dbContext.Users
+        .Include(user => user.RefreshTokens)
+        .SingleOrDefaultAsync(
+            user => user.Id == userId && user.DeletedAt == null,
+            cancellationToken);
   }
 
   public Task<UserRefreshToken?> GetRefreshTokenWithUserByHashAsync(string tokenHash, CancellationToken cancellationToken)
@@ -229,6 +263,15 @@ public class AuthRepository(StudyHubDbContext dbContext) : IAuthRepository
         .Include(refreshToken => refreshToken.User)
         .SingleOrDefaultAsync(
             refreshToken => refreshToken.TokenHash == tokenHash && refreshToken.User.DeletedAt == null,
+            cancellationToken);
+  }
+
+  public Task<UserTotpLoginChallenge?> GetTotpLoginChallengeWithUserAsync(Guid challengeId, CancellationToken cancellationToken)
+  {
+    return dbContext.UserTotpLoginChallenges
+        .Include(challenge => challenge.User)
+        .SingleOrDefaultAsync(
+            challenge => challenge.Id == challengeId && challenge.User.DeletedAt == null,
             cancellationToken);
   }
 
