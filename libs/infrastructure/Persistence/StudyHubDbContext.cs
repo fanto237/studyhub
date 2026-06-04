@@ -8,6 +8,7 @@ public class StudyHubDbContext(DbContextOptions<StudyHubDbContext> options) : Db
     public DbSet<User> Users => Set<User>();
     public DbSet<UserAuthCode> UserAuthCodes => Set<UserAuthCode>();
     public DbSet<UserRefreshToken> UserRefreshTokens => Set<UserRefreshToken>();
+    public DbSet<UserTotpLoginChallenge> UserTotpLoginChallenges => Set<UserTotpLoginChallenge>();
     public DbSet<Post> Posts => Set<Post>();
     public DbSet<Comment> Comments => Set<Comment>();
     public DbSet<Tag> Tags => Set<Tag>();

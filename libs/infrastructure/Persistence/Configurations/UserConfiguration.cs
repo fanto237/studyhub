@@ -37,6 +37,22 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(user => user.Role)
             .IsRequired();
 
+        builder.Property(user => user.IsTotpEnabled)
+            .HasDefaultValue(false)
+            .IsRequired();
+
+        builder.Property(user => user.TotpSecret)
+            .HasMaxLength(1024);
+
+        builder.Property(user => user.TotpEnabledAt);
+
+        builder.Property(user => user.TotpLastUsedTimeStep);
+
+        builder.Property(user => user.TotpPendingSecret)
+            .HasMaxLength(1024);
+
+        builder.Property(user => user.TotpPendingSecretCreatedAt);
+
         builder.Property(user => user.CreatedAt)
             .IsRequired();
 
