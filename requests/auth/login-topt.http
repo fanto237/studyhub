@@ -1,0 +1,12 @@
+@ChallengeId = 360bb4f0-18f1-4eee-bf31-6fc67cb2d34b
+
+POST {{Api_HostAddress}}/api/auth/login/totp
+Content-Type: application/json
+Accept: application/json
+
+
+
+{
+  "ChallengeId": "{{ChallengeId}}",
+  "Code": "374928"
+}

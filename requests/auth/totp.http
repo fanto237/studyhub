@@ -1,0 +1,29 @@
+@ChallengeId = your-challenge-id-here
+@Password= Sanada237@
+
+
+### SETUP TOTP
+POST {{Api_HostAddress}}/api/auth/totp/setup
+Content-Type: application/json
+Accept: application/json
+
+
+### ENABLE TOTP
+POST {{Api_HostAddress}}/api/auth/totp/enable
+Content-Type: application/json
+Accept: application/json
+
+{
+  "Code": "369387"
+}
+
+
+### DISABLE TOTP
+POST {{Api_HostAddress}}/api/auth/totp/disable
+Content-Type: application/json
+Accept: application/json
+
+{
+  "possword": "{{Password}}",
+  "Code": 374928
+}
