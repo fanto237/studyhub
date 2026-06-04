@@ -61,6 +61,8 @@ public static class ServiceCollectionExtensions
     services.AddScoped<IAuthRepository, AuthRepository>();
     services.AddScoped<IAuthEmailService, AuthEmailService>();
     services.AddSingleton<IAuthTokenService, AuthTokenService>();
+    services.AddSingleton<ITotpSecretProtector, TotpSecretProtector>();
+    services.AddSingleton<ITotpService, TotpService>();
     services.AddScoped<ICommentRepository, CommentRepository>();
     services.AddScoped<IPostRepository, PostRepository>();
     services.AddScoped<IPostFileStorageService, CloudflareR2PostFileStorageService>();
