@@ -17,6 +17,12 @@ public class User
   public UserRole Role { get; set; } = UserRole.User;
   public bool IsVerified { get; set; }
   public DateTimeOffset? LastVerifiedAt { get; set; }
+  public bool IsTotpEnabled { get; set; }
+  public string? TotpSecret { get; set; }
+  public DateTimeOffset? TotpEnabledAt { get; set; }
+  public long? TotpLastUsedTimeStep { get; set; }
+  public string? TotpPendingSecret { get; set; }
+  public DateTimeOffset? TotpPendingSecretCreatedAt { get; set; }
   public int KarmaScore { get; set; }
   public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
   public DateTimeOffset? DeletedAt { get; set; }
@@ -27,4 +33,5 @@ public class User
   public ICollection<PostReport> PostReports { get; set; } = [];
   public ICollection<UserAuthCode> AuthCodes { get; set; } = [];
   public ICollection<UserRefreshToken> RefreshTokens { get; set; } = [];
+  public ICollection<UserTotpLoginChallenge> TotpLoginChallenges { get; set; } = [];
 }
