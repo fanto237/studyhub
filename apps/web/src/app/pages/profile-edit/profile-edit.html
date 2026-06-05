@@ -357,6 +357,15 @@
             <span class="badge badge-warning badge-soft font-bold"
               >Pending verification</span
             >
+            } @if (user.isTotpEnabled) {
+            <span class="badge badge-success badge-soft font-bold">
+              <app-icon name="shield-check" class="size-3.5" />
+              2FA on
+            </span>
+            } @else {
+            <span class="badge badge-neutral badge-soft font-bold"
+              >2FA off</span
+            >
             }
           </div>
 
@@ -379,7 +388,7 @@
               </dt>
               <dd class="mt-1 text-sm font-bold">{{ user.universityName }}</dd>
             </div>
-            <div class="rounded-2xl border border-base-300 bg-base-200/65 p-4">
+            <!-- <div class="rounded-2xl border border-base-300 bg-base-200/65 p-4">
               <dt
                 class="text-[0.65rem] font-black uppercase tracking-[0.2em] text-base-content/45"
               >
@@ -419,7 +428,7 @@
                 @if (user.lastVerifiedAt) { {{ user.lastVerifiedAt | date:
                 'mediumDate' }} } @else { Not verified yet }
               </dd>
-            </div>
+            </div> -->
           </dl>
         </section>
 
@@ -430,13 +439,13 @@
           <div class="flex items-start justify-between gap-4">
             <div class="flex items-start gap-3">
               <span
-                class="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-secondary/15 text-secondary"
+                class="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary"
               >
                 <app-icon name="shield-check" class="size-6" />
               </span>
               <div>
                 <p
-                  class="text-[0.68rem] font-black uppercase tracking-[0.22em] text-secondary"
+                  class="text-[0.68rem] font-black uppercase tracking-[0.22em] text-primary"
                 >
                   Security
                 </p>
@@ -445,51 +454,237 @@
                 </h2>
               </div>
             </div>
-            <span class="badge badge-neutral badge-soft font-bold"
-              >Coming soon</span
+            @if (user.isTotpEnabled) {
+            <span class="badge badge-success badge-soft font-bold"
+              >Enabled</span
             >
+            } @else {
+            <span class="badge badge-neutral badge-soft font-bold">Off</span>
+            }
           </div>
 
           <p class="mt-4 text-sm leading-6 text-base-content/60">
-            Two-factor authentication is planned, but setup is not implemented
-            in this iteration. No secret, QR code, recovery code, or TOTP API is
-            created from this placeholder.
+            Add a second step to login with a time-based 6-digit code from an
+            authenticator app. StudyHub only sets login cookies after this code
+            is verified.
           </p>
 
+          @if (totpErrorMessage(); as message) {
+          <div class="alert alert-error mt-5" role="alert">
+            <app-icon name="alert-triangle" class="size-5 shrink-0" />
+            <span class="min-w-0 flex-1">{{ message }}</span>
+          </div>
+          } @if (totpSuccessMessage(); as message) {
+          <div class="alert alert-success mt-5" role="status">
+            <app-icon name="check" class="size-5 shrink-0" />
+            <span class="min-w-0 flex-1">{{ message }}</span>
+          </div>
+          }
+
           <div
-            class="mt-5 rounded-3xl border border-dashed border-base-300 bg-base-200/60 p-4"
+            class="mt-5 rounded-3xl border border-base-300 bg-base-200/60 p-4"
           >
             <div class="flex items-center justify-between gap-4">
               <div>
                 <p class="text-sm font-black">Status</p>
                 <p class="mt-1 text-xs font-semibold text-base-content/50">
-                  Not configured
+                  @if (user.isTotpEnabled) { Enabled @if (user.totpEnabledAt) {
+                  since {{ user.totpEnabledAt | date: 'mediumDate' }} } } @else
+                  { Not configured }
                 </p>
               </div>
               <input
-                class="toggle toggle-primary"
+                class="toggle toggle-success"
                 type="checkbox"
                 disabled
-                aria-label="TOTP is not available yet"
+                [checked]="user.isTotpEnabled"
+                aria-label="TOTP status"
               />
             </div>
 
-            <div class="mt-5 grid gap-2">
-              <button
-                class="btn btn-disabled btn-sm justify-start"
-                type="button"
-                disabled
+            @if (!user.isTotpEnabled) { @if (totpSetup(); as setup) {
+            <div class="mt-5 space-y-4 border-t border-base-300 pt-5">
+              <div
+                class="rounded-3xl border border-primary/15 bg-base-100 p-4 text-center shadow-inner shadow-base-300/30"
               >
-                Set up authenticator
-              </button>
-              <button
-                class="btn btn-disabled btn-sm justify-start"
-                type="button"
-                disabled
+                @if (setup.qrCodeDataUrl) {
+                <img
+                  class="mx-auto size-48 rounded-2xl border border-base-300 bg-white p-3 shadow-sm"
+                  [src]="setup.qrCodeDataUrl"
+                  alt="Authenticator setup QR code"
+                />
+                } @else if (isGeneratingTotpQr()) {
+                <span
+                  class="loading loading-spinner loading-lg text-primary"
+                  aria-hidden="true"
+                ></span>
+                <p class="mt-3 text-xs font-semibold text-base-content/50">
+                  Generating QR code...
+                </p>
+                } @else {
+                <p class="text-sm font-semibold text-base-content/60">
+                  QR generation failed. Enter the setup key manually instead.
+                </p>
+                }
+              </div>
+
+              <div>
+                <p
+                  class="text-xs font-black uppercase tracking-[0.18em] text-base-content/45"
+                >
+                  Manual setup key
+                </p>
+                <input
+                  class="input input-bordered mt-2 w-full rounded-2xl bg-base-100/80 font-mono text-xs text-base-content"
+                  [value]="setup.manualEntryKey"
+                  readonly
+                />
+                <p class="mt-2 text-xs leading-5 text-base-content/50">
+                  Setup expires around {{ setup.expiresAt | date: 'shortTime'
+                  }}. If it expires, start again and scan the new QR code.
+                </p>
+                <a
+                  class="link link-primary mt-2 inline-block text-xs font-bold"
+                  [href]="setup.otpAuthUri"
+                >
+                  Open authenticator URI
+                </a>
+              </div>
+
+              <form
+                class="space-y-3"
+                [formGroup]="enableTotpForm"
+                (ngSubmit)="enableTotp()"
+                novalidate
               >
-                Generate recovery codes
-              </button>
+                <label class="form-control">
+                  <span class="label pb-2 text-sm font-black">
+                    Confirm current code
+                  </span>
+                  <input
+                    class="input input-bordered input-lg w-full rounded-2xl bg-base-100 text-center text-2xl font-black tracking-[0.5em]"
+                    [class.input-error]="isEnableTotpCodeInvalid()"
+                    formControlName="code"
+                    autocomplete="one-time-code"
+                    inputmode="numeric"
+                    maxlength="6"
+                    pattern="[0-9]*"
+                    placeholder="000000"
+                    type="text"
+                  />
+                  @if (totpCodeError(isEnableTotpCodeInvalid()); as error) {
+                  <span class="label pt-2 text-sm text-error">{{ error }}</span>
+                  } @else {
+                  <span class="label pt-2 text-xs text-base-content/55">
+                    Enter exactly 6 digits from your authenticator app.
+                  </span>
+                  }
+                </label>
+
+                <div class="grid gap-2 sm:grid-cols-2">
+                  <button
+                    class="btn btn-primary text-primary-content"
+                    type="submit"
+                    [disabled]="enableTotpForm.invalid || isEnablingTotp()"
+                  >
+                    @if (isEnablingTotp()) {
+                    <span
+                      class="loading loading-spinner loading-sm"
+                      aria-hidden="true"
+                    ></span>
+                    Enabling } @else { Enable 2FA }
+                  </button>
+                  <button
+                    class="btn btn-ghost"
+                    type="button"
+                    (click)="cancelTotpSetup()"
+                    [disabled]="isEnablingTotp()"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
             </div>
+            } @else {
+            <button
+              class="btn btn-primary mt-5 w-full text-primary-content"
+              type="button"
+              (click)="startTotpSetup()"
+              [disabled]="isStartingTotpSetup()"
+            >
+              @if (isStartingTotpSetup()) {
+              <span
+                class="loading loading-spinner loading-sm"
+                aria-hidden="true"
+              ></span>
+              Starting setup } @else { Set up authenticator }
+            </button>
+            } } @else {
+            <form
+              class="mt-5 space-y-3 border-t border-base-300 pt-5"
+              [formGroup]="disableTotpForm"
+              (ngSubmit)="disableTotp()"
+              novalidate
+            >
+              <p class="text-sm leading-6 text-base-content/60">
+                To disable 2FA, enter your password and the current code from
+                your authenticator app. Other refresh sessions are revoked.
+              </p>
+
+              <label class="form-control">
+                <span class="label pb-2 text-sm font-black">Password</span>
+                <input
+                  class="input input-bordered w-full rounded-2xl bg-base-100"
+                  [class.input-error]="isDisableTotpPasswordInvalid()"
+                  formControlName="password"
+                  autocomplete="current-password"
+                  maxlength="256"
+                  placeholder="Your current password"
+                  type="password"
+                />
+                @if (disableTotpPasswordError(); as error) {
+                <span class="label pt-2 text-sm text-error">{{ error }}</span>
+                }
+              </label>
+
+              <label class="form-control">
+                <span class="label pb-2 text-sm font-black">
+                  Authenticator code
+                </span>
+                <input
+                  class="input input-bordered input-lg w-full rounded-2xl bg-base-100 text-center text-2xl font-black tracking-[0.5em]"
+                  [class.input-error]="isDisableTotpCodeInvalid()"
+                  formControlName="code"
+                  autocomplete="one-time-code"
+                  inputmode="numeric"
+                  maxlength="6"
+                  pattern="[0-9]*"
+                  placeholder="000000"
+                  type="text"
+                />
+                @if (totpCodeError(isDisableTotpCodeInvalid()); as error) {
+                <span class="label pt-2 text-sm text-error">{{ error }}</span>
+                } @else {
+                <span class="label pt-2 text-xs text-base-content/55">
+                  Enter exactly 6 digits from your authenticator app.
+                </span>
+                }
+              </label>
+
+              <button
+                class="btn btn-error w-full text-error-content"
+                type="submit"
+                [disabled]="disableTotpForm.invalid || isDisablingTotp()"
+              >
+                @if (isDisablingTotp()) {
+                <span
+                  class="loading loading-spinner loading-sm"
+                  aria-hidden="true"
+                ></span>
+                Disabling } @else { Disable 2FA }
+              </button>
+            </form>
+            }
           </div>
         </section>
       </aside>

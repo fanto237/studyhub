@@ -22,9 +22,11 @@ import {
 import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
+import { AuthApi } from '../../core/services/auth-api';
 import { AuthSessionStore } from '../../core/services/auth-session-store';
 import { UsersApi } from '../../core/services/users-api';
 import { resolveApiErrorMessage } from '../../core/types/api-error.util';
+import { type TotpSetupResponse } from '../../core/types/auth.models';
 import {
   type CurrentUserResponse,
   type UpdateCurrentUserRequest,
@@ -43,6 +45,19 @@ type ProfileEditFormControls = {
 
 type ProfileEditControlName = keyof ProfileEditFormControls;
 
+type EnableTotpFormControls = {
+  code: FormControl<string>;
+};
+
+type DisableTotpFormControls = {
+  password: FormControl<string>;
+  code: FormControl<string>;
+};
+
+type TotpSetupView = TotpSetupResponse & {
+  qrCodeDataUrl: string | null;
+};
+
 type InitialsSource = Pick<CurrentUserResponse, 'fullName' | 'username'>;
 
 @Component({
@@ -59,6 +74,7 @@ type InitialsSource = Pick<CurrentUserResponse, 'fullName' | 'username'>;
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileEdit implements OnInit {
+  private readonly authApi = inject(AuthApi);
   private readonly authSession = inject(AuthSessionStore);
   private readonly usersApi = inject(UsersApi);
   private readonly router = inject(Router);
@@ -88,6 +104,29 @@ export class ProfileEdit implements OnInit {
     ],
   });
 
+  readonly enableTotpForm: FormGroup<EnableTotpFormControls> = this.fb.group({
+    code: [
+      '',
+      [
+        Validators.required,
+        Validators.pattern(/^\d{6}$/),
+        Validators.maxLength(6),
+      ],
+    ],
+  });
+
+  readonly disableTotpForm: FormGroup<DisableTotpFormControls> = this.fb.group({
+    password: ['', [Validators.required, Validators.maxLength(256)]],
+    code: [
+      '',
+      [
+        Validators.required,
+        Validators.pattern(/^\d{6}$/),
+        Validators.maxLength(6),
+      ],
+    ],
+  });
+
   private readonly savedProfileValue = signal<UpdateCurrentUserRequest | null>(
     null,
   );
@@ -98,9 +137,16 @@ export class ProfileEdit implements OnInit {
 
   readonly isLoadingUser = signal(true);
   readonly isSaving = signal(false);
+  readonly isStartingTotpSetup = signal(false);
+  readonly isGeneratingTotpQr = signal(false);
+  readonly isEnablingTotp = signal(false);
+  readonly isDisablingTotp = signal(false);
   readonly loadErrorMessage = signal<string | null>(null);
   readonly saveErrorMessage = signal<string | null>(null);
   readonly successMessage = signal<string | null>(null);
+  readonly totpSetup = signal<TotpSetupView | null>(null);
+  readonly totpErrorMessage = signal<string | null>(null);
+  readonly totpSuccessMessage = signal<string | null>(null);
 
   readonly hasChanges = computed(() => {
     const savedProfileValue = this.savedProfileValue();
@@ -189,6 +235,183 @@ export class ProfileEdit implements OnInit {
       });
   }
 
+  startTotpSetup(): void {
+    this.totpErrorMessage.set(null);
+    this.totpSuccessMessage.set(null);
+    this.isStartingTotpSetup.set(true);
+
+    this.authApi
+      .startTotpSetup()
+      .pipe(
+        finalize(() => {
+          this.isStartingTotpSetup.set(false);
+        }),
+      )
+      .subscribe({
+        next: (setup) => {
+          const setupView: TotpSetupView = {
+            ...setup,
+            qrCodeDataUrl: null,
+          };
+
+          this.totpSetup.set(setupView);
+          this.enableTotpForm.reset({ code: '' });
+          this.totpSuccessMessage.set(setup.message);
+          void this.generateTotpQrCode(setupView);
+        },
+        error: (error: unknown) => {
+          if (this.redirectToLoginIfUnauthorized(error)) {
+            return;
+          }
+
+          this.totpErrorMessage.set(
+            resolveApiErrorMessage(error, {
+              fallbackMessage:
+                'Authenticator setup could not be started. Please try again.',
+              statusMessages: {
+                409: 'Two-factor authentication is already enabled.',
+              },
+            }),
+          );
+        },
+      });
+  }
+
+  enableTotp(): void {
+    this.totpErrorMessage.set(null);
+    this.totpSuccessMessage.set(null);
+
+    if (this.enableTotpForm.invalid) {
+      this.enableTotpForm.markAllAsTouched();
+      return;
+    }
+
+    this.isEnablingTotp.set(true);
+
+    this.authApi
+      .enableTotp({ code: this.enableTotpForm.controls.code.value.trim() })
+      .pipe(
+        finalize(() => {
+          this.isEnablingTotp.set(false);
+        }),
+      )
+      .subscribe({
+        next: (status) => {
+          this.applyTotpStatus(status.isTotpEnabled, status.totpEnabledAt);
+          this.totpSetup.set(null);
+          this.enableTotpForm.reset({ code: '' });
+          this.disableTotpForm.reset({ password: '', code: '' });
+          this.totpSuccessMessage.set(status.message);
+        },
+        error: (error: unknown) => {
+          if (this.redirectToLoginIfUnauthorized(error)) {
+            return;
+          }
+
+          this.totpErrorMessage.set(
+            resolveApiErrorMessage(error, {
+              fallbackMessage:
+                'The authenticator code could not be verified. Please try again.',
+              statusMessages: {
+                400: 'Enter the current 6-digit authenticator code.',
+                409: 'That authenticator code was already used or setup is not ready.',
+                410: 'The setup expired. Start again and scan the new QR code.',
+              },
+            }),
+          );
+        },
+      });
+  }
+
+  disableTotp(): void {
+    this.totpErrorMessage.set(null);
+    this.totpSuccessMessage.set(null);
+
+    if (this.disableTotpForm.invalid) {
+      this.disableTotpForm.markAllAsTouched();
+      return;
+    }
+
+    this.isDisablingTotp.set(true);
+
+    this.authApi
+      .disableTotp({
+        password: this.disableTotpForm.controls.password.value,
+        code: this.disableTotpForm.controls.code.value.trim(),
+      })
+      .pipe(
+        finalize(() => {
+          this.isDisablingTotp.set(false);
+        }),
+      )
+      .subscribe({
+        next: (status) => {
+          this.applyTotpStatus(status.isTotpEnabled, status.totpEnabledAt);
+          this.disableTotpForm.reset({ password: '', code: '' });
+          this.totpSuccessMessage.set(status.message);
+        },
+        error: (error: unknown) => {
+          if (this.redirectToLoginIfUnauthorized(error)) {
+            return;
+          }
+
+          this.totpErrorMessage.set(
+            resolveApiErrorMessage(error, {
+              fallbackMessage:
+                'Two-factor authentication could not be disabled. Please try again.',
+              statusMessages: {
+                400: 'Check your password and the current authenticator code.',
+                409: 'That authenticator code was already used or 2FA is already disabled.',
+              },
+            }),
+          );
+        },
+      });
+  }
+
+  cancelTotpSetup(): void {
+    this.totpSetup.set(null);
+    this.totpErrorMessage.set(null);
+    this.totpSuccessMessage.set(null);
+    this.enableTotpForm.reset({ code: '' });
+  }
+
+  isEnableTotpCodeInvalid(): boolean {
+    const control = this.enableTotpForm.controls.code;
+
+    return control.invalid && (control.dirty || control.touched);
+  }
+
+  isDisableTotpCodeInvalid(): boolean {
+    const control = this.disableTotpForm.controls.code;
+
+    return control.invalid && (control.dirty || control.touched);
+  }
+
+  isDisableTotpPasswordInvalid(): boolean {
+    const control = this.disableTotpForm.controls.password;
+
+    return control.invalid && (control.dirty || control.touched);
+  }
+
+  totpCodeError(isInvalid: boolean): string | null {
+    return isInvalid ? 'Enter exactly 6 digits.' : null;
+  }
+
+  disableTotpPasswordError(): string | null {
+    const control = this.disableTotpForm.controls.password;
+
+    if (!this.isDisableTotpPasswordInvalid()) {
+      return null;
+    }
+
+    if (control.hasError('required')) {
+      return 'Enter your current password.';
+    }
+
+    return 'Password cannot exceed 256 characters.';
+  }
+
   isInvalid(controlName: ProfileEditControlName): boolean {
     const control = this.profileForm.controls[controlName];
 
@@ -264,6 +487,9 @@ export class ProfileEdit implements OnInit {
     this.loadErrorMessage.set(null);
     this.saveErrorMessage.set(null);
     this.successMessage.set(null);
+    this.totpErrorMessage.set(null);
+    this.totpSuccessMessage.set(null);
+    this.totpSetup.set(null);
     this.isLoadingUser.set(true);
 
     this.usersApi
@@ -292,6 +518,52 @@ export class ProfileEdit implements OnInit {
           );
         },
       });
+  }
+
+  private async generateTotpQrCode(setup: TotpSetupView): Promise<void> {
+    this.isGeneratingTotpQr.set(true);
+
+    try {
+      const qrcode = await import('qrcode');
+      const qrCodeDataUrl = await qrcode.toDataURL(setup.otpAuthUri, {
+        errorCorrectionLevel: 'M',
+        margin: 1,
+        scale: 6,
+      });
+
+      this.totpSetup.update((currentSetup) =>
+        currentSetup?.otpAuthUri === setup.otpAuthUri
+          ? { ...currentSetup, qrCodeDataUrl }
+          : currentSetup,
+      );
+    } catch {
+      this.totpSetup.update((currentSetup) =>
+        currentSetup?.otpAuthUri === setup.otpAuthUri
+          ? { ...currentSetup, qrCodeDataUrl: null }
+          : currentSetup,
+      );
+    } finally {
+      this.isGeneratingTotpQr.set(false);
+    }
+  }
+
+  private applyTotpStatus(
+    isTotpEnabled: boolean,
+    totpEnabledAt: string | null,
+  ): void {
+    const user = this.currentUser();
+    if (!user) {
+      return;
+    }
+
+    const updatedUser: CurrentUserResponse = {
+      ...user,
+      isTotpEnabled,
+      totpEnabledAt,
+    };
+
+    this.currentUser.set(updatedUser);
+    this.authSession.updateCurrentUser(updatedUser);
   }
 
   private resetFormFromUser(user: CurrentUserResponse): void {
