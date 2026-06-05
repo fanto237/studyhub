@@ -153,6 +153,89 @@
             </div>
           </div>
         </div>
+        } @else { @if (twoFactorChallenge(); as challenge) {
+        <div
+          class="card border border-primary/20 bg-base-100/95 shadow-2xl shadow-primary/10 backdrop-blur"
+        >
+          <div class="card-body gap-5 p-6 sm:p-8">
+            <div class="text-center">
+              <span
+                class="mx-auto flex size-16 items-center justify-center rounded-3xl bg-primary/10 text-primary"
+              >
+                <app-icon name="shield-check" class="size-8" />
+              </span>
+              <p class="badge badge-primary badge-soft mt-4 font-semibold">
+                Two-factor authentication
+              </p>
+              <h1 class="mt-3 text-3xl font-black tracking-tight">
+                Enter your authenticator code
+              </h1>
+              <p class="mt-3 text-sm leading-6 text-base-content/65">
+                {{ challenge.message }} This challenge was created for
+                <span class="font-bold">@{{ challenge.username }}</span> and
+                expires in a few minutes.
+              </p>
+            </div>
+
+            @if (totpErrorMessage(); as message) {
+            <div class="alert alert-error" role="alert">
+              <app-icon name="alert-triangle" class="size-5 shrink-0" />
+              <span>{{ message }}</span>
+            </div>
+            }
+
+            <form
+              class="space-y-5"
+              [formGroup]="totpForm"
+              (ngSubmit)="onSubmitTotp()"
+              novalidate
+            >
+              <label class="form-control">
+                <span class="label pb-2 font-semibold">6-digit code</span>
+                <input
+                  class="input input-bordered input-lg w-full rounded-2xl bg-base-100 text-center text-2xl font-black tracking-[0.5em]"
+                  [class.input-error]="isTotpInvalid()"
+                  formControlName="code"
+                  autocomplete="one-time-code"
+                  inputmode="numeric"
+                  maxlength="6"
+                  pattern="[0-9]*"
+                  placeholder="000000"
+                  type="text"
+                />
+                @if (totpFieldError(); as error) {
+                <span class="label pt-2 text-sm text-error">{{ error }}</span>
+                } @else {
+                <span class="label pt-2 text-xs text-base-content/55">
+                  Use the 6-digit code from your authenticator app before it
+                  refreshes.
+                </span>
+                }
+              </label>
+
+              <button
+                class="btn btn-primary btn-lg w-full text-primary-content"
+                [disabled]="totpForm.invalid || isSubmittingTotp()"
+                type="submit"
+              >
+                @if (isSubmittingTotp()) {
+                <span
+                  class="loading loading-spinner loading-sm"
+                  aria-hidden="true"
+                ></span>
+                Verifying... } @else { Verify and log in }
+              </button>
+            </form>
+
+            <button
+              class="btn btn-ghost btn-sm"
+              type="button"
+              (click)="useDifferentAccount()"
+            >
+              Use a different account
+            </button>
+          </div>
+        </div>
         } @else { @if (unverifiedAccount(); as account) {
         <app-login-verification
           [account]="account"
@@ -258,7 +341,7 @@
             </p>
           </div>
         </form>
-        } } }
+        } } } }
       </section>
     </main>
   </div>

@@ -19,7 +19,10 @@ import { AuthSessionStore } from '../../../core/services/auth-session-store';
 import { type ApiEnvelope } from '../../../core/types/api-envelope.model';
 import { resolveApiErrorMessage } from '../../../core/types/api-error.util';
 import {
+  isTwoFactorRequiredLoginResponse,
+  LoginResponse,
   type LoginRequest,
+  type TwoFactorRequiredLoginResponse,
   type UnverifiedAccountLoginResponse,
 } from '../../../core/types/auth.models';
 import {
@@ -37,6 +40,10 @@ type LoginFormControls = {
 };
 
 type LoginControlName = keyof LoginFormControls;
+
+type TotpFormControls = {
+  code: FormControl<string>;
+};
 
 @Component({
   selector: 'app-login',
@@ -63,8 +70,14 @@ export class Login implements OnInit {
   readonly isAuthenticated = this.authSession.isAuthenticated;
   readonly sessionUser = this.authSession.displayUser;
   readonly unverifiedAccount = signal<UnverifiedAccount | null>(null);
+
+  readonly twoFactorChallenge = signal<TwoFactorRequiredLoginResponse | null>(
+    null,
+  );
   readonly isPasswordResetMode = signal(false);
   readonly passwordResetInitialPrivateEmail = signal<string | null>(null);
+  readonly isSubmittingTotp = signal(false);
+  readonly totpErrorMessage = signal<string | null>(null);
 
   readonly loginForm: FormGroup<LoginFormControls> = this.fb.nonNullable.group({
     usernameOrPrivateEmail: [
@@ -72,6 +85,17 @@ export class Login implements OnInit {
       [Validators.required, Validators.maxLength(320)],
     ],
     password: ['', [Validators.required, Validators.maxLength(256)]],
+  });
+
+  readonly totpForm: FormGroup<TotpFormControls> = this.fb.nonNullable.group({
+    code: [
+      '',
+      [
+        Validators.required,
+        Validators.pattern(/^\d{6}$/),
+        Validators.maxLength(6),
+      ],
+    ],
   });
 
   constructor() {
@@ -134,6 +158,7 @@ export class Login implements OnInit {
   onSubmit(): void {
     this.errorMessage.set(null);
     this.clearVerificationState();
+    this.clearTwoFactorState();
 
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
@@ -149,7 +174,12 @@ export class Login implements OnInit {
     this.isSubmitting.set(true);
 
     this.authSession.login(request).subscribe({
-      next: () => {
+      next: (response: LoginResponse) => {
+        if (isTwoFactorRequiredLoginResponse(response)) {
+          this.showTwoFactorPanel(response);
+          return;
+        }
+
         this.loginForm.reset();
         void this.navigateAfterAuthentication();
       },
@@ -170,9 +200,77 @@ export class Login implements OnInit {
     });
   }
 
+  onSubmitTotp(): void {
+    this.totpErrorMessage.set(null);
+
+    const challenge = this.twoFactorChallenge();
+    if (!challenge) {
+      this.clearTwoFactorState();
+      return;
+    }
+
+    if (this.totpForm.invalid) {
+      this.totpForm.markAllAsTouched();
+      return;
+    }
+
+    this.isSubmittingTotp.set(true);
+
+    this.authSession
+      .completeTotpLogin({
+        challengeId: challenge.challengeId,
+        code: this.totpForm.controls.code.value.trim(),
+      })
+      .subscribe({
+        next: () => {
+          this.loginForm.reset();
+          this.clearTwoFactorState();
+          void this.navigateAfterAuthentication();
+        },
+        error: (error: unknown) => {
+          this.totpErrorMessage.set(
+            this.resolveErrorMessage(
+              error,
+              'The authenticator code could not be verified. Please try again.',
+              {
+                401: 'The authenticator code is invalid or the challenge expired. Log in again if needed.',
+                409: 'That authenticator code was already used. Wait for a new code and try again.',
+                429: 'Too many invalid codes were entered. Log in again to start a new challenge.',
+              },
+            ),
+          );
+          this.isSubmittingTotp.set(false);
+        },
+        complete: () => {
+          this.isSubmittingTotp.set(false);
+        },
+      });
+  }
+
+  isTotpInvalid(): boolean {
+    const control = this.totpForm.controls.code;
+
+    return control.invalid && (control.dirty || control.touched);
+  }
+
+  totpFieldError(): string | null {
+    const control = this.totpForm.controls.code;
+
+    if (!this.isTotpInvalid()) {
+      return null;
+    }
+
+    if (control.hasError('required')) {
+      return 'Enter the 6-digit authenticator code.';
+    }
+
+    return 'Enter exactly 6 digits.';
+  }
+
   showPasswordReset(): void {
     this.errorMessage.set(null);
     this.clearVerificationState();
+    this.clearTwoFactorState();
     this.isPasswordResetMode.set(true);
 
     const loginIdentifier =
@@ -191,12 +289,14 @@ export class Login implements OnInit {
 
     this.loginForm.controls.password.reset('');
     this.clearVerificationState();
+    this.clearTwoFactorState();
   }
 
   useDifferentAccount(): void {
     this.loginForm.reset();
     this.clearVerificationState();
     this.clearPasswordResetState();
+    this.clearTwoFactorState();
   }
 
   returnToLoginFromPasswordReset(payload: LoginBackToLoginPayload = {}): void {
@@ -208,6 +308,7 @@ export class Login implements OnInit {
 
     this.loginForm.controls.password.reset('');
     this.clearPasswordResetState();
+    this.clearTwoFactorState();
   }
 
   private navigateAfterAuthentication(): Promise<boolean> {
@@ -238,6 +339,7 @@ export class Login implements OnInit {
 
   private showVerificationPanel(account: UnverifiedAccount): void {
     this.clearPasswordResetState();
+    this.clearTwoFactorState();
     this.unverifiedAccount.set(account);
     this.loginForm.controls.usernameOrPrivateEmail.setValue(
       account.username ?? this.loginForm.controls.usernameOrPrivateEmail.value,
@@ -245,8 +347,23 @@ export class Login implements OnInit {
     this.loginForm.controls.password.reset('');
   }
 
+  private showTwoFactorPanel(challenge: TwoFactorRequiredLoginResponse): void {
+    this.clearPasswordResetState();
+    this.clearVerificationState();
+    this.errorMessage.set(null);
+    this.twoFactorChallenge.set(challenge);
+    this.totpForm.reset({ code: '' });
+    this.loginForm.controls.password.reset('');
+  }
+
   private clearVerificationState(): void {
     this.unverifiedAccount.set(null);
+  }
+
+  private clearTwoFactorState(): void {
+    this.twoFactorChallenge.set(null);
+    this.totpErrorMessage.set(null);
+    this.totpForm.reset({ code: '' });
   }
 
   private clearPasswordResetState(): void {
