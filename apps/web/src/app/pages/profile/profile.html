@@ -117,6 +117,14 @@
             } @else {
             <span class="badge badge-warning badge-soft font-bold">Pending verification</span>
             }
+            @if (user.isTotpEnabled) {
+            <span class="badge badge-success badge-soft font-bold">
+              <app-icon name="shield-check" class="size-3.5" />
+              2FA on
+            </span>
+            } @else {
+            <span class="badge badge-neutral badge-soft font-bold">2FA off</span>
+            }
           </div>
 
           <div class="mt-5 flex justify-center">
