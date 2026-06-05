@@ -20,8 +20,11 @@ import {
 
 import {
   type AuthSessionResponse,
+  type CompleteTotpLoginRequest,
   type LoginRequest,
+  type LoginResponse,
   type LogoutResponse,
+  isTwoFactorRequiredLoginResponse,
 } from '../types/auth.models';
 import { type CurrentUserResponse } from '../types/users.models';
 import { AuthApi } from './auth-api';
@@ -124,12 +127,26 @@ export class AuthSessionStore {
     return this.sessionCheckRequest$;
   }
 
-  login(request: LoginRequest) {
+  login(request: LoginRequest): Observable<LoginResponse> {
     return this.authApi.login(request).pipe(
+      tap((response) => {
+        if (isTwoFactorRequiredLoginResponse(response)) {
+          this.authenticatedSessionSignal.set(null);
+          this.currentUserSignal.set(null);
+          return;
+        }
+
+        this.setAuthenticatedSession(response);
+      }),
+    );
+  }
+
+  completeTotpLogin(
+    request: CompleteTotpLoginRequest,
+  ): Observable<AuthSessionResponse> {
+    return this.authApi.completeTotpLogin(request).pipe(
       tap((session) => {
-        this.authenticatedSessionSignal.set(session);
-        this.currentUserSignal.set(null);
-        this.hasCheckedSessionSignal.set(true);
+        this.setAuthenticatedSession(session);
       }),
     );
   }
@@ -169,6 +186,12 @@ export class AuthSessionStore {
 
   clearLocalSession(): void {
     this.authenticatedSessionSignal.set(null);
+    this.currentUserSignal.set(null);
+    this.hasCheckedSessionSignal.set(true);
+  }
+
+  private setAuthenticatedSession(session: AuthSessionResponse): void {
+    this.authenticatedSessionSignal.set(session);
     this.currentUserSignal.set(null);
     this.hasCheckedSessionSignal.set(true);
   }

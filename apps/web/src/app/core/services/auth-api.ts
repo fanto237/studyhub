@@ -5,7 +5,11 @@ import { map } from 'rxjs';
 import { type ApiEnvelope } from '../types/api-envelope.model';
 import {
   type AuthSessionResponse,
+  type CompleteTotpLoginRequest,
+  type DisableTotpRequest,
+  type EnableTotpRequest,
   type LoginRequest,
+  type LoginResponse,
   type LogoutResponse,
   type RegisterAccountResponse,
   type RegisterRequest,
@@ -14,6 +18,8 @@ import {
   type ResetPasswordRequest,
   type ResetPasswordResponse,
   type SendAuthCodeRequest,
+  type TotpSetupResponse,
+  type TotpStatusResponse,
   type VerifyAccountRequest,
   type VerifyAccountResponse,
 } from '../types/auth.models';
@@ -40,7 +46,7 @@ export class AuthApi {
 
   login(request: LoginRequest) {
     const responseObservable = this.http
-      .post<ApiEnvelope<AuthSessionResponse>>('/api/auth/login', request, {
+      .post<ApiEnvelope<LoginResponse>>('/api/auth/login', request, {
         withCredentials: true,
       })
       .pipe(
@@ -54,6 +60,80 @@ export class AuthApi {
       );
 
     return responseObservable;
+  }
+
+  completeTotpLogin(request: CompleteTotpLoginRequest) {
+    return this.http
+      .post<ApiEnvelope<AuthSessionResponse>>('/api/auth/login/totp', request, {
+        withCredentials: true,
+      })
+      .pipe(
+        map((response) => {
+          if (response.status === 'success' && response.data) {
+            return response.data;
+          }
+
+          throw new Error(
+            response.message ?? 'Two-factor login was not completed.',
+          );
+        }),
+      );
+  }
+
+  startTotpSetup() {
+    return this.http
+      .post<
+        ApiEnvelope<TotpSetupResponse>
+      >('/api/auth/totp/setup', {}, { withCredentials: true })
+      .pipe(
+        map((response) => {
+          if (response.status === 'success' && response.data) {
+            return response.data;
+          }
+
+          throw new Error(
+            response.message ?? 'Authenticator setup could not be started.',
+          );
+        }),
+      );
+  }
+
+  enableTotp(request: EnableTotpRequest) {
+    return this.http
+      .post<
+        ApiEnvelope<TotpStatusResponse>
+      >('/api/auth/totp/enable', request, { withCredentials: true })
+      .pipe(
+        map((response) => {
+          if (response.status === 'success' && response.data) {
+            return response.data;
+          }
+
+          throw new Error(
+            response.message ??
+              'Two-factor authentication could not be enabled.',
+          );
+        }),
+      );
+  }
+
+  disableTotp(request: DisableTotpRequest) {
+    return this.http
+      .post<
+        ApiEnvelope<TotpStatusResponse>
+      >('/api/auth/totp/disable', request, { withCredentials: true })
+      .pipe(
+        map((response) => {
+          if (response.status === 'success' && response.data) {
+            return response.data;
+          }
+
+          throw new Error(
+            response.message ??
+              'Two-factor authentication could not be disabled.',
+          );
+        }),
+      );
   }
 
   refreshSession() {
