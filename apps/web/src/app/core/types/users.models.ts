@@ -21,6 +21,8 @@ export interface CurrentUserResponse {
   role: number | string;
   isVerified: boolean;
   lastVerifiedAt: string | null;
+  isTotpEnabled: boolean;
+  totpEnabledAt: string | null;
   karmaScore: number;
   createdAt: string;
   latestPosts: CurrentUserLatestPost[];

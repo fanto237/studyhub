@@ -63,6 +63,51 @@ export interface AuthSessionResponse {
   message: string;
 }
 
+export interface TwoFactorRequiredLoginResponse {
+  requiresTwoFactor: true;
+  challengeId: string;
+  expiresAt: string;
+  username: string;
+  message: string;
+}
+
+export type LoginResponse =
+  | AuthSessionResponse
+  | TwoFactorRequiredLoginResponse;
+
+export interface CompleteTotpLoginRequest {
+  challengeId: string;
+  code: string;
+}
+
+export interface TotpSetupResponse {
+  manualEntryKey: string;
+  otpAuthUri: string;
+  expiresAt: string;
+  message: string;
+}
+
+export interface EnableTotpRequest {
+  code: string;
+}
+
+export interface DisableTotpRequest {
+  password: string;
+  code: string;
+}
+
+export interface TotpStatusResponse {
+  isTotpEnabled: boolean;
+  totpEnabledAt: string | null;
+  message: string;
+}
+
+export function isTwoFactorRequiredLoginResponse(
+  response: LoginResponse,
+): response is TwoFactorRequiredLoginResponse {
+  return 'requiresTwoFactor' in response && response.requiresTwoFactor === true;
+}
+
 export interface VerifyAccountResponse {
   userId: string;
   schoolEmail: string;
