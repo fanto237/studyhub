@@ -9,10 +9,13 @@ import { RouterLink } from '@angular/router';
 import { AuthSessionStore } from '../../core/services/auth-session-store';
 import { Icon } from '../../shared/components/icon/icon';
 import { SiteHeader } from '../../shared/components/site-header/site-header';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-landing',
-  imports: [Icon, RouterLink, SiteHeader],
+  imports: [
+    TranslatePipe,
+    Icon, RouterLink, SiteHeader],
   templateUrl: './landing.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
