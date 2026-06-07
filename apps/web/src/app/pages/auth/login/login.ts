@@ -17,6 +17,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { AuthSessionStore } from '../../../core/services/auth-session-store';
 import { type ApiEnvelope } from '../../../core/types/api-envelope.model';
+import { TranslationService } from '../../../core/services/translation';
 import { resolveApiErrorMessage } from '../../../core/types/api-error.util';
 import {
   isTwoFactorRequiredLoginResponse,
@@ -33,6 +34,7 @@ import { Icon } from '../../../shared/components/icon/icon';
 import { SiteHeader } from '../../../shared/components/site-header/site-header';
 import { LoginPasswordReset } from './views/login-password-reset/login-password-reset';
 import { LoginVerification } from './views/login-verification/login-verification';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 
 type LoginFormControls = {
   usernameOrPrivateEmail: FormControl<string>;
@@ -48,6 +50,7 @@ type TotpFormControls = {
 @Component({
   selector: 'app-login',
   imports: [
+    TranslatePipe,
     Icon,
     LoginPasswordReset,
     LoginVerification,
@@ -63,6 +66,7 @@ export class Login implements OnInit {
   private readonly authSession = inject(AuthSessionStore);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly i18n = inject(TranslationService);
 
   readonly isSubmitting = signal(false);
   readonly isCheckingExistingSession = signal(true);
@@ -141,18 +145,22 @@ export class Login implements OnInit {
     }
 
     if (control.hasError('required')) {
-      return controlName === 'password'
-        ? 'Enter your password.'
-        : 'Enter your username or private email.';
+      return this.i18n.translate(
+        controlName === 'password'
+          ? 'validation.enterPassword'
+          : 'validation.enterLoginIdentifier',
+      );
     }
 
     if (control.hasError('maxlength')) {
-      return controlName === 'password'
-        ? 'Password cannot exceed 256 characters.'
-        : 'Username or email cannot exceed 320 characters.';
+      return this.i18n.translate(
+        controlName === 'password'
+          ? 'validation.passwordMax'
+          : 'validation.loginIdentifierMax',
+      );
     }
 
-    return 'Please check this field.';
+    return this.i18n.translate('validation.checkField');
   }
 
   onSubmit(): void {
@@ -231,11 +239,11 @@ export class Login implements OnInit {
           this.totpErrorMessage.set(
             this.resolveErrorMessage(
               error,
-              'The authenticator code could not be verified. Please try again.',
+              'routes.login.errors.totpVerificationFailed',
               {
-                401: 'The authenticator code is invalid or the challenge expired. Log in again if needed.',
-                409: 'That authenticator code was already used. Wait for a new code and try again.',
-                429: 'Too many invalid codes were entered. Log in again to start a new challenge.',
+                401: 'routes.login.errors.totpInvalidOrExpired',
+                409: 'routes.login.errors.totpAlreadyUsed',
+                429: 'routes.login.errors.totpTooManyInvalid',
               },
             ),
           );
@@ -261,10 +269,10 @@ export class Login implements OnInit {
     }
 
     if (control.hasError('required')) {
-      return 'Enter the 6-digit authenticator code.';
+      return this.i18n.translate('validation.enterAuthenticatorCode');
     }
 
-    return 'Enter exactly 6 digits.';
+    return this.i18n.translate('validation.exactlySixDigits');
   }
 
   showPasswordReset(): void {
@@ -385,7 +393,9 @@ export class Login implements OnInit {
       return {
         schoolEmail: null,
         username: null,
-        message: payload || 'Verify your school email before logging in.',
+        message:
+          payload ||
+          this.i18n.translate('routes.login.errors.verifySchoolEmailBeforeLogin'),
       };
     }
 
@@ -396,7 +406,7 @@ export class Login implements OnInit {
       data?.message ??
       data?.Message ??
       payload?.message ??
-      'Verify your school email before logging in.';
+      this.i18n.translate('routes.login.errors.verifySchoolEmailBeforeLogin');
 
     return {
       schoolEmail,
@@ -407,15 +417,22 @@ export class Login implements OnInit {
 
   private resolveErrorMessage(
     error: unknown,
-    fallbackMessage = 'Something went wrong while logging in. Please try again.',
+    fallbackMessage = 'routes.login.errors.loginFailed',
     statusMessages: Partial<Record<number, string>> = {},
   ): string {
+    const translatedStatusMessages = Object.fromEntries(
+      Object.entries(statusMessages).map(([status, message]) => [
+        Number(status),
+        this.i18n.translate(message ?? ''),
+      ]),
+    );
+
     return resolveApiErrorMessage(error, {
-      fallbackMessage,
+      fallbackMessage: this.i18n.translate(fallbackMessage),
       statusMessages: {
-        403: 'Your account must be verified before you can log in.',
-        404: 'No account matches those credentials.',
-        ...statusMessages,
+        403: this.i18n.translate('common.auth.accountMustBeVerified'),
+        404: this.i18n.translate('common.auth.noAccountMatchesCredentials'),
+        ...translatedStatusMessages,
       },
     });
   }

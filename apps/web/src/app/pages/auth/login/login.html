@@ -9,13 +9,13 @@
   >
     <app-site-header>
       <a siteHeaderActions class="btn btn-ghost btn-sm sm:btn-md" routerLink="/"
-        >Back home</a
+        >{{ 'navigation.backHome' | translate }}</a
       >
       <a
         siteHeaderActions
         class="btn btn-primary btn-sm text-primary-content sm:btn-md"
         routerLink="/signup"
-        >Sign Up</a
+        >{{ 'navigation.signUpTitle' | translate }}</a
       >
     </app-site-header>
 
@@ -23,17 +23,16 @@
       <section class="hidden lg:block" aria-labelledby="login-benefits-heading">
         <div class="max-w-xl">
           <p class="badge badge-primary badge-soft px-4 py-3 font-semibold">
-            Welcome back
+            {{ 'routes.login.welcomeBack' | translate }}
           </p>
           <h1
             id="login-benefits-heading"
             class="mt-5 text-5xl font-black leading-tight tracking-tight xl:text-6xl"
           >
-            Pick up where your study session left off.
+            {{ 'routes.login.pickUpWhereYourStudySessionLeftOff' | translate }}
           </h1>
           <p class="mt-5 text-lg leading-8 text-base-content/70">
-            Log in to access past papers, course resources, and the StudyHub
-            community trusted by your classmates.
+            {{ 'routes.login.logInToAccessPastPapersCourseResourcesAndTheStudyhubCommunityTrustedByYourClassmates' | translate }}
           </p>
         </div>
 
@@ -57,13 +56,13 @@
                   <app-icon name="document" class="size-6" />
                 </span>
                 <div>
-                  <p class="text-lg font-black">Recent study pack</p>
+                  <p class="text-lg font-black">{{ 'routes.login.recentStudyPack' | translate }}</p>
                   <p class="text-sm font-medium text-base-content/55">
                     MATH 201 Final Exam Pack
                   </p>
                 </div>
               </div>
-              <span class="badge badge-accent badge-soft">Saved</span>
+              <span class="badge badge-accent badge-soft">{{ 'routes.login.saved' | translate }}</span>
             </div>
 
             <div class="mt-6 grid gap-3">
@@ -72,7 +71,7 @@
               >
                 <div class="flex items-center justify-between gap-3">
                   <span class="text-sm font-bold text-base-content/65"
-                    >Last viewed</span
+                    >{{ 'routes.login.lastViewed' | translate }}</span
                   >
                   <span class="text-sm font-black text-primary">82%</span>
                 </div>
@@ -89,22 +88,22 @@
                 <div class="rounded-2xl bg-primary/10 p-4 text-primary">
                   <p class="text-2xl font-black">842</p>
                   <p class="mt-1 text-xs font-bold uppercase tracking-wide">
-                    downloads
+                    {{ 'common.metrics.downloads' | translate }}
                   </p>
                 </div>
                 <div class="rounded-2xl bg-accent/15 p-4 text-accent-content">
                   <p class="text-2xl font-black">32</p>
                   <p class="mt-1 text-xs font-bold uppercase tracking-wide">
-                    comments
+                    {{ 'common.metrics.comments' | translate }}
                   </p>
                 </div>
               </div>
             </div>
 
             <div class="mt-6 flex flex-wrap gap-2">
-              <span class="badge badge-primary badge-soft">Past papers</span>
-              <span class="badge badge-secondary badge-soft">Solutions</span>
-              <span class="badge badge-accent badge-soft">Course tags</span>
+              <span class="badge badge-primary badge-soft">{{ 'routes.login.pastPapers' | translate }}</span>
+              <span class="badge badge-secondary badge-soft">{{ 'routes.login.solutions' | translate }}</span>
+              <span class="badge badge-accent badge-soft">{{ 'routes.login.courseTags' | translate }}</span>
             </div>
           </div>
         </div>
@@ -129,18 +128,20 @@
               }
             </span>
             <p class="badge badge-success badge-soft mt-3 font-semibold">
-              @if (isCheckingExistingSession()) { Checking session } @else {
-              Logged in }
+              @if (isCheckingExistingSession()) {
+              {{ 'routes.login.session.checkingBadge' | translate }} } @else {
+              {{ 'routes.login.session.loggedInBadge' | translate }} }
             </p>
             <h1 class="mt-2 text-3xl font-black tracking-tight sm:text-4xl">
-              @if (sessionUser(); as user) { Welcome back, {{ user.fullName }} }
-              @else { Checking your StudyHub session... }
+              @if (sessionUser(); as user) {
+              {{ 'routes.login.session.welcomeBackPrefix' | translate }} {{ user.fullName }} }
+              @else { {{ 'routes.login.session.checkingHeading' | translate }} }
             </h1>
             <p class="mt-2 max-w-sm text-base leading-7 text-base-content/70">
-              @if (sessionUser(); as user) { You are already signed in as {{
-              user.username }}. Taking you back to your dashboard. } @else {
-              Please wait while we verify whether your cookie-backed session is
-              still active. }
+              @if (sessionUser(); as user) {
+              {{ 'routes.login.session.alreadySignedInAs' | translate }} {{
+              user.username }}. {{ 'routes.login.session.redirectingDashboard' | translate }} } @else {
+              {{ 'routes.login.session.checkingBody' | translate }} }
             </p>
             <div class="mt-6 flex flex-wrap justify-center gap-3">
               <a
@@ -148,7 +149,7 @@
                 routerLink="/home"
                 [class.btn-disabled]="isCheckingExistingSession()"
                 [attr.aria-disabled]="isCheckingExistingSession()"
-                >Continue to Home</a
+                >{{ 'navigation.continueHome' | translate }}</a
               >
             </div>
           </div>
@@ -165,15 +166,14 @@
                 <app-icon name="shield-check" class="size-8" />
               </span>
               <p class="badge badge-primary badge-soft mt-4 font-semibold">
-                Two-factor authentication
+                {{ 'routes.login.twoFactorAuthentication' | translate }}
               </p>
               <h1 class="mt-3 text-3xl font-black tracking-tight">
-                Enter your authenticator code
+                {{ 'routes.login.enterYourAuthenticatorCode' | translate }}
               </h1>
               <p class="mt-3 text-sm leading-6 text-base-content/65">
-                {{ challenge.message }} This challenge was created for
-                <span class="font-bold">@{{ challenge.username }}</span> and
-                expires in a few minutes.
+                {{ challenge.message }} {{ 'routes.login.totp.challengeCreatedFor' | translate }}
+                <span class="font-bold">@{{ challenge.username }}</span> {{ 'common.grammar.andExpiresSoon' | translate }}
               </p>
             </div>
 
@@ -191,7 +191,7 @@
               novalidate
             >
               <label class="form-control">
-                <span class="label pb-2 font-semibold">6-digit code</span>
+                <span class="label pb-2 font-semibold">{{ 'common.forms.sixDigitCode' | translate }}</span>
                 <input
                   class="input input-bordered input-lg w-full rounded-2xl bg-base-100 text-center text-2xl font-black tracking-[0.5em]"
                   [class.input-error]="isTotpInvalid()"
@@ -207,8 +207,7 @@
                 <span class="label pt-2 text-sm text-error">{{ error }}</span>
                 } @else {
                 <span class="label pt-2 text-xs text-base-content/55">
-                  Use the 6-digit code from your authenticator app before it
-                  refreshes.
+                  {{ 'routes.login.useThe6DigitCodeFromYourAuthenticatorAppBeforeItRefreshes' | translate }}
                 </span>
                 }
               </label>
@@ -223,7 +222,7 @@
                   class="loading loading-spinner loading-sm"
                   aria-hidden="true"
                 ></span>
-                Verifying... } @else { Verify and log in }
+                {{ 'routes.login.totp.verifying' | translate }} } @else { {{ 'routes.login.totp.submit' | translate }} }
               </button>
             </form>
 
@@ -232,7 +231,7 @@
               type="button"
               (click)="useDifferentAccount()"
             >
-              Use a different account
+              {{ 'navigation.useDifferentAccount' | translate }}
             </button>
           </div>
         </div>
@@ -252,16 +251,16 @@
           <p
             class="badge badge-primary badge-soft px-4 py-3 font-semibold lg:hidden"
           >
-            Welcome back
+            {{ 'routes.login.welcomeBack' | translate }}
           </p>
           <h1
             id="login-heading"
             class="mt-4 text-4xl font-black tracking-tight sm:text-5xl lg:mt-0"
           >
-            Log in to your account
+            {{ 'routes.login.logInToYourAccount' | translate }}
           </h1>
           <p class="mt-3 text-base leading-7 text-base-content/70">
-            Enter your username or private email to continue to StudyHub.
+            {{ 'routes.login.enterYourUsernameOrPrivateEmailToContinueToStudyhub' | translate }}
           </p>
         </div>
 
@@ -280,13 +279,13 @@
             }
 
             <label class="form-control">
-              <span class="label pb-2 font-semibold">Username or email</span>
+              <span class="label pb-2 font-semibold">{{ 'common.forms.usernameOrEmail' | translate }}</span>
               <input
                 class="input input-bordered w-full bg-base-100"
                 [class.input-error]="isInvalid('usernameOrPrivateEmail')"
                 formControlName="usernameOrPrivateEmail"
                 autocomplete="username"
-                placeholder="Enter your username or private email"
+                [placeholder]="'routes.login.enterYourUsernameOrPrivateEmail' | translate"
                 type="text"
               />
               @if (fieldError('usernameOrPrivateEmail'); as error) {
@@ -295,13 +294,13 @@
             </label>
 
             <label class="form-control">
-              <span class="label pb-2 font-semibold">Password</span>
+              <span class="label pb-2 font-semibold">{{ 'common.forms.password' | translate }}</span>
               <input
                 class="input input-bordered w-full bg-base-100"
                 [class.input-error]="isInvalid('password')"
                 formControlName="password"
                 autocomplete="current-password"
-                placeholder="Enter your password"
+                [placeholder]="'routes.login.enterYourPassword' | translate"
                 type="password"
               />
               @if (fieldError('password'); as error) {
@@ -315,7 +314,7 @@
                 type="button"
                 (click)="showPasswordReset()"
               >
-                Forgot password?
+                {{ 'routes.login.forgotPassword' | translate }}
               </button>
             </div>
 
@@ -330,13 +329,13 @@
                 class="loading loading-spinner loading-sm"
                 aria-hidden="true"
               ></span>
-              Logging in... } @else { Log in }
+              {{ 'routes.login.form.loggingIn' | translate }} } @else { {{ 'navigation.logIn' | translate }} }
             </button>
 
             <p class="text-center text-sm text-base-content/60">
-              Don't have an account?
+              {{ 'routes.login.dontHaveAnAccount' | translate }}
               <a class="link link-primary font-semibold" routerLink="/signup"
-                >Sign up</a
+                >{{ 'navigation.signUp' | translate }}</a
               >
             </p>
           </div>
