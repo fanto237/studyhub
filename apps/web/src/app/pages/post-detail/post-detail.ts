@@ -28,6 +28,7 @@ import {
 import { AuthSessionStore } from '../../core/services/auth-session-store';
 import { CommentsApi } from '../../core/services/comments-api';
 import { PostsApi } from '../../core/services/posts-api';
+import { TranslationService } from '../../core/services/translation';
 import { resolveApiErrorMessage } from '../../core/types/api-error.util';
 import {
   type GetPostResponse,
@@ -39,6 +40,8 @@ import {
 } from '../../core/types/posts.models';
 import { Icon } from '../../shared/components/icon/icon';
 import { ThemeToggle } from '../../shared/components/theme-toggle/theme-toggle';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { LanguageSelector } from '../../shared/components/language-selector/language-selector';
 
 const MAX_COMMENT_LENGTH = 4000;
 const MAX_REPORT_DETAILS_LENGTH = 2000;
@@ -66,6 +69,8 @@ type CommentThreadNode = {
 @Component({
   selector: 'app-post-detail',
   imports: [
+    LanguageSelector,
+    TranslatePipe,
     DatePipe,
     DecimalPipe,
     NgClass,
@@ -87,6 +92,7 @@ export class PostDetail implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly sanitizer = inject(DomSanitizer);
+  readonly i18n = inject(TranslationService);
 
   private readonly replyForms = new Map<
     string,
@@ -108,28 +114,28 @@ export class PostDetail implements OnInit {
   }> = [
     {
       value: 'spam',
-      label: 'Spam or scam',
-      description: 'Promotional, misleading, or low-quality content.',
+      label: 'routes.postDetail.report.reasons.spam.label',
+      description: 'routes.postDetail.report.reasons.spam.description',
     },
     {
       value: 'copyright',
-      label: 'Copyright issue',
-      description: "The PDF appears to violate someone else's rights.",
+      label: 'routes.postDetail.report.reasons.copyright.label',
+      description: 'routes.postDetail.report.reasons.copyright.description',
     },
     {
       value: 'abusive',
-      label: 'Abusive content',
-      description: 'Harassment, hate, or unsafe material.',
+      label: 'routes.postDetail.report.reasons.abusive.label',
+      description: 'routes.postDetail.report.reasons.abusive.description',
     },
     {
       value: 'wrong-content',
-      label: 'Wrong content',
-      description: 'The title, tags, or file do not match the resource.',
+      label: 'routes.postDetail.report.reasons.wrongContent.label',
+      description: 'routes.postDetail.report.reasons.wrongContent.description',
     },
     {
       value: 'other',
-      label: 'Other',
-      description: 'Something else that moderators should review.',
+      label: 'routes.postDetail.report.reasons.other.label',
+      description: 'routes.postDetail.report.reasons.other.description',
     },
   ];
 
@@ -254,7 +260,7 @@ export class PostDetail implements OnInit {
           this.post.set(null);
           this.isLoading.set(false);
           this.isNotFound.set(true);
-          this.errorMessage.set('This post link is missing an id.');
+          this.errorMessage.set(this.i18n.translate('routes.postDetail.thisPostLinkIsMissingAnId'));
           return;
         }
 
@@ -290,7 +296,7 @@ export class PostDetail implements OnInit {
 
         this.actionErrorMessage.set(
           resolveApiErrorMessage(error, {
-            fallbackMessage: 'Your vote could not be saved. Please try again.',
+            fallbackMessage: this.i18n.translate('errors.posts.voteSave'),
           }),
         );
         this.isVoting.set(false);
@@ -448,7 +454,7 @@ export class PostDetail implements OnInit {
           }
 
           const message = resolveApiErrorMessage(error, {
-            fallbackMessage: 'This report could not be sent. Please try again.',
+            fallbackMessage: this.i18n.translate('routes.postDetail.thisReportCouldNotBeSentPleaseTryAgain'),
             statusMessages: {
               409: 'You have already reported this resource.',
             },
@@ -493,7 +499,7 @@ export class PostDetail implements OnInit {
       .subscribe({
         next: () => {
           this.commentForm.reset();
-          this.commentSuccessMessage.set('Your comment was posted.');
+          this.commentSuccessMessage.set(this.i18n.translate('routes.postDetail.yourCommentWasPosted'));
           this.refreshComments(post.id);
         },
         error: (error: unknown) => {
@@ -563,7 +569,7 @@ export class PostDetail implements OnInit {
         next: () => {
           form.reset();
           this.activeReplyCommentId.set(null);
-          this.commentSuccessMessage.set('Your reply was posted.');
+          this.commentSuccessMessage.set(this.i18n.translate('routes.postDetail.yourReplyWasPosted'));
           this.refreshComments(post.id);
         },
         error: (error: unknown) => {
@@ -628,7 +634,7 @@ export class PostDetail implements OnInit {
         next: (updatedComment) => {
           this.replaceComment(updatedComment);
           this.activeEditCommentId.set(null);
-          this.commentSuccessMessage.set('Comment updated.');
+          this.commentSuccessMessage.set(this.i18n.translate('routes.postDetail.commentUpdated'));
           this.refreshComments(post.id);
         },
         error: (error: unknown) => {
@@ -659,7 +665,9 @@ export class PostDetail implements OnInit {
 
     if (typeof window !== 'undefined') {
       const confirmed = window.confirm(
-        'Delete this comment? Replies will stay visible and this comment will be shown as [deleted].',
+        this.i18n.translate(
+          'routes.postDetail.deleteThisCommentRepliesWillStayVisibleAndThisCommentWillBeShownAsDeleted',
+        ),
       );
       if (!confirmed) {
         return;
@@ -673,7 +681,7 @@ export class PostDetail implements OnInit {
     this.commentsApi.deleteComment(comment.id).subscribe({
       next: () => {
         this.markCommentDeleted(comment.id);
-        this.commentSuccessMessage.set('Comment deleted.');
+        this.commentSuccessMessage.set(this.i18n.translate('routes.postDetail.commentDeleted'));
         this.refreshComments(post.id);
       },
       error: (error: unknown) => {
@@ -759,7 +767,7 @@ export class PostDetail implements OnInit {
       return `Show ${count} ${count === 1 ? 'reply' : 'replies'}`;
     }
 
-    return 'Hide replies';
+    return this.i18n.translate('common.actions.hideReplies');
   }
 
   canManagePost(post: GetPostResponse): boolean {
@@ -800,14 +808,14 @@ export class PostDetail implements OnInit {
     }
 
     if (control.hasError('required')) {
-      return 'Write a comment before posting.';
+      return this.i18n.translate('validation.writeComment');
     }
 
     if (control.hasError('maxlength')) {
       return `Comments must be ${MAX_COMMENT_LENGTH} characters or fewer.`;
     }
 
-    return 'Please check this comment.';
+    return this.i18n.translate('validation.checkComment');
   }
 
   reportDetailsError(): string | null {
@@ -818,7 +826,7 @@ export class PostDetail implements OnInit {
       control.touched &&
       !control.value.trim()
     ) {
-      return 'Add a few details for other reports.';
+      return this.i18n.translate('validation.reportDetailsRequired');
     }
 
     if (!(control.invalid && (control.dirty || control.touched))) {
@@ -829,7 +837,7 @@ export class PostDetail implements OnInit {
       return `Report details must be ${MAX_REPORT_DETAILS_LENGTH} characters or fewer.`;
     }
 
-    return 'Please check these details.';
+    return this.i18n.translate('validation.checkDetails');
   }
 
   formTextLength(form: FormGroup<CommentFormControls>): number {
@@ -867,7 +875,7 @@ export class PostDetail implements OnInit {
         );
         this.errorMessage.set(
           resolveApiErrorMessage(error, {
-            fallbackMessage: 'This post could not be loaded. Please try again.',
+            fallbackMessage: this.i18n.translate('routes.postDetail.thisPostCouldNotBeLoadedPleaseTryAgain'),
             statusMessages: {
               404: 'This post was not found or is no longer available.',
             },
@@ -896,7 +904,7 @@ export class PostDetail implements OnInit {
 
         this.commentErrorMessage.set(
           resolveApiErrorMessage(error, {
-            fallbackMessage: 'The discussion could not be refreshed.',
+            fallbackMessage: this.i18n.translate('routes.postDetail.theDiscussionCouldNotBeRefreshed'),
           }),
         );
         this.isRefreshingComments.set(false);

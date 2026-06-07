@@ -11,7 +11,7 @@
       <a
         class="flex items-center gap-3"
         routerLink="/home"
-        aria-label="StudyHub home"
+        [attr.aria-label]="'navigation.aria.home' | translate"
       >
         <span
           class="flex size-11 items-center justify-center rounded-2xl bg-primary text-primary-content shadow-lg shadow-primary/20"
@@ -23,35 +23,36 @@
             StudyHub
           </span>
           <span class="text-xs font-bold text-base-content/50">
-            Resource detail
+            {{ 'routes.postDetail.resourceDetail' | translate }}
           </span>
         </span>
       </a>
 
       <nav
         class="hidden items-center gap-2 sm:flex"
-        aria-label="Resource navigation"
+        [attr.aria-label]="'navigation.aria.resource' | translate"
       >
         <a class="btn btn-ghost btn-sm gap-2" routerLink="/home">
           <app-icon name="home" class="size-4" />
-          Home
+          {{ 'navigation.home' | translate }}
         </a>
         <a class="btn btn-ghost btn-sm gap-2" routerLink="/upload">
           <app-icon name="upload" class="size-4" />
-          Upload
+          {{ 'navigation.upload' | translate }}
         </a>
         <a class="btn btn-ghost btn-sm gap-2" routerLink="/profile">
           <app-icon name="user" class="size-4" />
-          Profile
+          {{ 'navigation.profile' | translate }}
         </a>
       </nav>
 
       <div class="flex items-center gap-2">
-        <app-theme-toggle />
+        <app-language-selector />
+          <app-theme-toggle />
         <a
           class="btn btn-ghost btn-circle btn-sm sm:hidden"
           routerLink="/home"
-          aria-label="Back home"
+          [attr.aria-label]="'navigation.backHome' | translate"
         >
           <app-icon name="home" class="size-4" />
         </a>
@@ -102,10 +103,10 @@
           type="button"
           (click)="retry()"
         >
-          Retry
+          {{ 'common.actions.retry' | translate }}
         </button>
         }
-        <a class="btn btn-outline" routerLink="/home">Back to feed</a>
+        <a class="btn btn-outline" routerLink="/home">{{ 'navigation.backToFeed' | translate }}</a>
       </div>
     </section>
     } @else { @if (post(); as postItem) {
@@ -116,16 +117,16 @@
           aria-labelledby="post-detail-heading"
         >
           <div class="flex flex-wrap items-center gap-2">
-            <span class="badge badge-primary badge-sm">PDF</span>
+            <span class="badge badge-primary badge-sm">{{ 'common.file.pdf' | translate }}</span>
             @if (postItem.currentVote) {
             <span class="badge badge-accent badge-soft badge-sm">
-              Voted {{ postItem.currentVote }}
+              {{ 'shared.postCard.voted' | translate }} {{ postItem.currentVote }}
             </span>
             }
             <span
               class="text-xs font-bold uppercase tracking-[0.18em] text-base-content/40"
             >
-              {{ postItem.createdAt | date: 'mediumDate' }}
+              {{ postItem.createdAt | date: 'mediumDate' : undefined : i18n.locale() }}
             </span>
           </div>
 
@@ -140,7 +141,7 @@
             <a
               class="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-sm font-black text-primary transition hover:bg-primary hover:text-primary-content"
               [routerLink]="['/users', postItem.user.id]"
-              [attr.aria-label]="'Open profile for @' + postItem.user.username"
+              [attr.aria-label]="('navigation.openProfileFor' | translate) + postItem.user.username"
             >
               {{ initials(postItem.user) }}
             </a>
@@ -152,7 +153,7 @@
                 @{{ postItem.user.username }}
               </a>
               <p class="truncate text-xs text-base-content/50">
-                Contributor profile
+                {{ 'routes.postDetail.contributorProfile' | translate }}
               </p>
             </div>
           </div>
@@ -160,12 +161,11 @@
           <p
             class="mt-6 whitespace-pre-line text-base leading-8 text-base-content/70"
           >
-            {{ postItem.description || 'No description was added for this
-            resource.' }}
+            {{ postItem.description || ('shared.postCard.emptyDescription' | translate) }}
           </p>
 
           @if (postItem.tags.length > 0) {
-          <div class="mt-6 flex flex-wrap gap-2" aria-label="Post tags">
+          <div class="mt-6 flex flex-wrap gap-2" [attr.aria-label]="'routes.postDetail.postTags' | translate">
             @for (tag of postItem.tags; track tag) {
             <span class="badge badge-outline px-3 py-3">{{ tag }}</span>
             }
@@ -184,13 +184,13 @@
               <p
                 class="text-xs font-black uppercase tracking-[0.22em] text-primary"
               >
-                Preview
+                {{ 'common.labels.preview' | translate }}
               </p>
               <h2
                 id="pdf-preview-heading"
                 class="mt-1 text-2xl font-black tracking-tight"
               >
-                PDF resource
+                {{ 'common.file.pdfResource' | translate }}
               </h2>
             </div>
             <div class="flex flex-wrap gap-2">
@@ -199,7 +199,7 @@
                 type="button"
                 (click)="openPdf()"
               >
-                Open PDF
+                {{ 'common.actions.openPdf' | translate }}
               </button>
               <button
                 class="btn btn-primary btn-sm text-primary-content"
@@ -212,9 +212,9 @@
                   class="loading loading-spinner loading-xs"
                   aria-hidden="true"
                 ></span>
-                Preparing } @else {
+                {{ 'common.actions.preparing' | translate }} } @else {
                 <app-icon name="download" class="size-4" />
-                Download }
+                {{ 'common.actions.download' | translate }} }
               </button>
             </div>
           </div>
@@ -224,7 +224,7 @@
             <iframe
               class="h-144 w-full rounded-3xl border border-base-300 bg-base-100 lg:h-192"
               [src]="safePdfUrl"
-              title="{{ postItem.title }} PDF preview"
+              [title]="postItem.title + ' ' + ('common.file.pdfPreview' | translate)"
             ></iframe>
           </div>
           } @else {
@@ -233,9 +233,9 @@
               name="document"
               class="mx-auto size-10 text-base-content/35"
             />
-            <p class="mt-3 font-bold">Preview unavailable.</p>
+            <p class="mt-3 font-bold">{{ 'routes.postDetail.previewUnavailable' | translate }}</p>
             <p class="mt-1 text-sm text-base-content/55">
-              Use Open PDF or Download to view this resource.
+              {{ 'routes.postDetail.useOpenPdfOrDownloadToViewThisResource' | translate }}
             </p>
           </div>
           }
@@ -250,13 +250,13 @@
               <p
                 class="text-xs font-black uppercase tracking-[0.22em] text-primary"
               >
-                Discussion
+                {{ 'routes.postDetail.discussion' | translate }}
               </p>
               <h2
                 id="comments-heading"
                 class="mt-2 text-2xl font-black tracking-tight"
               >
-                {{ postItem.commentCount | number }} comments
+                {{ postItem.commentCount | number }} {{ 'common.metrics.comments' | translate }}
               </h2>
             </div>
             @if (isRefreshingComments()) {
@@ -265,7 +265,7 @@
                 class="loading loading-spinner loading-xs"
                 aria-hidden="true"
               ></span>
-              Refreshing
+              {{ 'common.actions.refreshing' | translate }}
             </span>
             }
           </div>
@@ -280,7 +280,7 @@
                 class="textarea textarea-bordered min-h-36 resize-y bg-base-100 w-full"
                 formControlName="text"
                 [attr.maxlength]="maxCommentLength"
-                placeholder="Ask a question, share study tips, or clarify this PDF..."
+                [placeholder]="'routes.postDetail.askAQuestionShareStudyTipsOrClarifyThisPdf' | translate"
               ></textarea>
             </label>
             @if (commentTextError(commentForm); as textError) {
@@ -297,7 +297,7 @@
                   class="loading loading-spinner loading-sm"
                   aria-hidden="true"
                 ></span>
-                Posting } @else { Post comment }
+                {{ 'common.actions.posting' | translate }} } @else { {{ 'common.actions.postComment' | translate }} }
               </button>
             </div>
           </form>
@@ -320,9 +320,9 @@
               name="message-circle"
               class="mx-auto size-10 text-base-content/35"
             />
-            <p class="mt-3 font-bold">No comments yet.</p>
+            <p class="mt-3 font-bold">{{ 'routes.postDetail.noCommentsYet' | translate }}</p>
             <p class="mt-1 text-sm text-base-content/55">
-              Start the thread with a note or question about this PDF.
+              {{ 'routes.postDetail.startTheThreadWithANoteOrQuestionAboutThisPdf' | translate }}
             </p>
           </div>
           } @else {
@@ -339,7 +339,7 @@
                   <span
                     class="badge badge-ghost border-base-300 bg-base-200/70 px-3 py-2 font-semibold text-base-content/60"
                   >
-                    Replying to @{{ node.parent.user.username }}
+                    {{ 'routes.postDetail.replyingTo' | translate }} @{{ node.parent.user.username }}
                   </span>
                 </div>
                 }
@@ -349,7 +349,7 @@
                     class="flex shrink-0 items-center justify-center rounded-2xl text-xs font-black transition hover:bg-primary hover:text-primary-content"
                     [ngClass]="node.depth === 0 ? 'size-10 bg-primary/10 text-primary' : 'size-9 bg-accent/15 text-accent-content'"
                     [routerLink]="['/users', comment.user.id]"
-                    [attr.aria-label]="'Open profile for @' + comment.user.username"
+                    [attr.aria-label]="('navigation.openProfileFor' | translate) + comment.user.username"
                   >
                     {{ initials(comment.user) }}
                   </a>
@@ -365,11 +365,11 @@
                           @{{ comment.user.username }}
                         </a>
                         <p class="truncate text-xs text-base-content/45">
-                          Contributor
+                          {{ 'routes.postDetail.contributor' | translate }}
                         </p>
                       </div>
                       <time class="text-xs font-semibold text-base-content/45">
-                        {{ comment.createdAt | date: 'mediumDate' }}
+                        {{ comment.createdAt | date: 'mediumDate' : undefined : i18n.locale() }}
                       </time>
                     </div>
 
@@ -405,7 +405,7 @@
                             type="button"
                             (click)="cancelEdit(comment.id)"
                           >
-                            Cancel
+                            {{ 'common.actions.cancel' | translate }}
                           </button>
                           <button
                             class="btn btn-primary btn-sm text-primary-content"
@@ -417,7 +417,7 @@
                               class="loading loading-spinner loading-xs"
                               aria-hidden="true"
                             ></span>
-                            Saving } @else { Save }
+                            {{ 'common.actions.saving' | translate }} } @else { {{ 'common.actions.save' | translate }} }
                           </button>
                         </div>
                       </div>
@@ -439,7 +439,7 @@
                         type="button"
                         (click)="startReply(comment)"
                       >
-                        Reply
+                        {{ 'common.actions.reply' | translate }}
                       </button>
                       } @if (canManageComment(comment)) {
                       <button
@@ -447,7 +447,7 @@
                         type="button"
                         (click)="startEdit(comment)"
                       >
-                        Edit
+                        {{ 'common.actions.edit' | translate }}
                       </button>
                       <button
                         class="btn btn-ghost btn-xs text-error"
@@ -460,7 +460,7 @@
                           class="loading loading-spinner loading-xs"
                           aria-hidden="true"
                         ></span>
-                        Deleting } @else { Delete }
+                        {{ 'common.actions.deleting' | translate }} } @else { {{ 'common.actions.delete' | translate }} }
                       </button>
                       } @if (node.children.length > 0) {
                       <button
@@ -489,7 +489,7 @@
                         class="textarea textarea-bordered min-h-20 w-full resize-y bg-base-100"
                         formControlName="text"
                         [attr.maxlength]="maxCommentLength"
-                        placeholder="Write a reply..."
+                        [placeholder]="'routes.postDetail.writeAReply' | translate"
                       ></textarea>
                       <div
                         class="mt-2 flex flex-wrap items-center justify-between gap-3"
@@ -511,7 +511,7 @@
                             type="button"
                             (click)="cancelReply(comment.id)"
                           >
-                            Cancel
+                            {{ 'common.actions.cancel' | translate }}
                           </button>
                           <button
                             class="btn btn-primary btn-sm text-primary-content"
@@ -523,7 +523,7 @@
                               class="loading loading-spinner loading-xs"
                               aria-hidden="true"
                             ></span>
-                            Replying } @else { Reply }
+                            {{ 'common.actions.replying' | translate }} } @else { {{ 'common.actions.reply' | translate }} }
                           </button>
                         </div>
                       </div>
@@ -540,7 +540,7 @@
                 class="relative mt-3 space-y-3"
                 [id]="commentRepliesId(comment.id)"
                 role="group"
-                [attr.aria-label]="'Replies to @' + comment.user.username"
+                [attr.aria-label]="('routes.postDetail.repliesTo' | translate) + comment.user.username"
                 [style.--reply-rail-left]="replyRailPosition(node)"
               >
                 <span
@@ -570,7 +570,7 @@
 
       <aside
         class="space-y-6 lg:sticky lg:top-24 lg:self-start"
-        aria-label="Resource actions"
+        [attr.aria-label]="'routes.postDetail.resourceActions' | translate"
       >
         @if (actionErrorMessage(); as inlineMessage) {
         <div class="alert alert-error" role="alert">
@@ -582,11 +582,11 @@
         <section
           class="rounded-4xl border border-base-300 bg-base-100/90 p-5 shadow-xl shadow-base-300/30 backdrop-blur sm:p-6"
         >
-          <h2 class="text-xl font-black">Resource actions</h2>
+          <h2 class="text-xl font-black">{{ 'routes.postDetail.resourceActions' | translate }}</h2>
 
           <div
             class="mt-5 flex items-center justify-center gap-2 rounded-3xl bg-base-200/80 p-3"
-            aria-label="Vote controls"
+            [attr.aria-label]="'shared.postCard.voteControls' | translate"
           >
             <button
               class="btn btn-ghost btn-square"
@@ -594,7 +594,7 @@
               [disabled]="isVoting()"
               type="button"
               (click)="votePost(postItem.currentVote === 'up' ? 'remove' : 'up')"
-              aria-label="Upvote post"
+              [attr.aria-label]="'shared.postCard.upvote' | translate"
             >
               <app-icon name="arrow-up" class="size-5" />
             </button>
@@ -603,7 +603,7 @@
               <p
                 class="text-[0.65rem] font-bold uppercase tracking-wide text-base-content/45"
               >
-                score
+                {{ 'common.metrics.scoreLower' | translate }}
               </p>
             </div>
             <button
@@ -612,7 +612,7 @@
               [disabled]="isVoting()"
               type="button"
               (click)="votePost(postItem.currentVote === 'down' ? 'remove' : 'down')"
-              aria-label="Downvote post"
+              [attr.aria-label]="'shared.postCard.downvote' | translate"
             >
               <app-icon name="arrow-down" class="size-5" />
             </button>
@@ -620,7 +620,7 @@
 
           <div class="mt-5 grid gap-3">
             <button class="btn btn-outline" type="button" (click)="openPdf()">
-              Open PDF
+              {{ 'common.actions.openPdf' | translate }}
             </button>
             <button
               class="btn btn-primary text-primary-content"
@@ -633,16 +633,16 @@
                 class="loading loading-spinner loading-sm"
                 aria-hidden="true"
               ></span>
-              Preparing } @else {
+              {{ 'common.actions.preparing' | translate }} } @else {
               <app-icon name="download" class="size-5" />
-              Download }
+              {{ 'common.actions.download' | translate }} }
             </button>
 
             @if (canManagePost(postItem)) {
             <div
               class="divider my-1 text-xs font-black uppercase tracking-[0.18em] text-error/75"
             >
-              Danger zone
+              {{ 'routes.postDetail.dangerZone' | translate }}
             </div>
             <button
               class="btn btn-outline btn-error"
@@ -655,9 +655,9 @@
                 class="loading loading-spinner loading-sm"
                 aria-hidden="true"
               ></span>
-              Deleting… } @else {
+              {{ 'common.actions.deletingEllipsis' | translate }} } @else {
               <app-icon name="trash" class="size-5" />
-              Delete resource }
+              {{ 'common.actions.deleteResource' | translate }} }
             </button>
             }
           </div>
@@ -667,12 +667,11 @@
           class="rounded-4xl border border-base-300 bg-base-100/90 p-5 shadow-xl shadow-base-300/30 backdrop-blur sm:p-6"
         >
           <p class="text-xs font-black uppercase tracking-[0.22em] text-error">
-            Report
+            {{ 'common.actions.report' | translate }}
           </p>
-          <h2 class="mt-2 text-xl font-black">Flag this resource</h2>
+          <h2 class="mt-2 text-xl font-black">{{ 'routes.postDetail.flagThisResource' | translate }}</h2>
           <p class="mt-2 text-sm leading-6 text-base-content/60">
-            Reports go to moderators. Choose the closest reason and add details
-            when helpful.
+            {{ 'routes.postDetail.reportsGoToModeratorsChooseTheClosestReasonAndAddDetailsWhenHelpful' | translate }}
           </p>
 
           <form
@@ -681,14 +680,14 @@
             (ngSubmit)="reportPost()"
           >
             <label class="form-control">
-              <span class="label-text mb-2 font-bold">Reason</span>
+              <span class="label-text mb-2 font-bold">{{ 'common.labels.reason' | translate }}</span>
               <select
                 class="select select-bordered w-full"
                 formControlName="reason"
                 (change)="onReportReasonChange()"
               >
                 @for (reason of reportReasons; track reason.value) {
-                <option [value]="reason.value">{{ reason.label }}</option>
+                <option [value]="reason.value">{{ reason.label | translate }}</option>
                 }
               </select>
             </label>
@@ -698,14 +697,14 @@
             <p
               class="rounded-2xl bg-base-200/70 p-3 text-xs leading-5 text-base-content/60"
             >
-              {{ reason.description }}
+              {{ reason.description | translate }}
             </p>
             } }
 
             <label class="form-control">
               <span class="label pb-2">
                 <span class="label-text font-bold">
-                  Details @if (reportForm.controls.reason.value === 'other') {
+                  {{ 'common.actions.details' | translate }} @if (reportForm.controls.reason.value === 'other') {
                   <span class="text-error">*</span>
                   }
                 </span>
@@ -719,7 +718,7 @@
                 class="textarea textarea-bordered min-h-24 resize-y w-full"
                 formControlName="details"
                 [attr.maxlength]="maxReportDetailsLength"
-                placeholder="Add context for moderators..."
+                [placeholder]="'routes.postDetail.addContextForModerators' | translate"
               ></textarea>
             </label>
             @if (reportDetailsError(); as reportDetailsErrorMessage) {
@@ -748,7 +747,7 @@
                 class="loading loading-spinner loading-sm"
                 aria-hidden="true"
               ></span>
-              Sending } @else { Submit report }
+              {{ 'common.actions.sending' | translate }} } @else { {{ 'common.actions.submitReport' | translate }} }
             </button>
           </form>
         </section>
@@ -774,17 +773,16 @@
         </span>
         <div>
           <p class="text-xs font-black uppercase tracking-[0.22em] text-error">
-            Delete resource
+            {{ 'common.actions.deleteResource' | translate }}
           </p>
           <h2
             id="delete-post-modal-title"
             class="mt-1 text-2xl font-black sm:block hidden"
           >
-            Delete “{{ modalPost.title }}”?
+            {{ 'routes.postDetail.deleteTitle' | translate: { title: modalPost.title } }}
           </h2>
           <p class="mt-3 leading-7 text-base-content/65">
-            This removes the PDF from StudyHub and makes its detail page
-            unavailable. This action cannot be undone from the interface.
+            {{ 'routes.postDetail.thisRemovesThePdfFromStudyhubAndMakesItsDetailPageUnavailableThisActionCannotBeUndoneFromTheInterface' | translate }}
           </p>
         </div>
       </div>
@@ -803,7 +801,7 @@
           type="button"
           (click)="closeDeletePostModal()"
         >
-          Cancel
+          {{ 'common.actions.cancel' | translate }}
         </button>
         <button
           class="btn btn-error"
@@ -816,7 +814,7 @@
             class="loading loading-spinner loading-sm"
             aria-hidden="true"
           ></span>
-          Deleting… } @else { Delete resource }
+          {{ 'common.actions.deletingEllipsis' | translate }} } @else { {{ 'common.actions.deleteResource' | translate }} }
         </button>
       </div>
     </div>
@@ -824,10 +822,10 @@
       class="modal-backdrop"
       [disabled]="isDeletingPost()"
       type="button"
-      aria-label="Close delete resource confirmation"
+      [attr.aria-label]="'common.actions.closeDeleteResourceConfirmation' | translate"
       (click)="closeDeletePostModal()"
     >
-      close
+      {{ 'common.actions.close' | translate }}
     </button>
   </div>
   } }
