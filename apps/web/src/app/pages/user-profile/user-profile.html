@@ -13,7 +13,7 @@
       <a
         class="flex items-center gap-3"
         routerLink="/home"
-        aria-label="StudyHub home"
+        [attr.aria-label]="'navigation.aria.home' | translate"
       >
         <span
           class="flex size-11 items-center justify-center rounded-2xl bg-primary text-primary-content shadow-lg shadow-primary/20"
@@ -25,28 +25,29 @@
             StudyHub
           </span>
           <span class="text-xs font-bold text-base-content/50">
-            Contributor profile
+            {{ 'routes.postDetail.contributorProfile' | translate }}
           </span>
         </span>
       </a>
 
-      <nav class="hidden items-center gap-2 lg:flex" aria-label="Profile navigation">
+      <nav class="hidden items-center gap-2 lg:flex" [attr.aria-label]="'navigation.aria.profile' | translate">
         <a class="btn btn-ghost btn-sm gap-2" routerLink="/home">
           <app-icon name="home" class="size-4" />
-          Home
+          {{ 'navigation.home' | translate }}
         </a>
         <a class="btn btn-ghost btn-sm gap-2" routerLink="/upload">
           <app-icon name="upload" class="size-4" />
-          Upload
+          {{ 'navigation.upload' | translate }}
         </a>
         <a class="btn btn-ghost btn-sm gap-2" routerLink="/profile">
           <app-icon name="user" class="size-4" />
-          Profile
+          {{ 'navigation.profile' | translate }}
         </a>
       </nav>
 
       <div class="flex items-center gap-2">
-        <app-theme-toggle />
+        <app-language-selector />
+          <app-theme-toggle />
       </div>
     </div>
   </header>
@@ -107,15 +108,15 @@
           type="button"
           (click)="retryProfile()"
         >
-          Retry
+          {{ 'common.actions.retry' | translate }}
         </button>
         }
-        <a class="btn btn-outline" routerLink="/home">Back to feed</a>
+        <a class="btn btn-outline" routerLink="/home">{{ 'navigation.backToFeed' | translate }}</a>
       </div>
     </section>
     } @else { @if (profile(); as user) {
     <div class="grid gap-6 xl:grid-cols-[22rem_minmax(0,1fr)]">
-      <aside class="space-y-6 xl:sticky xl:top-24 xl:self-start" aria-label="Contributor summary">
+      <aside class="space-y-6 xl:sticky xl:top-24 xl:self-start" [attr.aria-label]="'routes.userProfile.contributorSummary' | translate">
         <section
           class="rounded-[2rem] border border-base-300 bg-base-100/85 p-5 shadow-xl shadow-base-300/30 backdrop-blur sm:p-6"
         >
@@ -127,7 +128,7 @@
             </span>
             <div class="mt-5 min-w-0">
               <p class="text-[0.7rem] font-black uppercase tracking-[0.24em] text-primary">
-                Contributor
+                {{ 'routes.postDetail.contributor' | translate }}
               </p>
               <h1 class="mt-2 text-2xl font-black tracking-tight">
                 @{{ user.username }}
@@ -142,15 +143,15 @@
             @if (user.isVerified) {
             <span class="badge badge-success badge-soft font-bold">
               <app-icon name="shield-check" class="size-3.5" />
-              Verified student
+              {{ 'common.status.verifiedStudent' | translate }}
             </span>
             } @else {
             <span class="badge badge-warning badge-soft font-bold">
-              Verification pending
+              {{ 'common.status.verificationPending' | translate }}
             </span>
             }
             <span class="badge badge-primary badge-soft font-bold">
-              {{ user.karmaScore | number }} karma
+              {{ user.karmaScore | number }} {{ 'common.metrics.karma' | translate }}
             </span>
           </div>
 
@@ -158,13 +159,13 @@
             <div class="rounded-2xl bg-primary/10 p-4 text-primary">
               <p class="text-2xl font-black">{{ user.totalUploads | number }}</p>
               <p class="mt-1 text-[0.65rem] font-bold uppercase tracking-wide">
-                Uploads
+                {{ 'common.metrics.uploads' | translate }}
               </p>
             </div>
             <div class="rounded-2xl bg-accent/15 p-4 text-accent-content">
               <p class="text-2xl font-black">{{ user.totalUpvotesReceived | number }}</p>
               <p class="mt-1 text-[0.65rem] font-bold uppercase tracking-wide">
-                Upvotes
+                {{ 'common.metrics.upvotes' | translate }}
               </p>
             </div>
           </div>
@@ -172,18 +173,18 @@
           <dl class="mt-5 space-y-3">
             <div class="rounded-2xl border border-base-300 bg-base-200/65 p-4">
               <dt class="text-[0.65rem] font-black uppercase tracking-[0.2em] text-base-content/45">
-                Joined
+                {{ 'common.labels.joined' | translate }}
               </dt>
               <dd class="mt-1 text-sm font-bold">
-                {{ user.createdAt | date: 'mediumDate' }}
+                {{ user.createdAt | date: 'mediumDate' : undefined : i18n.locale() }}
               </dd>
             </div>
             <div class="rounded-2xl border border-base-300 bg-base-200/65 p-4">
               <dt class="text-[0.65rem] font-black uppercase tracking-[0.2em] text-base-content/45">
-                Privacy
+                {{ 'common.labels.privacy' | translate }}
               </dt>
               <dd class="mt-1 text-sm font-semibold leading-6 text-base-content/65">
-                StudyHub only shows contributor activity and public trust signals here.
+                {{ 'routes.userProfile.studyhubOnlyShowsContributorActivityAndPublicTrustSignalsHere' | translate }}
               </dd>
             </div>
           </dl>
@@ -194,30 +195,30 @@
           aria-labelledby="visible-stats-heading"
         >
           <p id="visible-stats-heading" class="text-sm font-black uppercase tracking-[0.22em] text-base-content/45">
-            Visible page stats
+            {{ 'common.metrics.visiblePageStats' | translate }}
           </p>
           <div class="mt-4 grid grid-cols-3 gap-2">
             <div class="rounded-2xl bg-base-200/80 p-3 text-center">
               <p class="text-lg font-black text-primary">{{ scoreTotals.upvotes | number }}</p>
               <p class="mt-1 text-[0.62rem] font-bold uppercase tracking-wide text-base-content/45">
-                Upvotes
+                {{ 'common.metrics.upvotes' | translate }}
               </p>
             </div>
             <div class="rounded-2xl bg-base-200/80 p-3 text-center">
               <p class="text-lg font-black text-secondary">{{ scoreTotals.downvotes | number }}</p>
               <p class="mt-1 text-[0.62rem] font-bold uppercase tracking-wide text-base-content/45">
-                Down
+                {{ 'common.metrics.down' | translate }}
               </p>
             </div>
             <div class="rounded-2xl bg-base-200/80 p-3 text-center">
               <p class="text-lg font-black">{{ scoreTotals.score | number }}</p>
               <p class="mt-1 text-[0.62rem] font-bold uppercase tracking-wide text-base-content/45">
-                Score
+                {{ 'common.metrics.score' | translate }}
               </p>
             </div>
           </div>
           <p class="mt-3 text-xs leading-5 text-base-content/50">
-            These totals are for the loaded upload list, not private account data.
+            {{ 'routes.userProfile.theseTotalsAreForTheLoadedUploadListNotPrivateAccountData' | translate }}
           </p>
         </section>
 
@@ -226,10 +227,10 @@
           aria-labelledby="profile-tags-heading"
         >
           <p class="text-xs font-black uppercase tracking-[0.22em] text-base-content/45">
-            Topics
+            {{ 'common.metrics.topics' | translate }}
           </p>
           <h2 id="profile-tags-heading" class="mt-1 text-xl font-black">
-            Popular tags
+            {{ 'common.metrics.popularTags' | translate }}
           </h2>
 
           @if (popularTags().length > 0) {
@@ -248,7 +249,7 @@
           </div>
           } @else {
           <p class="mt-5 text-sm leading-6 text-base-content/60">
-            Tags will appear after this contributor's uploads load.
+            {{ 'routes.userProfile.tagsWillAppearAfterThisContributorsUploadsLoad' | translate }}
           </p>
           }
         </section>
@@ -262,13 +263,13 @@
           <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <p class="text-sm font-black uppercase tracking-[0.22em] text-primary">
-                Public uploads
+                {{ 'routes.userProfile.publicUploads' | translate }}
               </p>
               <h2 id="profile-heading" class="mt-3 text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl">
                 Resources shared by @{{ user.username }}.
               </h2>
               <p class="mt-3 max-w-2xl text-base leading-7 text-base-content/65">
-                Review this contributor's visible StudyHub materials, trust signals, and community feedback without exposing private account details.
+                {{ 'routes.userProfile.reviewThisContributorsVisibleStudyhubMaterialsTrustSignalsAndCommunityFeedbackWithoutExposingPrivateAccountDetails' | translate }}
               </p>
             </div>
 
@@ -276,13 +277,13 @@
               <div class="rounded-2xl bg-primary p-4 text-primary-content shadow-lg shadow-primary/20">
                 <span class="text-2xl font-black">{{ user.totalUploads | number }}</span>
                 <span class="mt-1 block text-xs font-bold uppercase tracking-wide opacity-80">
-                  Total uploads
+                  {{ 'common.metrics.totalUploads' | translate }}
                 </span>
               </div>
               <div class="rounded-2xl bg-base-200 p-4">
                 <span class="text-2xl font-black">{{ uploads().length | number }}</span>
                 <span class="mt-1 block text-xs font-bold uppercase tracking-wide text-base-content/55">
-                  Visible now
+                  {{ 'common.metrics.visibleNow' | translate }}
                 </span>
               </div>
             </div>
@@ -296,15 +297,15 @@
           <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <h3 id="upload-controls-heading" class="text-lg font-black">
-                Browse uploads
+                {{ 'common.actions.browseUploads' | translate }}
               </h3>
               <p class="mt-1 text-sm font-semibold text-base-content/55">
-                Sort and filter this contributor's paginated upload history.
+                {{ 'common.sort.contributorUploadHistoryHelp' | translate }}
               </p>
             </div>
 
-            <div class="flex flex-wrap gap-2" aria-label="Upload sort options">
-              @for (option of sortOptions; track option.value) {
+            <div class="flex flex-wrap gap-2" [attr.aria-label]="'common.sort.uploadSortOptions' | translate">
+              @for (option of sortOptions(); track option.value) {
               <button
                 class="btn btn-sm gap-2"
                 [ngClass]="sort() === option.value ? 'btn-primary text-primary-content' : 'btn-ghost'"
@@ -323,20 +324,20 @@
           @if (hasUploadFilters()) {
           <div class="mt-5 flex flex-wrap items-center gap-2 border-t border-base-300 pt-4">
             <span class="text-xs font-black uppercase tracking-[0.18em] text-base-content/45">
-              Tags
+              {{ 'common.forms.tags' | translate }}
             </span>
             @for (tag of selectedTags(); track tag) {
             <button
               class="badge badge-primary badge-soft cursor-pointer font-bold"
               type="button"
               (click)="removeTag(tag)"
-              title="Remove tag filter"
+              [attr.title]="'common.actions.removeTagFilter' | translate"
             >
               {{ tag }} ×
             </button>
             }
             <button class="btn btn-ghost btn-xs" type="button" (click)="clearUploadFilters()">
-              Clear filters
+              {{ 'common.actions.clearFilters' | translate }}
             </button>
           </div>
           }
@@ -347,7 +348,7 @@
           <app-icon name="alert-triangle" class="size-5 shrink-0" />
           <span class="min-w-0 flex-1">{{ message }}</span>
           <button class="btn btn-sm" type="button" (click)="retryUploads()">
-            Retry
+            {{ 'common.actions.retry' | translate }}
           </button>
         </div>
         }
@@ -414,14 +415,14 @@
         } @else {
         <section
           class="rounded-[2rem] border-2 border-dashed border-base-300 bg-base-100/85 p-10 text-center shadow-sm"
-          aria-label="No uploads"
+          [attr.aria-label]="'routes.profile.noUploads' | translate"
         >
           <span
             class="mx-auto flex size-16 items-center justify-center rounded-3xl bg-primary/10 text-primary"
           >
             <app-icon name="document" class="size-8" />
           </span>
-          <h3 class="mt-5 text-2xl font-black">No public uploads found.</h3>
+          <h3 class="mt-5 text-2xl font-black">{{ 'routes.userProfile.noPublicUploadsFound' | translate }}</h3>
           <p class="mx-auto mt-3 max-w-md text-sm leading-6 text-base-content/60">
             @if (hasUploadFilters()) { Remove a tag filter to see more resources from this contributor. } @else { This contributor has not shared visible resources yet. }
           </p>
@@ -431,11 +432,11 @@
             type="button"
             (click)="clearUploadFilters()"
           >
-            Clear filters
+            {{ 'common.actions.clearFilters' | translate }}
           </button>
           } @else {
           <a class="btn btn-primary mt-6 text-primary-content" routerLink="/home">
-            Browse StudyHub
+            {{ 'navigation.browseStudyHub' | translate }}
           </a>
           }
         </section>
