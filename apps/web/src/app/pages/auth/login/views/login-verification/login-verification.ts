@@ -19,6 +19,7 @@ import {
 } from '@angular/forms';
 
 import { AuthApi } from '../../../../../core/services/auth-api';
+import { TranslationService } from '../../../../../core/services/translation';
 import { resolveApiErrorMessage } from '../../../../../core/types/api-error.util';
 import { type VerifyAccountResponse } from '../../../../../core/types/auth.models';
 import {
@@ -26,6 +27,7 @@ import {
   type UnverifiedAccount,
 } from '../../../../../core/types/login-flow.models';
 import { Icon } from '../../../../../shared/components/icon/icon';
+import { TranslatePipe } from '../../../../../shared/pipes/translate.pipe';
 
 type VerificationFormControls = {
   schoolEmail: FormControl<string>;
@@ -36,13 +38,16 @@ const RESEND_COOLDOWN_SECONDS = 5 * 60;
 
 @Component({
   selector: 'app-login-verification',
-  imports: [Icon, ReactiveFormsModule],
+  imports: [
+    TranslatePipe,
+    Icon, ReactiveFormsModule],
   templateUrl: './login-verification.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginVerification implements OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly authApi = inject(AuthApi);
+  private readonly i18n = inject(TranslationService);
 
   private resendCooldownTimer: ReturnType<typeof setInterval> | null = null;
 
@@ -125,7 +130,7 @@ export class LoginVerification implements OnDestroy {
     }
 
     if (control.hasError('required')) {
-      return 'Enter the verification code.';
+      return this.i18n.translate('validation.enterVerificationCode');
     }
 
     if (
@@ -133,10 +138,10 @@ export class LoginVerification implements OnDestroy {
       control.hasError('maxlength') ||
       control.hasError('pattern')
     ) {
-      return 'Enter exactly 6 numeric digits.';
+      return this.i18n.translate('validation.exactlySixNumericDigits');
     }
 
-    return 'Please check the verification code.';
+    return this.i18n.translate('validation.checkVerificationCode');
   }
 
   schoolEmailError(): string | null {
@@ -147,18 +152,18 @@ export class LoginVerification implements OnDestroy {
     }
 
     if (control.hasError('required')) {
-      return 'Enter your school email.';
+      return this.i18n.translate('validation.enterSchoolEmail');
     }
 
     if (control.hasError('email')) {
-      return 'Enter a valid school email address.';
+      return this.i18n.translate('validation.schoolEmail');
     }
 
     if (control.hasError('maxlength')) {
-      return 'School email cannot exceed 320 characters.';
+      return this.i18n.translate('common.auth.schoolEmailMax');
     }
 
-    return 'Please check the school email.';
+    return this.i18n.translate('validation.checkSchoolEmail');
   }
 
   onVerifyAccount(): void {
@@ -189,9 +194,9 @@ export class LoginVerification implements OnDestroy {
           this.verificationErrorMessage.set(
             this.resolveErrorMessage(
               error,
-              'We could not verify your account. Check the code and try again.',
+              'routes.login.errors.verificationFailed',
               {
-                409: 'This account is already verified. You can log in now.',
+                409: 'routes.login.errors.verificationAlreadyVerified',
               },
             ),
           );
@@ -230,11 +235,11 @@ export class LoginVerification implements OnDestroy {
           this.verificationErrorMessage.set(
             this.resolveErrorMessage(
               error,
-              'We could not send a new verification code. Please try again later.',
+              'routes.login.errors.verificationCodeSendFailed',
               {
-                404: 'We could not find an account for that school email.',
-                409: 'This account is already verified. You can log in now.',
-                429: 'A verification code was sent recently. Please wait before requesting another one.',
+                404: 'routes.login.errors.verificationAccountNotFound',
+                409: 'routes.login.errors.verificationAlreadyVerified',
+                429: 'routes.login.errors.verificationCodeRateLimited',
               },
             ),
           );
@@ -303,12 +308,19 @@ export class LoginVerification implements OnDestroy {
     fallbackMessage: string,
     statusMessages: Partial<Record<number, string>> = {},
   ): string {
+    const translatedStatusMessages = Object.fromEntries(
+      Object.entries(statusMessages).map(([status, message]) => [
+        Number(status),
+        this.i18n.translate(message ?? ''),
+      ]),
+    );
+
     return resolveApiErrorMessage(error, {
-      fallbackMessage,
+      fallbackMessage: this.i18n.translate(fallbackMessage),
       statusMessages: {
-        403: 'Your account must be verified before you can log in.',
-        404: 'No account matches those credentials.',
-        ...statusMessages,
+        403: this.i18n.translate('common.auth.accountMustBeVerified'),
+        404: this.i18n.translate('common.auth.noAccountMatchesCredentials'),
+        ...translatedStatusMessages,
       },
     });
   }

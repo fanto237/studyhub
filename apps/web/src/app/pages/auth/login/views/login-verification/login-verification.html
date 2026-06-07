@@ -9,13 +9,13 @@
       <app-icon name="check" class="size-8" />
     </span>
     <p class="badge badge-success badge-soft mt-3 font-semibold">
-      Account verified
+      {{ 'common.auth.accountVerified' | translate }}
     </p>
     <h1
       id="login-heading"
       class="mt-2 text-3xl font-black tracking-tight sm:text-4xl"
     >
-      You're ready to log in
+      {{ 'common.auth.readyToLogIn' | translate }}
     </h1>
     <p class="mt-2 max-w-sm text-base leading-7 text-base-content/70">
       {{ verified.message }} Enter your password again to start your StudyHub
@@ -27,14 +27,14 @@
         type="button"
         (click)="onBackToLogin()"
       >
-        Log in now
+        {{ 'navigation.logInNow' | translate }}
       </button>
       <button
         class="btn btn-outline"
         type="button"
         (click)="useDifferentAccount.emit()"
       >
-        Use a different account
+        {{ 'navigation.useDifferentAccount' | translate }}
       </button>
     </div>
   </div>
@@ -51,13 +51,13 @@
         <app-icon name="mail" class="size-8" />
       </span>
       <p class="badge badge-warning badge-soft mt-4 font-semibold">
-        Verification required
+        {{ 'common.auth.verificationRequired' | translate }}
       </p>
       <h1
         id="login-heading"
         class="mt-3 text-3xl font-black tracking-tight sm:text-4xl"
       >
-        Verify your school email
+        {{ 'common.auth.verifySchoolEmail' | translate }}
       </h1>
       <p class="mt-2 text-base leading-7 text-base-content/70">
         @if (account().schoolEmail) { We can send a fresh 6-digit verification
@@ -90,13 +90,13 @@
     >
       @if (!account().schoolEmail) {
       <label class="form-control">
-        <span class="label pb-2 font-semibold">School email</span>
+        <span class="label pb-2 font-semibold">{{ 'common.forms.schoolEmail' | translate }}</span>
         <input
           class="input input-bordered w-full bg-base-100"
           [class.input-error]="isSchoolEmailInvalid()"
           formControlName="schoolEmail"
           autocomplete="email"
-          placeholder="you@school.edu"
+          [placeholder]="'common.placeholders.schoolEmail' | translate"
           type="email"
         />
         @if (schoolEmailError(); as error) {
@@ -106,7 +106,7 @@
       }
 
       <label class="form-control">
-        <span class="label pb-2 font-semibold">Verification code</span>
+        <span class="label pb-2 font-semibold">{{ 'common.forms.verificationCode' | translate }}</span>
         <input
           class="input input-bordered input-lg w-full bg-base-100 text-center text-2xl font-black tracking-[0.5em]"
           [class.input-error]="isVerificationCodeInvalid()"
@@ -123,7 +123,7 @@
         <span class="label pt-2 text-sm text-error">{{ error }}</span>
         } @else {
         <span class="label pt-2 text-xs text-base-content/55"
-          >The code is exactly 6 digits and expires after 10 minutes.</span
+          >{{ 'common.auth.codeExpiresHelp' | translate }}</span
         >
         }
       </label>
@@ -147,7 +147,7 @@
       class="rounded-2xl border border-base-300 bg-base-200/60 p-4 text-center"
     >
       <p class="text-sm text-base-content/65">
-        Need a new code? Check spam first, then request another one.
+        {{ 'common.auth.needNewCode' | translate }}
       </p>
       <button
         class="btn btn-outline btn-sm mt-3"
@@ -176,14 +176,14 @@
         type="button"
         (click)="onBackToLogin()"
       >
-        Back to login
+        {{ 'navigation.backToLogin' | translate }}
       </button>
       <button
         class="btn btn-ghost btn-sm"
         type="button"
         (click)="useDifferentAccount.emit()"
       >
-        Use a different account
+        {{ 'navigation.useDifferentAccount' | translate }}
       </button>
     </div>
   </div>
