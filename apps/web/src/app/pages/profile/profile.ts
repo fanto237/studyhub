@@ -12,6 +12,7 @@ import { Router, RouterLink } from '@angular/router';
 
 import { AuthSessionStore } from '../../core/services/auth-session-store';
 import { PostsApi } from '../../core/services/posts-api';
+import { TranslationService } from '../../core/services/translation';
 import { UsersApi } from '../../core/services/users-api';
 import { resolveApiErrorMessage } from '../../core/types/api-error.util';
 import {
@@ -26,6 +27,8 @@ import { type IconName } from '../../shared/components/icon/icon.registry';
 import { MobileDock } from '../../shared/components/mobile-dock/mobile-dock';
 import { PostCard } from '../../shared/components/post-card/post-card';
 import { ThemeToggle } from '../../shared/components/theme-toggle/theme-toggle';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { LanguageSelector } from '../../shared/components/language-selector/language-selector';
 
 type UploadPagination = {
   page: number;
@@ -46,6 +49,8 @@ type InitialsSource = Pick<CurrentUserResponse, 'fullName' | 'username'>;
 @Component({
   selector: 'app-profile',
   imports: [
+    LanguageSelector,
+    TranslatePipe,
     DatePipe,
     DecimalPipe,
     Icon,
@@ -63,6 +68,7 @@ export class Profile implements OnInit {
   private readonly postsApi = inject(PostsApi);
   private readonly usersApi = inject(UsersApi);
   private readonly router = inject(Router);
+  readonly i18n = inject(TranslationService);
 
   private readonly pageSize = 9;
 
@@ -87,26 +93,26 @@ export class Profile implements OnInit {
   readonly userErrorMessage = signal<string | null>(null);
   readonly uploadsErrorMessage = signal<string | null>(null);
 
-  readonly sortOptions: readonly SortOption[] = [
+  readonly sortOptions = computed<readonly SortOption[]>(() => [
     {
       value: 'new',
-      label: 'Newest',
-      helper: 'Recently uploaded first',
+      label: this.i18n.translate('common.sort.newest'),
+      helper: this.i18n.translate('common.sort.recentlyUploadedFirst'),
       icon: 'clock',
     },
     {
       value: 'top',
-      label: 'Top rated',
-      helper: 'Highest peer scores',
+      label: this.i18n.translate('common.sort.topRated'),
+      helper: this.i18n.translate('common.sort.highestPeerScores'),
       icon: 'trophy',
     },
     {
       value: 'trending',
-      label: 'Trending',
-      helper: 'Balanced by activity',
+      label: this.i18n.translate('common.sort.trending'),
+      helper: this.i18n.translate('common.sort.balancedActivity'),
       icon: 'flame',
     },
-  ];
+  ]);
 
   readonly canLoadMore = computed(
     () => this.pagination().page < this.pagination().totalPages,
@@ -229,7 +235,7 @@ export class Profile implements OnInit {
 
         this.uploadsErrorMessage.set(
           resolveApiErrorMessage(error, {
-            fallbackMessage: 'Your vote could not be saved. Please try again.',
+            fallbackMessage: this.i18n.translate('errors.posts.voteSave'),
           }),
         );
         this.setPostVoting(post.id, false);
@@ -260,7 +266,7 @@ export class Profile implements OnInit {
         this.uploadsErrorMessage.set(
           resolveApiErrorMessage(error, {
             fallbackMessage:
-              'The PDF download could not be prepared. Please try again.',
+              this.i18n.translate('errors.posts.pdfDownload'),
           }),
         );
         this.downloadingPostId.set(null);
@@ -298,14 +304,14 @@ export class Profile implements OnInit {
     }
 
     if (role === 1) {
-      return 'Admin';
+      return this.i18n.translate('common.roles.admin');
     }
 
     if (role === 2) {
-      return 'Moderator';
+      return this.i18n.translate('common.roles.moderator');
     }
 
-    return 'Student';
+    return this.i18n.translate('common.roles.student');
   }
 
   private loadCurrentUser(): void {
@@ -323,8 +329,9 @@ export class Profile implements OnInit {
 
         this.userErrorMessage.set(
           resolveApiErrorMessage(error, {
-            fallbackMessage:
-              'Your profile could not be loaded. Please try again.',
+            fallbackMessage: this.i18n.translate(
+              'errors.profile.load',
+            ),
           }),
         );
         this.isLoadingUser.set(false);
@@ -380,8 +387,9 @@ export class Profile implements OnInit {
 
           this.uploadsErrorMessage.set(
             resolveApiErrorMessage(error, {
-              fallbackMessage:
-                'Your uploads could not be loaded. Please try again.',
+              fallbackMessage: this.i18n.translate(
+                'errors.profile.uploadsLoad',
+              ),
             }),
           );
           this.isLoadingUploads.set(false);
