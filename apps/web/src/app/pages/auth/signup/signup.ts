@@ -15,6 +15,7 @@ import {
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
+import { TranslationService } from '../../../core/services/translation';
 import { resolveApiErrorMessage } from '../../../core/types/api-error.util';
 import { AuthApi } from '../../../core/services/auth-api';
 import {
@@ -24,6 +25,7 @@ import {
 import { passwordMatchValidator } from '../../../core/validators/password-match.validator';
 import { Icon } from '../../../shared/components/icon/icon';
 import { SiteHeader } from '../../../shared/components/site-header/site-header';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 
 type SignupFormControls = {
   fullName: FormControl<string>;
@@ -52,7 +54,9 @@ const LOGIN_REDIRECT_SECONDS = 5;
 
 @Component({
   selector: 'app-signup',
-  imports: [Icon, ReactiveFormsModule, RouterLink, SiteHeader],
+  imports: [
+    TranslatePipe,
+    Icon, ReactiveFormsModule, RouterLink, SiteHeader],
   templateUrl: './signup.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -60,6 +64,7 @@ export class Signup implements OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly authApi = inject(AuthApi);
   private readonly router = inject(Router);
+  private readonly i18n = inject(TranslationService);
 
   private resendCooldownTimer: ReturnType<typeof setInterval> | null = null;
   private redirectTimer: ReturnType<typeof setInterval> | null = null;
@@ -173,14 +178,14 @@ export class Signup implements OnDestroy {
 
     if (controlName === 'confirmPassword') {
       if (control.hasError('required') && (control.dirty || control.touched)) {
-        return 'Confirm your password.';
+        return this.i18n.translate('validation.confirmPassword');
       }
 
       if (
         this.signupForm.hasError('passwordMismatch') &&
         (control.dirty || control.touched)
       ) {
-        return 'Passwords do not match.';
+        return this.i18n.translate('validation.passwordsDoNotMatch');
       }
 
       return null;
@@ -191,32 +196,34 @@ export class Signup implements OnDestroy {
     }
 
     if (control.hasError('required')) {
-      return 'This field is required.';
+      return this.i18n.translate('validation.required');
     }
 
     if (control.hasError('requiredTrue')) {
-      return 'Please accept the terms to continue.';
+      return this.i18n.translate('validation.acceptTerms');
     }
 
     if (control.hasError('email')) {
-      return 'Enter a valid email address.';
+      return this.i18n.translate('validation.email');
     }
 
     if (control.hasError('minlength')) {
-      return controlName === 'password'
-        ? 'Use at least 8 characters.'
-        : 'This value is too short.';
+      return this.i18n.translate(
+        controlName === 'password'
+          ? 'validation.passwordMin'
+          : 'validation.tooShort',
+      );
     }
 
     if (control.hasError('maxlength')) {
-      return 'This value is too long.';
+      return this.i18n.translate('validation.tooLong');
     }
 
     if (control.hasError('pattern')) {
-      return 'Use 3–30 characters: letters, numbers, dots, underscores, or hyphens. Start and end with a letter or number.';
+      return this.i18n.translate('validation.usernamePattern');
     }
 
-    return 'Please check this field.';
+    return this.i18n.translate('validation.checkField');
   }
 
   verificationCodeError(): string | null {
@@ -227,7 +234,7 @@ export class Signup implements OnDestroy {
     }
 
     if (control.hasError('required')) {
-      return 'Enter the verification code.';
+      return this.i18n.translate('validation.enterVerificationCode');
     }
 
     if (
@@ -235,10 +242,10 @@ export class Signup implements OnDestroy {
       control.hasError('maxlength') ||
       control.hasError('pattern')
     ) {
-      return 'Enter exactly 6 numeric digits.';
+      return this.i18n.translate('validation.exactlySixNumericDigits');
     }
 
-    return 'Please check the verification code.';
+    return this.i18n.translate('validation.checkVerificationCode');
   }
 
   onSubmit(): void {
@@ -320,9 +327,9 @@ export class Signup implements OnDestroy {
           this.verificationErrorMessage.set(
             this.resolveErrorMessage(
               error,
-              'We could not verify your account. Check the code and try again.',
+              'routes.signup.errors.verificationFailed',
               {
-                409: 'This account is already verified. You can log in now.',
+                409: 'routes.signup.errors.verificationAlreadyVerified',
               },
             ),
           );
@@ -341,7 +348,7 @@ export class Signup implements OnDestroy {
     const account = this.registeredAccount();
     if (!account) {
       this.verificationErrorMessage.set(
-        'Create an account before requesting a new code.',
+        this.i18n.translate('routes.signup.errors.verificationRequired'),
       );
       return;
     }
@@ -362,11 +369,11 @@ export class Signup implements OnDestroy {
         this.verificationErrorMessage.set(
           this.resolveErrorMessage(
             error,
-            'We could not send a new verification code. Please try again later.',
+            'routes.signup.errors.verificationCodeSendFailed',
             {
-              404: 'We could not find an account for that school email.',
-              409: 'This account is already verified. You can log in now.',
-              429: 'A verification code was sent recently. Please wait before requesting another one.',
+              404: 'routes.signup.errors.verificationAccountNotFound',
+              409: 'routes.signup.errors.verificationAlreadyVerified',
+              429: 'routes.signup.errors.verificationCodeRateLimited',
             },
           ),
         );
@@ -464,14 +471,21 @@ export class Signup implements OnDestroy {
 
   private resolveErrorMessage(
     error: unknown,
-    fallbackMessage = 'Something went wrong while creating your account. Please try again.',
+    fallbackMessage = 'routes.signup.errors.createFailed',
     statusMessages: Partial<Record<number, string>> = {},
   ): string {
+    const translatedStatusMessages = Object.fromEntries(
+      Object.entries(statusMessages).map(([status, message]) => [
+        Number(status),
+        this.i18n.translate(message ?? ''),
+      ]),
+    );
+
     return resolveApiErrorMessage(error, {
-      fallbackMessage,
+      fallbackMessage: this.i18n.translate(fallbackMessage),
       statusMessages: {
-        409: 'An account already exists with one of those emails or username.',
-        ...statusMessages,
+        409: this.i18n.translate('routes.signup.anAccountAlreadyExistsWithOneOfThoseEmailsOrUsername'),
+        ...translatedStatusMessages,
       },
     });
   }

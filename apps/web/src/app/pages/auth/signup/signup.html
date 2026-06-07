@@ -9,13 +9,13 @@
   >
     <app-site-header>
       <a siteHeaderActions class="btn btn-ghost btn-sm sm:btn-md" routerLink="/"
-        >Back home</a
+        >{{ 'navigation.backHome' | translate }}</a
       >
       <a
         siteHeaderActions
         class="btn btn-primary btn-sm text-primary-content sm:btn-md"
         routerLink="/login"
-        >Log In</a
+        >{{ 'navigation.logInTitle' | translate }}</a
       >
     </app-site-header>
 
@@ -28,17 +28,16 @@
       >
         <div class="max-w-xl">
           <p class="badge badge-primary badge-soft px-4 py-3 font-semibold">
-            Student-verified access
+            {{ 'common.auth.studentVerifiedAccess' | translate }}
           </p>
           <h1
             id="signup-benefits-heading"
             class="mt-5 text-5xl font-black leading-tight tracking-tight xl:text-6xl"
           >
-            Join the exam prep community built around your school.
+            {{ 'routes.signup.joinTheExamPrepCommunityBuiltAroundYourSchool' | translate }}
           </h1>
           <p class="mt-5 text-lg leading-8 text-base-content/70">
-            Create your account, verify your school email, and get ready to
-            share useful past papers with classmates as StudyHub grows.
+            {{ 'routes.signup.createYourAccountVerifyYourSchoolEmailAndGetReadyToShareUsefulPastPapersWithClassmatesAsStudyhubGrows' | translate }}
           </p>
         </div>
 
@@ -54,11 +53,10 @@
               </span>
               <div>
                 <h2 class="text-lg font-black">
-                  Find relevant material faster
+                  {{ 'routes.signup.findRelevantMaterialFaster' | translate }}
                 </h2>
                 <p class="mt-1 text-sm leading-6 text-base-content/65">
-                  Discover course files, past papers, and solutions organized
-                  for real study sessions.
+                  {{ 'routes.signup.discoverCourseFilesPastPapersAndSolutionsOrganizedForRealStudySessions' | translate }}
                 </p>
               </div>
             </div>
@@ -74,10 +72,9 @@
                 <app-icon name="upload" class="size-6" />
               </span>
               <div>
-                <h2 class="text-lg font-black">Share once, help everyone</h2>
+                <h2 class="text-lg font-black">{{ 'routes.signup.shareOnceHelpEveryone' | translate }}</h2>
                 <p class="mt-1 text-sm leading-6 text-base-content/65">
-                  Upload practical resources that help peers prepare with more
-                  context and confidence.
+                  {{ 'routes.signup.uploadPracticalResourcesThatHelpPeersPrepareWithMoreContextAndConfidence' | translate }}
                 </p>
               </div>
             </div>
@@ -93,10 +90,9 @@
                 <app-icon name="shield-check" class="size-6" />
               </span>
               <div>
-                <h2 class="text-lg font-black">Keep the community trusted</h2>
+                <h2 class="text-lg font-black">{{ 'routes.signup.keepTheCommunityTrusted' | translate }}</h2>
                 <p class="mt-1 text-sm leading-6 text-base-content/65">
-                  School email verification helps keep StudyHub focused on real
-                  students.
+                  {{ 'routes.signup.schoolEmailVerificationHelpsKeepStudyhubFocusedOnRealStudents' | translate }}
                 </p>
               </div>
             </div>
@@ -120,10 +116,10 @@
               <app-icon name="check" class="size-8" />
             </span>
             <p class="badge badge-success badge-soft mt-3 font-semibold">
-              Account verified
+              {{ 'common.auth.accountVerified' | translate }}
             </p>
             <h1 class="mt-2 text-3xl font-black tracking-tight sm:text-4xl">
-              You're ready to log in
+              {{ 'common.auth.readyToLogIn' | translate }}
             </h1>
             <p class="mt-2 max-w-lg text-base leading-7 text-base-content/70">
               {{ verified.message }} Redirecting you to login in
@@ -137,14 +133,14 @@
                 type="button"
                 (click)="goToLoginNow()"
               >
-                Go to login now
+                {{ 'navigation.goToLoginNow' | translate }}
               </button>
               <button
                 class="btn btn-outline"
                 type="button"
                 (click)="onRegisterAnotherAccount()"
               >
-                Register another account
+                {{ 'common.auth.registerAnotherAccount' | translate }}
               </button>
             </div>
           </div>
@@ -161,16 +157,16 @@
                 <app-icon name="mail" class="size-8" />
               </span>
               <p class="badge badge-success badge-soft mt-4 font-semibold">
-                Account created
+                {{ 'routes.signup.accountCreated' | translate }}
               </p>
               <h1 class="mt-3 text-3xl font-black tracking-tight sm:text-4xl">
-                Verify your school email
+                {{ 'common.auth.verifySchoolEmail' | translate }}
               </h1>
               <p class="mt-2 text-base leading-7 text-base-content/70">
-                We sent a 6-digit verification code to
+                {{ 'routes.signup.weSentA6DigitVerificationCodeTo' | translate }}
                 <span class="font-bold text-base-content"
                   >{{ account.schoolEmail }}</span
-                >. Enter it below before logging in to StudyHub.
+                >{{ 'routes.signup.enterItBelowBeforeLoggingInToStudyhub' | translate }}
               </p>
             </div>
 
@@ -193,7 +189,7 @@
               novalidate
             >
               <label class="form-control">
-                <span class="label pb-2 font-semibold">Verification code</span>
+                <span class="label pb-2 font-semibold">{{ 'common.forms.verificationCode' | translate }}</span>
                 <input
                   class="input input-bordered input-lg w-full bg-base-100 text-center text-2xl font-black tracking-[0.5em]"
                   [class.input-error]="isVerificationCodeInvalid()"
@@ -210,8 +206,7 @@
                 <span class="label pt-2 text-sm text-error">{{ error }}</span>
                 } @else {
                 <span class="label pt-2 text-xs text-base-content/55"
-                  >The code is exactly 6 digits and expires after 10
-                  minutes.</span
+                  >{{ 'common.auth.codeExpiresHelp' | translate }}</span
                 >
                 }
               </label>
@@ -237,7 +232,7 @@
               class="rounded-2xl border border-base-300 bg-base-200/60 p-4 text-center"
             >
               <p class="text-sm text-base-content/65">
-                Didn't receive the code? Check spam, then request a new one.
+                {{ 'common.auth.didNotReceiveCode' | translate }}
               </p>
               <button
                 class="btn btn-outline btn-sm mt-3"
@@ -261,14 +256,14 @@
                 class="btn btn-ghost btn-sm"
                 [routerLink]="['/login']"
                 [queryParams]="{ username: account.username }"
-                >Already verified? Log in</a
+                >{{ 'navigation.alreadyVerifiedLogIn' | translate }}</a
               >
               <button
                 class="btn btn-ghost btn-sm"
                 type="button"
                 (click)="onRegisterAnotherAccount()"
               >
-                Register another account
+                {{ 'common.auth.registerAnotherAccount' | translate }}
               </button>
             </div>
           </div>
@@ -278,17 +273,16 @@
           <p
             class="badge badge-primary badge-soft px-4 py-3 font-semibold lg:hidden"
           >
-            Student-verified access
+            {{ 'common.auth.studentVerifiedAccess' | translate }}
           </p>
           <h1
             id="signup-heading"
             class="mt-4 text-4xl font-black tracking-tight sm:text-5xl lg:mt-0"
           >
-            Create your StudyHub account
+            {{ 'routes.signup.createYourStudyhubAccount' | translate }}
           </h1>
           <p class="mt-3 text-base leading-7 text-base-content/70 sm:text-lg">
-            Sign up with your personal email and verify your school email to
-            keep the community student-focused.
+            {{ 'routes.signup.signUpWithYourPersonalEmailAndVerifyYourSchoolEmailToKeepTheCommunityStudentFocused' | translate }}
           </p>
         </div>
 
@@ -308,13 +302,13 @@
 
             <div class="grid gap-4 sm:grid-cols-2">
               <label class="form-control sm:col-span-2">
-                <span class="label pb-2 font-semibold">Full name</span>
+                <span class="label pb-2 font-semibold">{{ 'common.forms.fullName' | translate }}</span>
                 <input
                   class="input input-bordered w-full bg-base-100"
                   [class.input-error]="isInvalid('fullName')"
                   formControlName="fullName"
                   autocomplete="name"
-                  placeholder="Enter your full name"
+                  [placeholder]="'common.placeholders.fullName' | translate"
                   type="text"
                 />
                 @if (fieldError('fullName'); as error) {
@@ -323,33 +317,32 @@
               </label>
 
               <label class="form-control sm:col-span-2">
-                <span class="label pb-2 font-semibold">Username</span>
+                <span class="label pb-2 font-semibold">{{ 'common.forms.username' | translate }}</span>
                 <input
                   class="input input-bordered w-full bg-base-100"
                   [class.input-error]="isInvalid('username')"
                   formControlName="username"
                   autocomplete="username"
-                  placeholder="Choose a username"
+                  [placeholder]="'common.placeholders.username' | translate"
                   type="text"
                 />
                 @if (fieldError('username'); as error) {
                 <span class="label pt-2 text-sm text-error">{{ error }}</span>
                 } @else {
                 <span class="label pt-2 text-xs text-base-content/55"
-                  >3–30 characters; letters, numbers, dots, underscores, and
-                  hyphens.</span
+                  >{{ 'routes.signup.text330CharactersLettersNumbersDotsUnderscoresAndHyphens' | translate }}</span
                 >
                 }
               </label>
 
               <label class="form-control">
-                <span class="label pb-2 font-semibold">Private email</span>
+                <span class="label pb-2 font-semibold">{{ 'common.forms.privateEmail' | translate }}</span>
                 <input
                   class="input input-bordered w-full bg-base-100"
                   [class.input-error]="isInvalid('privateEmail')"
                   formControlName="privateEmail"
                   autocomplete="email"
-                  placeholder="you@example.com"
+                  [placeholder]="'common.placeholders.privateEmail' | translate"
                   type="email"
                 />
                 @if (fieldError('privateEmail'); as error) {
@@ -358,13 +351,13 @@
               </label>
 
               <label class="form-control">
-                <span class="label pb-2 font-semibold">School email</span>
+                <span class="label pb-2 font-semibold">{{ 'common.forms.schoolEmail' | translate }}</span>
                 <input
                   class="input input-bordered w-full bg-base-100"
                   [class.input-error]="isInvalid('schoolEmail')"
                   formControlName="schoolEmail"
                   autocomplete="email"
-                  placeholder="name@university.edu"
+                  [placeholder]="'common.placeholders.universityEmail' | translate"
                   type="email"
                 />
                 @if (fieldError('schoolEmail'); as error) {
@@ -373,13 +366,13 @@
               </label>
 
               <label class="form-control sm:col-span-2">
-                <span class="label pb-2 font-semibold">University name</span>
+                <span class="label pb-2 font-semibold">{{ 'common.forms.universityName' | translate }}</span>
                 <input
                   class="input input-bordered w-full bg-base-100"
                   [class.input-error]="isInvalid('universityName')"
                   formControlName="universityName"
                   autocomplete="organization"
-                  placeholder="e.g., University of Waterloo"
+                  [placeholder]="'common.placeholders.universityName' | translate"
                   type="text"
                 />
                 @if (fieldError('universityName'); as error) {
@@ -388,32 +381,32 @@
               </label>
 
               <label class="form-control">
-                <span class="label pb-2 font-semibold">Password</span>
+                <span class="label pb-2 font-semibold">{{ 'common.forms.password' | translate }}</span>
                 <input
                   class="input input-bordered w-full bg-base-100"
                   [class.input-error]="isInvalid('password')"
                   formControlName="password"
                   autocomplete="new-password"
-                  placeholder="Create a password"
+                  [placeholder]="'common.placeholders.createPassword' | translate"
                   type="password"
                 />
                 @if (fieldError('password'); as error) {
                 <span class="label pt-2 text-sm text-error">{{ error }}</span>
                 } @else {
                 <span class="label pt-2 text-xs text-base-content/55"
-                  >Use at least 8 characters.</span
+                  >{{ 'validation.passwordMin' | translate }}</span
                 >
                 }
               </label>
 
               <label class="form-control">
-                <span class="label pb-2 font-semibold">Confirm password</span>
+                <span class="label pb-2 font-semibold">{{ 'common.forms.confirmPassword' | translate }}</span>
                 <input
                   class="input input-bordered w-full bg-base-100"
                   [class.input-error]="isInvalid('confirmPassword') || (signupForm.hasError('passwordMismatch') && signupForm.controls.confirmPassword.touched)"
                   formControlName="confirmPassword"
                   autocomplete="new-password"
-                  placeholder="Repeat your password"
+                  [placeholder]="'common.placeholders.repeatPassword' | translate"
                   type="password"
                 />
                 @if (fieldError('confirmPassword'); as error) {
@@ -432,15 +425,14 @@
                 type="checkbox"
               />
               <span class="text-sm leading-6 text-base-content/70">
-                I agree to the
+                {{ 'routes.signup.iAgreeToThe' | translate }}
                 <a class="link link-primary font-semibold" href="#terms"
-                  >Terms of Service</a
+                  >{{ 'common.legal.termsOfService' | translate }}</a
                 >
-                and
+                {{ 'common.grammar.and' | translate }}
                 <a class="link link-primary font-semibold" href="#privacy"
-                  >Privacy Policy</a
-                >. I understand StudyHub will email my school address for
-                account verification. @if (fieldError('termsAccepted'); as
+                  >{{ 'common.legal.privacyPolicy' | translate }}</a
+                >. {{ 'routes.signup.form.verificationConsent' | translate }} @if (fieldError('termsAccepted'); as
                 error) {
                 <span class="mt-1 block text-error">{{ error }}</span>
                 }
@@ -458,13 +450,13 @@
                 class="loading loading-spinner loading-sm"
                 aria-hidden="true"
               ></span>
-              Creating account... } @else { Create account }
+              {{ 'routes.signup.form.creatingAccount' | translate }} } @else { {{ 'routes.signup.form.createAccount' | translate }} }
             </button>
 
             <p class="text-center text-sm text-base-content/60">
-              Already have an account?
+              {{ 'routes.signup.alreadyHaveAnAccount' | translate }}
               <a class="link link-primary font-semibold" routerLink="/login"
-                >Log in</a
+                >{{ 'navigation.logIn' | translate }}</a
               >
             </p>
           </div>
