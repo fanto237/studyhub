@@ -2,6 +2,9 @@ import {
   ApplicationConfig,
   provideBrowserGlobalErrorListeners,
 } from '@angular/core';
+import { registerLocaleData } from '@angular/common';
+import localeDe from '@angular/common/locales/de';
+import localeFr from '@angular/common/locales/fr';
 import {
   provideHttpClient,
   withFetch,
@@ -14,6 +17,9 @@ import {
   provideClientHydration,
   withEventReplay,
 } from '@angular/platform-browser';
+
+registerLocaleData(localeFr);
+registerLocaleData(localeDe);
 
 export const appConfig: ApplicationConfig = {
   providers: [
