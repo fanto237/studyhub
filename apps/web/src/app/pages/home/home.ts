@@ -15,6 +15,7 @@ import { debounceTime, distinctUntilChanged, map } from 'rxjs';
 
 import { AuthSessionStore } from '../../core/services/auth-session-store';
 import { PostsApi } from '../../core/services/posts-api';
+import { TranslationService } from '../../core/services/translation';
 import { UsersApi } from '../../core/services/users-api';
 import { resolveApiErrorMessage } from '../../core/types/api-error.util';
 import {
@@ -26,9 +27,11 @@ import {
 import { type CurrentUserResponse } from '../../core/types/users.models';
 import { Icon } from '../../shared/components/icon/icon';
 import { type IconName } from '../../shared/components/icon/icon.registry';
+import { LanguageSelector } from '../../shared/components/language-selector/language-selector';
 import { MobileDock } from '../../shared/components/mobile-dock/mobile-dock';
 import { PostCard } from '../../shared/components/post-card/post-card';
 import { ThemeToggle } from '../../shared/components/theme-toggle/theme-toggle';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { SidebarProfile } from './components/sidebar-profile/sidebar-profile';
 
 type FeedPagination = {
@@ -52,6 +55,7 @@ type InitialsSource = Pick<CurrentUserResponse, 'fullName' | 'username'>;
   imports: [
     DecimalPipe,
     Icon,
+    LanguageSelector,
     MobileDock,
     NgClass,
     PostCard,
@@ -59,6 +63,7 @@ type InitialsSource = Pick<CurrentUserResponse, 'fullName' | 'username'>;
     RouterLink,
     SidebarProfile,
     ThemeToggle,
+    TranslatePipe,
   ],
   templateUrl: './home.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -67,6 +72,7 @@ export class Home implements OnInit {
   private readonly authSession = inject(AuthSessionStore);
   private readonly postsApi = inject(PostsApi);
   private readonly usersApi = inject(UsersApi);
+  readonly i18n = inject(TranslationService);
   private readonly router = inject(Router);
 
   private readonly pageSize = 10;
@@ -97,26 +103,26 @@ export class Home implements OnInit {
   readonly feedErrorMessage = signal<string | null>(null);
   readonly logoutErrorMessage = signal<string | null>(null);
 
-  readonly sortOptions: readonly SortOption[] = [
+  readonly sortOptions = computed<readonly SortOption[]>(() => [
     {
       value: 'trending',
-      label: 'Trending',
-      helper: 'Balanced by recent activity',
+      label: this.i18n.translate('common.sort.trending'),
+      helper: this.i18n.translate('common.sort.balancedRecentActivity'),
       icon: 'flame',
     },
     {
       value: 'top',
-      label: 'Top rated',
-      helper: 'Highest peer scores',
+      label: this.i18n.translate('common.sort.topRated'),
+      helper: this.i18n.translate('common.sort.highestPeerScores'),
       icon: 'trophy',
     },
     {
       value: 'new',
-      label: 'Newest',
-      helper: 'Fresh uploads first',
+      label: this.i18n.translate('common.sort.newest'),
+      helper: this.i18n.translate('common.sort.freshUploadsFirst'),
       icon: 'clock',
     },
-  ];
+  ]);
 
   readonly canLoadMore = computed(
     () => this.pagination().page < this.pagination().totalPages,
@@ -262,7 +268,7 @@ export class Home implements OnInit {
 
         this.feedErrorMessage.set(
           resolveApiErrorMessage(error, {
-            fallbackMessage: 'Your vote could not be saved. Please try again.',
+            fallbackMessage: this.i18n.translate('errors.posts.voteSave'),
           }),
         );
         this.setPostVoting(post.id, false);
@@ -293,7 +299,7 @@ export class Home implements OnInit {
         this.feedErrorMessage.set(
           resolveApiErrorMessage(error, {
             fallbackMessage:
-              'The PDF download could not be prepared. Please try again.',
+              this.i18n.translate('errors.posts.pdfDownload'),
           }),
         );
         this.downloadingPostId.set(null);
@@ -325,7 +331,7 @@ export class Home implements OnInit {
 
         this.logoutErrorMessage.set(
           resolveApiErrorMessage(error, {
-            fallbackMessage: 'Logout was not completed. Please try again.',
+            fallbackMessage: this.i18n.translate('errors.auth.logoutIncomplete'),
           }),
         );
         this.isLoggingOut.set(false);
@@ -384,7 +390,7 @@ export class Home implements OnInit {
         this.userErrorMessage.set(
           resolveApiErrorMessage(error, {
             fallbackMessage:
-              'Your profile could not be loaded. Refresh the page to try again.',
+              this.i18n.translate('errors.profile.loadRefresh'),
           }),
         );
         this.isLoadingUser.set(false);
@@ -441,7 +447,7 @@ export class Home implements OnInit {
           this.feedErrorMessage.set(
             resolveApiErrorMessage(error, {
               fallbackMessage:
-                'The StudyHub feed could not be loaded. Please try again.',
+                this.i18n.translate('errors.feed.load'),
             }),
           );
           this.isLoadingPosts.set(false);
