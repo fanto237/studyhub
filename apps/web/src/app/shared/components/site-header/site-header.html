@@ -3,18 +3,19 @@
     <a
       class="flex items-center gap-2 text-base-content"
       [routerLink]="homeLink()"
-      aria-label="StudyHub home"
+      [attr.aria-label]="'navigation.aria.home' | translate"
     >
       <app-icon name="studyhub-file" class="size-6 text-primary" />
       <span class="text-xl font-bold tracking-tight sm:text-2xl">StudyHub</span>
     </a>
   </div>
 
-  <nav class="navbar-center hidden lg:flex" aria-label="Primary navigation">
+  <nav class="navbar-center hidden lg:flex" [attr.aria-label]="'navigation.aria.primary' | translate">
     <ng-content select="[siteHeaderNav]" />
   </nav>
 
   <div class="navbar-end gap-2">
+    <app-language-selector />
     <app-theme-toggle />
     <ng-content select="[siteHeaderActions]" />
   </div>
