@@ -19,10 +19,12 @@ import {
 } from '@angular/forms';
 
 import { AuthApi } from '../../../../../core/services/auth-api';
+import { TranslationService } from '../../../../../core/services/translation';
 import { resolveApiErrorMessage } from '../../../../../core/types/api-error.util';
 import { type LoginBackToLoginPayload } from '../../../../../core/types/login-flow.models';
 import { passwordMatchValidator } from '../../../../../core/validators/password-match.validator';
 import { Icon } from '../../../../../shared/components/icon/icon';
+import { TranslatePipe } from '../../../../../shared/pipes/translate.pipe';
 
 type PasswordResetRequestFormControls = {
   privateEmail: FormControl<string>;
@@ -41,13 +43,16 @@ const RESEND_COOLDOWN_SECONDS = 5 * 60;
 
 @Component({
   selector: 'app-login-password-reset',
-  imports: [Icon, ReactiveFormsModule],
+  imports: [
+    TranslatePipe,
+    Icon, ReactiveFormsModule],
   templateUrl: './login-password-reset.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginPasswordReset implements OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly authApi = inject(AuthApi);
+  private readonly i18n = inject(TranslationService);
 
   private passwordResetCooldownTimer: ReturnType<typeof setInterval> | null =
     null;
@@ -149,18 +154,18 @@ export class LoginPasswordReset implements OnDestroy {
     }
 
     if (control.hasError('required')) {
-      return 'Enter your private email.';
+      return this.i18n.translate('validation.enterPrivateEmail');
     }
 
     if (control.hasError('email')) {
-      return 'Enter a valid private email address.';
+      return this.i18n.translate('validation.privateEmail');
     }
 
     if (control.hasError('maxlength')) {
-      return 'Private email cannot exceed 320 characters.';
+      return this.i18n.translate('common.auth.privateEmailMax');
     }
 
-    return 'Please check the private email.';
+    return this.i18n.translate('validation.checkPrivateEmail');
   }
 
   passwordResetCodeError(): string | null {
@@ -171,7 +176,7 @@ export class LoginPasswordReset implements OnDestroy {
     }
 
     if (control.hasError('required')) {
-      return 'Enter the password reset code.';
+      return this.i18n.translate('validation.enterPasswordResetCode');
     }
 
     if (
@@ -179,10 +184,10 @@ export class LoginPasswordReset implements OnDestroy {
       control.hasError('maxlength') ||
       control.hasError('pattern')
     ) {
-      return 'Enter exactly 6 numeric digits.';
+      return this.i18n.translate('validation.exactlySixNumericDigits');
     }
 
-    return 'Please check the reset code.';
+    return this.i18n.translate('validation.checkResetCode');
   }
 
   passwordResetFieldError(
@@ -192,14 +197,14 @@ export class LoginPasswordReset implements OnDestroy {
 
     if (controlName === 'confirmPassword') {
       if (control.hasError('required') && (control.dirty || control.touched)) {
-        return 'Confirm your new password.';
+        return this.i18n.translate('validation.confirmNewPassword');
       }
 
       if (
         this.passwordResetForm.hasError('passwordMismatch') &&
         (control.dirty || control.touched)
       ) {
-        return 'Passwords do not match.';
+        return this.i18n.translate('validation.passwordsDoNotMatch');
       }
 
       return null;
@@ -210,18 +215,18 @@ export class LoginPasswordReset implements OnDestroy {
     }
 
     if (control.hasError('required')) {
-      return 'Enter a new password.';
+      return this.i18n.translate('validation.enterNewPassword');
     }
 
     if (control.hasError('minlength')) {
-      return 'Use at least 8 characters.';
+      return this.i18n.translate('validation.passwordMin');
     }
 
     if (control.hasError('maxlength')) {
-      return 'Password cannot exceed 256 characters.';
+      return this.i18n.translate('validation.passwordMax');
     }
 
-    return 'Please check this field.';
+    return this.i18n.translate('validation.checkField');
   }
 
   onRequestPasswordReset(): void {
@@ -301,7 +306,7 @@ export class LoginPasswordReset implements OnDestroy {
           this.passwordResetErrorMessage.set(
             this.resolvePasswordResetErrorMessage(
               error,
-              'We could not reset your password. Check the code and try again.',
+              'routes.login.errors.passwordResetFailed',
             ),
           );
           this.isResettingPassword.set(false);
@@ -347,7 +352,7 @@ export class LoginPasswordReset implements OnDestroy {
         this.passwordResetErrorMessage.set(
           this.resolvePasswordResetErrorMessage(
             error,
-            'We could not send a password reset code. Please try again later.',
+            'routes.login.errors.passwordResetCodeSendFailed',
           ),
         );
 
@@ -395,11 +400,11 @@ export class LoginPasswordReset implements OnDestroy {
     fallbackMessage: string,
   ): string {
     return resolveApiErrorMessage(error, {
-      fallbackMessage,
+      fallbackMessage: this.i18n.translate(fallbackMessage),
       statusMessages: {
-        400: 'The reset code is invalid or expired. Request a new code and try again.',
-        429: 'A reset code was sent recently. Please wait before requesting another one.',
-        503: 'StudyHub could not send email right now. Please try again later.',
+        400: this.i18n.translate('routes.login.theResetCodeIsInvalidOrExpiredRequestANewCodeAndTryAgain'),
+        429: this.i18n.translate('common.auth.resetCodeRateLimited'),
+        503: this.i18n.translate('common.auth.emailUnavailable'),
       },
     });
   }
