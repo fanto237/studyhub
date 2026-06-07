@@ -6,12 +6,15 @@ import {
 } from '@angular/core';
 
 import { type CurrentUserResponse } from '../../../../core/types/users.models';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 type InitialsSource = Pick<CurrentUserResponse, 'fullName' | 'username'>;
 
 @Component({
   selector: 'app-sidebar-profile',
-  imports: [DecimalPipe],
+  imports: [
+    TranslatePipe,
+    DecimalPipe],
   templateUrl: './sidebar-profile.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
