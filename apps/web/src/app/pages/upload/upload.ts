@@ -20,10 +20,13 @@ import { Router, RouterLink } from '@angular/router';
 
 import { AuthSessionStore } from '../../core/services/auth-session-store';
 import { PostsApi } from '../../core/services/posts-api';
+import { TranslationService } from '../../core/services/translation';
 import { resolveApiErrorMessage } from '../../core/types/api-error.util';
 import { Icon } from '../../shared/components/icon/icon';
 import { MobileDock } from '../../shared/components/mobile-dock/mobile-dock';
 import { ThemeToggle } from '../../shared/components/theme-toggle/theme-toggle';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { LanguageSelector } from '../../shared/components/language-selector/language-selector';
 
 type UploadFormControls = {
   title: FormControl<string>;
@@ -38,7 +41,10 @@ const MAX_TAG_LENGTH = 100;
 
 @Component({
   selector: 'app-upload',
-  imports: [Icon, MobileDock, ReactiveFormsModule, RouterLink, ThemeToggle],
+  imports: [
+    LanguageSelector,
+    TranslatePipe,
+    Icon, MobileDock, ReactiveFormsModule, RouterLink, ThemeToggle],
   templateUrl: './upload.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -47,6 +53,7 @@ export class Upload implements OnDestroy {
   private readonly postsApi = inject(PostsApi);
   private readonly router = inject(Router);
   private readonly authSession = inject(AuthSessionStore);
+  private readonly i18n = inject(TranslationService);
 
   private successRedirectTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -100,14 +107,14 @@ export class Upload implements OnDestroy {
     }
 
     if (control.hasError('required')) {
-      return 'Add a title for this PDF.';
+      return this.i18n.translate('validation.titleRequired');
     }
 
     if (control.hasError('maxlength')) {
-      return `Title must be ${MAX_TITLE_LENGTH} characters or fewer.`;
+      return this.i18n.translate('validation.titleMax', { max: MAX_TITLE_LENGTH });
     }
 
-    return 'Please check the title.';
+    return this.i18n.translate('validation.checkTitle');
   }
 
   descriptionError(): string | null {
@@ -118,15 +125,15 @@ export class Upload implements OnDestroy {
     }
 
     if (control.hasError('maxlength')) {
-      return `Description must be ${MAX_DESCRIPTION_LENGTH} characters or fewer.`;
+      return this.i18n.translate('validation.descriptionMax', { max: MAX_DESCRIPTION_LENGTH });
     }
 
-    return 'Please check the description.';
+    return this.i18n.translate('validation.checkDescription');
   }
 
   tagInputError(): string | null {
     if (this.tagControl.invalid && (this.tagControl.dirty || this.tagControl.touched)) {
-      return `Tags must be ${MAX_TAG_LENGTH} characters or fewer.`;
+      return this.i18n.translate('validation.tagsMax', { max: MAX_TAG_LENGTH });
     }
 
     return this.tagErrorMessage();
@@ -138,7 +145,7 @@ export class Upload implements OnDestroy {
     }
 
     if (this.fileControl.hasError('required') && this.fileControl.touched) {
-      return 'Choose a PDF file to upload.';
+      return this.i18n.translate('validation.choosePdf');
     }
 
     return null;
@@ -274,7 +281,7 @@ export class Upload implements OnDestroy {
       })
       .subscribe({
         next: (response) => {
-          this.successMessage.set(response.message || 'Your PDF was uploaded.');
+          this.successMessage.set(response.message || this.i18n.translate('routes.upload.yourPdfWasUploaded'));
           this.successRedirectTimer = setTimeout(() => {
             void this.router.navigate(['/posts', response.id]);
           }, 650);
@@ -286,9 +293,9 @@ export class Upload implements OnDestroy {
 
           this.uploadErrorMessage.set(
             resolveApiErrorMessage(error, {
-              fallbackMessage: 'The PDF could not be uploaded. Please try again.',
+              fallbackMessage: this.i18n.translate('routes.upload.thePdfCouldNotBeUploadedPleaseTryAgain'),
               statusMessages: {
-                413: `PDF files must be ${this.maxFileSizeMb} MB or smaller.`,
+                413: this.i18n.translate('validation.pdfMaxSize', { maxSize: this.maxFileSizeMb }),
               },
             }),
           );
@@ -328,18 +335,18 @@ export class Upload implements OnDestroy {
 
   private validateFile(file: File): string | null {
     if (file.size === 0) {
-      return 'The selected PDF file cannot be empty.';
+      return this.i18n.translate('validation.pdfEmpty');
     }
 
     if (file.size > MAX_FILE_SIZE_BYTES) {
-      return `PDF files must be ${this.maxFileSizeMb} MB or smaller.`;
+      return this.i18n.translate('validation.pdfMaxSize', { maxSize: this.maxFileSizeMb });
     }
 
     const hasPdfExtension = file.name.toLowerCase().endsWith('.pdf');
     const hasPdfType = file.type === 'application/pdf';
 
     if (!hasPdfExtension && !hasPdfType) {
-      return 'Choose a PDF file with a .pdf extension.';
+      return this.i18n.translate('validation.pdfExtension');
     }
 
     return null;
@@ -358,18 +365,18 @@ export class Upload implements OnDestroy {
       }
 
       if (tag.length > MAX_TAG_LENGTH) {
-        this.tagErrorMessage.set(`Tags must be ${MAX_TAG_LENGTH} characters or fewer.`);
+        this.tagErrorMessage.set(this.i18n.translate('validation.tagsMax', { max: MAX_TAG_LENGTH }));
         break;
       }
 
       if (nextTags.length >= MAX_TAG_COUNT) {
-        this.tagErrorMessage.set(`Add at most ${MAX_TAG_COUNT} tags.`);
+        this.tagErrorMessage.set(this.i18n.translate('validation.tagsCountMax', { max: MAX_TAG_COUNT }));
         break;
       }
 
       const normalizedLower = tag.toLowerCase();
       if (nextTags.some((selectedTag) => selectedTag.toLowerCase() === normalizedLower)) {
-        this.tagErrorMessage.set(`“${tag}” is already added.`);
+        this.tagErrorMessage.set(this.i18n.translate('validation.tagAlreadyAdded', { tag }));
         continue;
       }
 

@@ -8,7 +8,7 @@
     class="sticky top-0 z-40 border-b border-base-300 bg-base-100/90 px-4 py-3 shadow-sm backdrop-blur sm:px-6 lg:px-8"
   >
     <div class="mx-auto flex max-w-7xl items-center justify-between gap-3">
-      <a class="flex items-center gap-3" routerLink="/home" aria-label="StudyHub home">
+      <a class="flex items-center gap-3" routerLink="/home" [attr.aria-label]="'navigation.aria.home' | translate">
         <span
           class="flex size-11 items-center justify-center rounded-2xl bg-primary text-primary-content shadow-lg shadow-primary/20"
         >
@@ -19,28 +19,29 @@
             StudyHub
           </span>
           <span class="text-xs font-bold text-base-content/50">
-            Upload resource
+            {{ 'routes.upload.uploadResource' | translate }}
           </span>
         </span>
       </a>
 
-      <nav class="hidden items-center gap-2 lg:flex" aria-label="Upload navigation">
+      <nav class="hidden items-center gap-2 lg:flex" [attr.aria-label]="'navigation.aria.upload' | translate">
         <a class="btn btn-ghost btn-sm gap-2" routerLink="/home">
           <app-icon name="home" class="size-4" />
-          Home
+          {{ 'navigation.home' | translate }}
         </a>
         <a class="btn btn-primary btn-sm gap-2 text-primary-content" routerLink="/upload">
           <app-icon name="upload" class="size-4" />
-          Upload
+          {{ 'navigation.upload' | translate }}
         </a>
         <a class="btn btn-ghost btn-sm gap-2" routerLink="/profile">
           <app-icon name="user" class="size-4" />
-          Profile
+          {{ 'navigation.profile' | translate }}
         </a>
       </nav>
 
       <div class="flex items-center gap-2">
-        <app-theme-toggle />
+        <app-language-selector />
+          <app-theme-toggle />
       </div>
     </div>
   </header>
@@ -54,17 +55,17 @@
         <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <p class="text-sm font-black uppercase tracking-[0.22em] text-primary">
-              New StudyHub resource
+              {{ 'routes.upload.newStudyhubResource' | translate }}
             </p>
             <h1 id="upload-heading" class="mt-3 text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl">
-              Upload a PDF for classmates.
+              {{ 'routes.upload.uploadAPdfForClassmates' | translate }}
             </h1>
             <p class="mt-3 max-w-2xl text-base leading-7 text-base-content/65">
-              Add a clear title, a helpful description, and searchable tags so other students can find this document quickly.
+              {{ 'routes.upload.addAClearTitleAHelpfulDescriptionAndSearchableTagsSoOtherStudentsCanFindThisDocumentQuickly' | translate }}
             </p>
           </div>
           <span class="badge badge-primary badge-soft shrink-0 px-4 py-3 font-bold">
-            PDF only · {{ maxFileSizeMb }} MB max
+            {{ 'common.file.pdfOnly' | translate }} · {{ maxFileSizeMb }} {{ 'common.file.mbMax' | translate }}
           </span>
         </div>
 
@@ -78,17 +79,17 @@
         @if (successMessage(); as message) {
         <div class="alert alert-success mt-6" role="status">
           <app-icon name="check" class="size-5 shrink-0" />
-          <span>{{ message }} Opening the detail page...</span>
+          <span>{{ message }} {{ 'routes.upload.openingTheDetailPage' | translate }}</span>
         </div>
         }
 
         <form class="mt-8 grid gap-7" [formGroup]="uploadForm" (ngSubmit)="onSubmit()" novalidate>
           <section aria-labelledby="file-heading">
             <div class="mb-3 flex items-center justify-between gap-3">
-              <h2 id="file-heading" class="text-lg font-black">PDF file</h2>
+              <h2 id="file-heading" class="text-lg font-black">{{ 'common.file.pdfFile' | translate }}</h2>
               @if (selectedFile()) {
               <button class="btn btn-ghost btn-xs" type="button" [disabled]="isUploading()" (click)="removeSelectedFile()">
-                Remove file
+                {{ 'common.actions.removeFile' | translate }}
               </button>
               }
             </div>
@@ -118,10 +119,10 @@
                 </span>
                 <p class="mt-4 break-all text-lg font-black">{{ file.name }}</p>
                 <p class="mt-1 text-sm font-semibold text-base-content/55">
-                  {{ selectedFileSize() }} · Ready to upload
+                  {{ selectedFileSize() }} · {{ 'routes.upload.readyToUpload' | translate }}
                 </p>
                 <label class="btn btn-outline btn-sm mt-5" [class.btn-disabled]="isUploading()">
-                  Choose a different file
+                  {{ 'common.actions.chooseDifferentFile' | translate }}
                   <input class="hidden" type="file" accept="application/pdf,.pdf" [disabled]="isUploading()" (change)="onFileSelected($event)" />
                 </label>
               </div>
@@ -130,12 +131,12 @@
                 <span class="mx-auto flex size-16 items-center justify-center rounded-3xl bg-primary/10 text-primary">
                   <app-icon name="upload" class="size-8" />
                 </span>
-                <p class="mt-4 text-xl font-black">Drag and drop your PDF here</p>
+                <p class="mt-4 text-xl font-black">{{ 'routes.upload.dragAndDropYourPdfHere' | translate }}</p>
                 <p class="mt-2 text-sm leading-6 text-base-content/60">
-                  Or browse from your device. Files must be PDFs and {{ maxFileSizeMb }} MB or smaller.
+                  {{ 'routes.upload.orBrowseFromYourDeviceFilesMustBePdfsAndMaxsizeMbOrSmaller' | translate: { maxSize: maxFileSizeMb } }}
                 </p>
                 <label class="btn btn-primary mt-5 text-primary-content" [class.btn-disabled]="isUploading()">
-                  Browse files
+                  {{ 'common.actions.browseFiles' | translate }}
                   <input class="hidden" type="file" accept="application/pdf,.pdf" [disabled]="isUploading()" (change)="onFileSelected($event)" />
                 </label>
               </div>
@@ -146,22 +147,22 @@
             <p class="mt-2 text-sm font-semibold text-error">{{ error }}</p>
             } @else {
             <p class="mt-2 text-xs font-semibold text-base-content/50">
-              PDF type is checked in the browser as a hint; the server will verify the uploaded file too.
+              {{ 'routes.upload.pdfTypeIsCheckedInTheBrowserAsAHintTheServerWillVerifyTheUploadedFileToo' | translate }}
             </p>
             }
           </section>
 
           <section class="grid gap-5" aria-labelledby="metadata-heading">
-            <h2 id="metadata-heading" class="text-lg font-black">Document details</h2>
+            <h2 id="metadata-heading" class="text-lg font-black">{{ 'routes.upload.documentDetails' | translate }}</h2>
 
             <label class="form-control">
-              <span class="label pb-2 font-semibold">Title</span>
+              <span class="label pb-2 font-semibold">{{ 'common.forms.title' | translate }}</span>
               <input
                 class="input input-bordered input-lg w-full bg-base-100"
                 [class.input-error]="titleError()"
                 formControlName="title"
                 maxlength="256"
-                placeholder="e.g., Calculus I Final Exam 2024"
+                [placeholder]="'routes.upload.eGCalculusIFinalExam2024' | translate"
                 type="text"
                 autocomplete="off"
               />
@@ -169,32 +170,32 @@
                 @if (titleError(); as error) {
                 <span class="text-error">{{ error }}</span>
                 } @else {
-                <span class="text-base-content/50">{{ uploadForm.controls.title.value.length }}/{{ maxTitleLength }} characters</span>
+                <span class="text-base-content/50">{{ uploadForm.controls.title.value.length }}/{{ maxTitleLength }} {{ 'common.forms.characters' | translate }}</span>
                 }
               </span>
             </label>
 
             <label class="form-control">
-              <span class="label pb-2 font-semibold">Description</span>
+              <span class="label pb-2 font-semibold">{{ 'common.forms.description' | translate }}</span>
               <textarea
                 class="textarea textarea-bordered min-h-32 w-full bg-base-100 text-base"
                 [class.textarea-error]="descriptionError()"
                 formControlName="description"
                 maxlength="4000"
-                placeholder="What course, term, topics, or notes should classmates know?"
+                [placeholder]="'routes.upload.whatCourseTermTopicsOrNotesShouldClassmatesKnow' | translate"
               ></textarea>
               <span class="label pt-2 text-xs">
                 @if (descriptionError(); as error) {
                 <span class="text-error">{{ error }}</span>
                 } @else {
-                <span class="text-base-content/50">Optional · {{ uploadForm.controls.description.value.length }}/{{ maxDescriptionLength }} characters</span>
+                <span class="text-base-content/50">{{ 'common.forms.optional' | translate }} · {{ uploadForm.controls.description.value.length }}/{{ maxDescriptionLength }} {{ 'common.forms.characters' | translate }}</span>
                 }
               </span>
             </label>
 
             <div class="form-control">
               <div class="flex items-center justify-between gap-3 pb-2">
-                <label class="font-semibold" for="tag-input">Tags</label>
+                <label class="font-semibold" for="tag-input">{{ 'common.forms.tags' | translate }}</label>
                 <span class="text-xs font-bold text-base-content/45">
                   {{ selectedTags().length }}/{{ maxTagCount }}
                 </span>
@@ -210,7 +211,7 @@
                       type="button"
                       [disabled]="isUploading()"
                       (click)="removeTag(tag)"
-                      [attr.aria-label]="'Remove tag ' + tag"
+                      [attr.aria-label]="('common.actions.removeTagFilter' | translate) + ': ' + tag"
                     >
                       ×
                     </button>
@@ -223,7 +224,7 @@
                     [formControl]="tagControl"
                     [disabled]="isUploading() || selectedTags().length >= maxTagCount"
                     maxlength="100"
-                    placeholder="Add a tag..."
+                    [placeholder]="'routes.upload.addATag' | translate"
                     type="text"
                     autocomplete="off"
                     (keydown)="onTagKeydown($event)"
@@ -236,7 +237,7 @@
               <p class="mt-2 text-sm font-semibold text-error">{{ error }}</p>
               } @else {
               <p class="mt-2 text-xs font-semibold text-base-content/50">
-                Press Enter or comma after each tag. Use course codes, subjects, years, or exam types.
+                {{ 'routes.upload.pressEnterOrCommaAfterEachTagUseCourseCodesSubjectsYearsOrExamTypes' | translate }}
               </p>
               }
             </div>
@@ -251,50 +252,50 @@
             >
               @if (isUploading()) {
               <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
-              Uploading... } @else {
+              {{ 'common.actions.uploading' | translate }} } @else {
               <app-icon name="upload" class="size-5" />
-              Upload and share }
+              {{ 'common.actions.uploadAndShare' | translate }} }
             </button>
 
             <div class="flex flex-col gap-2 sm:flex-row">
               <button class="btn btn-outline" type="button" [disabled]="isUploading()" (click)="resetForm()">
-                Reset
+                {{ 'common.actions.reset' | translate }}
               </button>
               <a class="btn btn-ghost" routerLink="/home" [class.btn-disabled]="isUploading()">
-                Cancel
+                {{ 'common.actions.cancel' | translate }}
               </a>
             </div>
           </div>
         </form>
       </section>
 
-      <aside class="space-y-6 lg:sticky lg:top-24 lg:self-start" aria-label="Upload guidance">
+      <aside class="space-y-6 lg:sticky lg:top-24 lg:self-start" [attr.aria-label]="'routes.upload.uploadGuidance' | translate">
         <section class="rounded-[2rem] border border-base-300 bg-base-100/85 p-5 shadow-xl shadow-base-300/30 backdrop-blur sm:p-6">
           <span class="flex size-12 items-center justify-center rounded-2xl bg-accent/15 text-accent-content">
             <app-icon name="check" class="size-6" />
           </span>
-          <h2 class="mt-4 text-xl font-black">Before you upload</h2>
+          <h2 class="mt-4 text-xl font-black">{{ 'routes.upload.beforeYouUpload' | translate }}</h2>
           <ul class="mt-4 space-y-3 text-sm leading-6 text-base-content/65">
             <li class="flex gap-3">
               <span class="mt-2 size-2 shrink-0 rounded-full bg-primary"></span>
-              Use a title classmates would search for.
+              {{ 'routes.upload.useATitleClassmatesWouldSearchFor' | translate }}
             </li>
             <li class="flex gap-3">
               <span class="mt-2 size-2 shrink-0 rounded-full bg-primary"></span>
-              Add tags like course code, subject, year, and exam type.
+              {{ 'routes.upload.addTagsLikeCourseCodeSubjectYearAndExamType' | translate }}
             </li>
             <li class="flex gap-3">
               <span class="mt-2 size-2 shrink-0 rounded-full bg-primary"></span>
-              Only upload PDFs you are allowed to share with your StudyHub community.
+              {{ 'routes.upload.onlyUploadPdfsYouAreAllowedToShareWithYourStudyhubCommunity' | translate }}
             </li>
           </ul>
         </section>
 
         <section class="rounded-[2rem] border border-primary/20 bg-primary p-5 text-primary-content shadow-xl shadow-primary/20 sm:p-6">
-          <span class="badge border-white/20 bg-white/15 text-primary-content">After upload</span>
-          <h2 class="mt-4 text-xl font-black">You'll see the detail page next.</h2>
+          <span class="badge border-white/20 bg-white/15 text-primary-content">{{ 'routes.upload.afterUpload' | translate }}</span>
+          <h2 class="mt-4 text-xl font-black">{{ 'routes.upload.afterUploadTitle' | translate }}</h2>
           <p class="mt-2 text-sm leading-6 text-primary-content/80">
-            StudyHub will open the new resource page where you can view the PDF, copy the link, or download it like any other post.
+            {{ 'routes.upload.studyhubWillOpenTheNewResourcePageWhereYouCanViewThePdfCopyTheLinkOrDownloadItLikeAnyOtherPost' | translate }}
           </p>
         </section>
       </aside>
