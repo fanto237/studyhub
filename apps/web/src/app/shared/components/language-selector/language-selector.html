@@ -1,0 +1,14 @@
+<label class="sr-only" for="studyhub-language-selector">
+  {{ 'shared.languageSelector.selectLanguage' | translate }}
+</label>
+<select
+  id="studyhub-language-selector"
+  class="select select-bordered select-sm w-auto max-w-32 bg-base-100 font-semibold"
+  [attr.aria-label]="'shared.languageSelector.selectLanguage' | translate"
+  [value]="activeLanguage()"
+  (change)="setLanguage($any($event.target).value)"
+>
+  @for (option of languageOptions; track option.code) {
+  <option [value]="option.code">{{ option.label }}</option>
+  }
+</select>
