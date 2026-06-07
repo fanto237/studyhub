@@ -1,0 +1,28 @@
+import { type TranslationSchema } from '../../schema';
+
+export const upload = {
+  addAClearTitleAHelpfulDescriptionAndSearchableTagsSoOtherStudentsCanFindThisDocumentQuickly: 'Füge einen klaren Titel, eine hilfreiche Beschreibung und durchsuchbare Tags hinzu, damit andere Studierende dieses Dokument schnell finden können.',
+  addATag: 'Tag hinzufügen…',
+  addTagsLikeCourseCodeSubjectYearAndExamType: 'Füge Tags wie Kurscode, Fach, Jahr und Prüfungstyp hinzu.',
+  afterUpload: 'Nach dem Hochladen',
+  beforeYouUpload: 'Vor dem Hochladen',
+  documentDetails: 'Dokumentdetails',
+  dragAndDropYourPdfHere: 'Ziehe deine PDF hierher',
+  eGCalculusIFinalExam2024: 'z. B. Analysis I Abschlussprüfung 2024',
+  afterUploadTitle: 'Als Nächstes siehst du die Detailseite.',
+  newStudyhubResource: 'Neue StudyHub-Ressource',
+  onlyUploadPdfsYouAreAllowedToShareWithYourStudyhubCommunity: 'Lade nur PDFs hoch, die du mit deiner StudyHub-Community teilen darfst.',
+  openingTheDetailPage: 'Detailseite wird geöffnet…',
+  orBrowseFromYourDeviceFilesMustBePdfsAndMaxsizeMbOrSmaller: 'Oder durchsuche dein Gerät. Dateien müssen PDFs sein und dürfen höchstens {maxSize} MB groß sein.',
+  pdfTypeIsCheckedInTheBrowserAsAHintTheServerWillVerifyTheUploadedFileToo: 'Der PDF-Typ wird im Browser als Hinweis geprüft; der Server verifiziert die hochgeladene Datei ebenfalls.',
+  pressEnterOrCommaAfterEachTagUseCourseCodesSubjectsYearsOrExamTypes: 'Drücke nach jedem Tag Enter oder Komma. Verwende Kurscodes, Fächer, Jahre oder Prüfungstypen.',
+  readyToUpload: 'Bereit zum Hochladen',
+  studyhubWillOpenTheNewResourcePageWhereYouCanViewThePdfCopyTheLinkOrDownloadItLikeAnyOtherPost: 'StudyHub öffnet die neue Ressourcenseite, auf der du die PDF ansehen, den Link kopieren oder sie wie jeden anderen Beitrag herunterladen kannst.',
+  thePdfCouldNotBeUploadedPleaseTryAgain: 'Die PDF konnte nicht hochgeladen werden. Bitte versuche es erneut.',
+  uploadAPdfForClassmates: 'Lade eine PDF für Kommilitoninnen und Kommilitonen hoch.',
+  uploadGuidance: 'Upload-Hinweise',
+  uploadResource: 'Ressource hochladen',
+  useATitleClassmatesWouldSearchFor: 'Verwende einen Titel, nach dem Kommilitoninnen und Kommilitonen suchen würden.',
+  whatCourseTermTopicsOrNotesShouldClassmatesKnow: 'Welchen Kurs, welches Semester, welche Themen oder Hinweise sollen Kommilitonen kennen?',
+  yourPdfWasUploaded: 'Deine PDF wurde hochgeladen.',
+} as const satisfies TranslationSchema['routes']['upload'];

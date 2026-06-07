@@ -1,0 +1,28 @@
+import { type TranslationSchema } from '../../schema';
+
+export const upload = {
+  addAClearTitleAHelpfulDescriptionAndSearchableTagsSoOtherStudentsCanFindThisDocumentQuickly: 'Add a clear title, a helpful description, and searchable tags so other students can find this document quickly.',
+  addATag: 'Add a tag...',
+  addTagsLikeCourseCodeSubjectYearAndExamType: 'Add tags like course code, subject, year, and exam type.',
+  afterUpload: 'After upload',
+  beforeYouUpload: 'Before you upload',
+  documentDetails: 'Document details',
+  dragAndDropYourPdfHere: 'Drag and drop your PDF here',
+  eGCalculusIFinalExam2024: 'e.g., Calculus I Final Exam 2024',
+  afterUploadTitle: 'You\'ll see the detail page next.',
+  newStudyhubResource: 'New StudyHub resource',
+  onlyUploadPdfsYouAreAllowedToShareWithYourStudyhubCommunity: 'Only upload PDFs you are allowed to share with your StudyHub community.',
+  openingTheDetailPage: 'Opening the detail page...',
+  orBrowseFromYourDeviceFilesMustBePdfsAndMaxsizeMbOrSmaller: 'Or browse from your device. Files must be PDFs and {maxSize} MB or smaller.',
+  pdfTypeIsCheckedInTheBrowserAsAHintTheServerWillVerifyTheUploadedFileToo: 'PDF type is checked in the browser as a hint; the server will verify the uploaded file too.',
+  pressEnterOrCommaAfterEachTagUseCourseCodesSubjectsYearsOrExamTypes: 'Press Enter or comma after each tag. Use course codes, subjects, years, or exam types.',
+  readyToUpload: 'Ready to upload',
+  studyhubWillOpenTheNewResourcePageWhereYouCanViewThePdfCopyTheLinkOrDownloadItLikeAnyOtherPost: 'StudyHub will open the new resource page where you can view the PDF, copy the link, or download it like any other post.',
+  thePdfCouldNotBeUploadedPleaseTryAgain: 'The PDF could not be uploaded. Please try again.',
+  uploadAPdfForClassmates: 'Upload a PDF for classmates.',
+  uploadGuidance: 'Upload guidance',
+  uploadResource: 'Upload resource',
+  useATitleClassmatesWouldSearchFor: 'Use a title classmates would search for.',
+  whatCourseTermTopicsOrNotesShouldClassmatesKnow: 'What course, term, topics, or notes should classmates know?',
+  yourPdfWasUploaded: 'Your PDF was uploaded.',
+} as const satisfies TranslationSchema['routes']['upload'];

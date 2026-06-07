@@ -1,0 +1,35 @@
+import { type TranslationSchema } from '../../schema';
+
+export const signup = {
+  errors: {
+    createFailed: 'Something went wrong while creating your account. Please try again.',
+    verificationRequired: 'Create an account before requesting a new code.',
+    verificationFailed: 'We could not verify your account. Check the code and try again.',
+    verificationAlreadyVerified: 'This account is already verified. You can log in now.',
+    verificationCodeSendFailed: 'We could not send a new verification code. Please try again later.',
+    verificationAccountNotFound: 'We could not find an account for that school email.',
+    verificationCodeRateLimited: 'A verification code was sent recently. Please wait before requesting another one.',
+  },
+  accountCreated: 'Account created',
+  alreadyHaveAnAccount: 'Already have an account?',
+  anAccountAlreadyExistsWithOneOfThoseEmailsOrUsername: 'An account already exists with one of those emails or username.',
+  createYourAccountVerifyYourSchoolEmailAndGetReadyToShareUsefulPastPapersWithClassmatesAsStudyhubGrows: 'Create your account, verify your school email, and get ready to share useful past papers with classmates as StudyHub grows.',
+  createYourStudyhubAccount: 'Create your StudyHub account',
+  discoverCourseFilesPastPapersAndSolutionsOrganizedForRealStudySessions: 'Discover course files, past papers, and solutions organized for real study sessions.',
+  enterItBelowBeforeLoggingInToStudyhub: '. Enter it below before logging in to StudyHub.',
+  findRelevantMaterialFaster: 'Find relevant material faster',
+  form: {
+    createAccount: 'Create account',
+    creatingAccount: 'Creating account...',
+    verificationConsent: 'I understand StudyHub will email my school address for account verification.',
+  },
+  iAgreeToThe: 'I agree to the',
+  joinTheExamPrepCommunityBuiltAroundYourSchool: 'Join the exam prep community built around your school.',
+  keepTheCommunityTrusted: 'Keep the community trusted',
+  schoolEmailVerificationHelpsKeepStudyhubFocusedOnRealStudents: 'School email verification helps keep StudyHub focused on real students.',
+  shareOnceHelpEveryone: 'Share once, help everyone',
+  signUpWithYourPersonalEmailAndVerifyYourSchoolEmailToKeepTheCommunityStudentFocused: 'Sign up with your personal email and verify your school email to keep the community student-focused.',
+  text330CharactersLettersNumbersDotsUnderscoresAndHyphens: '3–30 characters; letters, numbers, dots, underscores, and hyphens.',
+  uploadPracticalResourcesThatHelpPeersPrepareWithMoreContextAndConfidence: 'Upload practical resources that help peers prepare with more context and confidence.',
+  weSentA6DigitVerificationCodeTo: 'We sent a 6-digit verification code to',
+} as const satisfies TranslationSchema['routes']['signup'];

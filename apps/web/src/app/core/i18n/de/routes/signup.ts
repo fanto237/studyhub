@@ -1,0 +1,35 @@
+import { type TranslationSchema } from '../../schema';
+
+export const signup = {
+  errors: {
+    createFailed: 'Beim Erstellen deines Kontos ist etwas schiefgelaufen. Bitte versuche es erneut.',
+    verificationRequired: 'Erstelle ein Konto, bevor du einen neuen Code anforderst.',
+    verificationFailed: 'Wir konnten dein Konto nicht verifizieren. Prüfe den Code und versuche es erneut.',
+    verificationAlreadyVerified: 'Dieses Konto ist bereits verifiziert. Du kannst dich jetzt anmelden.',
+    verificationCodeSendFailed: 'Wir konnten keinen neuen Verifizierungscode senden. Bitte versuche es später erneut.',
+    verificationAccountNotFound: 'Für diese Hochschul-E-Mail wurde kein Konto gefunden.',
+    verificationCodeRateLimited: 'Vor Kurzem wurde bereits ein Verifizierungscode gesendet. Bitte warte, bevor du einen neuen anforderst.',
+  },
+  accountCreated: 'Konto erstellt',
+  alreadyHaveAnAccount: 'Du hast schon ein Konto?',
+  anAccountAlreadyExistsWithOneOfThoseEmailsOrUsername: 'Mit einer dieser E-Mail-Adressen oder diesem Benutzernamen existiert bereits ein Konto.',
+  createYourAccountVerifyYourSchoolEmailAndGetReadyToShareUsefulPastPapersWithClassmatesAsStudyhubGrows: 'Erstelle dein Konto, verifiziere deine Hochschul-E-Mail und bereite dich darauf vor, hilfreiche alte Prüfungen mit Kommilitoninnen und Kommilitonen zu teilen, während StudyHub wächst.',
+  createYourStudyhubAccount: 'Erstelle dein StudyHub-Konto',
+  discoverCourseFilesPastPapersAndSolutionsOrganizedForRealStudySessions: 'Entdecke Kursdateien, alte Prüfungen und Lösungen, organisiert für echte Lernsitzungen.',
+  enterItBelowBeforeLoggingInToStudyhub: '. Gib ihn unten ein, bevor du dich bei StudyHub anmeldest.',
+  findRelevantMaterialFaster: 'Relevantes Material schneller finden',
+  form: {
+    createAccount: 'Konto erstellen',
+    creatingAccount: 'Konto wird erstellt…',
+    verificationConsent: 'Ich verstehe, dass StudyHub meiner Hochschuladresse zur Kontoverifizierung eine E-Mail sendet.',
+  },
+  iAgreeToThe: 'Ich stimme den',
+  joinTheExamPrepCommunityBuiltAroundYourSchool: 'Werde Teil der Prüfungsvorbereitungs-Community an deiner Hochschule.',
+  keepTheCommunityTrusted: 'Halte die Community vertrauenswürdig',
+  schoolEmailVerificationHelpsKeepStudyhubFocusedOnRealStudents: 'Die Verifizierung der Hochschul-E-Mail hilft, StudyHub auf echte Studierende auszurichten.',
+  shareOnceHelpEveryone: 'Einmal teilen, allen helfen',
+  signUpWithYourPersonalEmailAndVerifyYourSchoolEmailToKeepTheCommunityStudentFocused: 'Registriere dich mit deiner privaten E-Mail und verifiziere deine Hochschul-E-Mail, damit die Community auf Studierende fokussiert bleibt.',
+  text330CharactersLettersNumbersDotsUnderscoresAndHyphens: '3–30 Zeichen; Buchstaben, Zahlen, Punkte, Unterstriche und Bindestriche.',
+  uploadPracticalResourcesThatHelpPeersPrepareWithMoreContextAndConfidence: 'Lade praktische Ressourcen hoch, die Mitstudierenden helfen, sich mit mehr Kontext und Sicherheit vorzubereiten.',
+  weSentA6DigitVerificationCodeTo: 'Wir haben einen 6-stelligen Verifizierungscode gesendet an',
+} as const satisfies TranslationSchema['routes']['signup'];
