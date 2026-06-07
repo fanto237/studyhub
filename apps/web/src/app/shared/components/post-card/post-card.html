@@ -3,14 +3,14 @@
 <article
   class="group cursor-pointer rounded-3xl border border-base-300 bg-base-100/95 p-4 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-base-100 sm:p-5"
   tabindex="0"
-  [attr.aria-label]="'Open post details: ' + postItem.title"
+  [attr.aria-label]="('shared.postCard.openDetails' | translate) + ': ' + postItem.title"
   (click)="openPostDetail($event)"
   (keydown)="handleCardKeydown($event)"
 >
   <div class="flex gap-4">
     <div
       class="hidden w-14 shrink-0 flex-col items-center gap-1 rounded-2xl bg-base-200/80 p-1.5 sm:flex"
-      aria-label="Vote controls"
+      [attr.aria-label]="'shared.postCard.voteControls' | translate"
     >
       <button
         class="btn btn-ghost btn-xs btn-square"
@@ -18,7 +18,7 @@
         [disabled]="voting()"
         type="button"
         (click)="requestVote(postItem.currentVote === 'up' ? 'remove' : 'up')"
-        aria-label="Upvote post"
+        [attr.aria-label]="'shared.postCard.upvote' | translate"
       >
         <app-icon name="arrow-up" class="size-5" />
       </button>
@@ -29,7 +29,7 @@
         [disabled]="voting()"
         type="button"
         (click)="requestVote(postItem.currentVote === 'down' ? 'remove' : 'down')"
-        aria-label="Downvote post"
+        [attr.aria-label]="'shared.postCard.downvote' | translate"
       >
         <app-icon name="arrow-down" class="size-5" />
       </button>
@@ -37,16 +37,16 @@
 
     <div class="min-w-0 flex-1">
       <div class="flex flex-wrap items-center gap-2">
-        <span class="badge badge-primary badge-sm">PDF</span>
+        <span class="badge badge-primary badge-sm">{{ 'common.file.pdf' | translate }}</span>
         @if (postItem.currentVote) {
         <span class="badge badge-accent badge-soft badge-sm">
-          Voted {{ postItem.currentVote }}
+          {{ 'shared.postCard.voted' | translate }} {{ postItem.currentVote }}
         </span>
         }
         <span
           class="text-xs font-bold uppercase tracking-[0.18em] text-base-content/40"
         >
-          {{ postItem.createdAt | date: 'mediumDate' }}
+          {{ postItem.createdAt | date: 'mediumDate' : undefined : i18n.locale() }}
         </span>
       </div>
 
@@ -90,7 +90,7 @@
           <a
             class="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-sm font-black text-primary transition hover:bg-primary hover:text-primary-content"
             [routerLink]="['/users', postItem.user.id]"
-            [attr.aria-label]="'Open profile for @' + postItem.user.username"
+            [attr.aria-label]="('navigation.openProfileFor' | translate) + postItem.user.username"
           >
             {{ initials(postItem.user) }}
           </a>
@@ -99,7 +99,7 @@
               class="truncate text-sm font-bold text-base-content/70 transition hover:text-primary"
               [routerLink]="['/users', postItem.user.id]"
             >
-              By @{{ postItem.user.username }}
+              {{ 'shared.postCard.by' | translate }} @{{ postItem.user.username }}
             </a>
           </div>
           <div
@@ -118,7 +118,7 @@
               [disabled]="voting()"
               type="button"
               (click)="requestVote(postItem.currentVote === 'up' ? 'remove' : 'up')"
-              aria-label="Upvote post"
+              [attr.aria-label]="'shared.postCard.upvote' | translate"
             >
               <app-icon name="arrow-up" class="size-4" />
             </button>
@@ -131,7 +131,7 @@
               [disabled]="voting()"
               type="button"
               (click)="requestVote(postItem.currentVote === 'down' ? 'remove' : 'down')"
-              aria-label="Downvote post"
+              [attr.aria-label]="'shared.postCard.downvote' | translate"
             >
               <app-icon name="arrow-down" class="size-4" />
             </button>
@@ -141,7 +141,7 @@
             class="btn btn-ghost btn-sm"
             [routerLink]="['/posts', postItem.id]"
           >
-            Details
+            {{ 'common.actions.details' | translate }}
           </a>
           <!-- <a
             class="btn btn-outline btn-sm"
@@ -149,7 +149,7 @@
             target="_blank"
             rel="noopener noreferrer"
           >
-            View PDF
+            {{ 'shared.postCard.viewPdf' | translate }}
           </a> -->
           <button
             class="btn btn-primary btn-sm text-primary-content"
@@ -162,9 +162,9 @@
               class="loading loading-spinner loading-xs"
               aria-hidden="true"
             ></span>
-            Preparing } @else {
+            {{ 'common.actions.preparing' | translate }} } @else {
             <app-icon name="download" class="size-4" />
-            Download }
+            {{ 'common.actions.download' | translate }} }
           </button>
         </div>
       </div>

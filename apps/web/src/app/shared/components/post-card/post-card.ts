@@ -13,7 +13,9 @@ import {
   type PostFeedUser,
   type VoteRequestValue,
 } from '../../../core/types/posts.models';
+import { TranslationService } from '../../../core/services/translation';
 import { Icon } from '../icon/icon';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 export type PostCardVoteRequest = {
   post: PostFeedItem;
@@ -22,12 +24,13 @@ export type PostCardVoteRequest = {
 
 @Component({
   selector: 'app-post-card',
-  imports: [DatePipe, DecimalPipe, Icon, RouterLink],
+  imports: [DatePipe, DecimalPipe, Icon, RouterLink, TranslatePipe],
   templateUrl: './post-card.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PostCard {
   private readonly router = inject(Router);
+  readonly i18n = inject(TranslationService);
 
   readonly post = input.required<PostFeedItem>();
   readonly voting = input(false);
@@ -47,7 +50,7 @@ export class PostCard {
   }
 
   descriptionText(description: string | null): string {
-    const fallback = 'No description was added for this resource.';
+    const fallback = this.i18n.translate('shared.postCard.emptyDescription');
     const text = description?.trim() || fallback;
     const maxLength = this.descriptionMaxLength();
 
