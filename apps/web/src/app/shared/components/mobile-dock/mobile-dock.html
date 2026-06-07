@@ -1,6 +1,6 @@
 <nav
-  class="dock dock-md z-50 border-t border-base-300 bg-base-100/95 text-base-content shadow-[0_-16px_40px_rgba(15,23,42,0.12)] backdrop-blur lg:hidden supports-[backdrop-filter]:bg-base-100/85"
-  aria-label="Primary mobile navigation"
+  class="dock dock-md z-50 border-t border-base-300 bg-base-100/95 text-base-content shadow-[0_-16px_40px_rgba(15,23,42,0.12)] backdrop-blur lg:hidden supports-backdrop-filter:bg-base-100/85"
+  [attr.aria-label]="'navigation.aria.mobilePrimary' | translate"
 >
   @for (item of items; track item.route) {
   <a
@@ -11,10 +11,12 @@
     [ngClass]="routeState.isActive ? 'dock-active text-primary' : 'text-base-content/60'"
     [routerLinkActiveOptions]="{ exact: true }"
     [routerLink]="item.route"
-    [attr.aria-label]="item.label"
+    [attr.aria-label]="item.label | translate"
   >
     <app-icon [name]="item.icon" class="size-5" />
-    <span class="dock-label text-[0.68rem] font-black">{{ item.label }}</span>
+    <span class="dock-label text-[0.68rem] font-black"
+      >{{ item.label | translate }}</span
+    >
   </a>
   }
 </nav>
