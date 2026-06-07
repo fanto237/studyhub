@@ -25,6 +25,7 @@ import { finalize } from 'rxjs';
 import { AuthApi } from '../../core/services/auth-api';
 import { AuthSessionStore } from '../../core/services/auth-session-store';
 import { UsersApi } from '../../core/services/users-api';
+import { TranslationService } from '../../core/services/translation';
 import { resolveApiErrorMessage } from '../../core/types/api-error.util';
 import { type TotpSetupResponse } from '../../core/types/auth.models';
 import {
@@ -34,6 +35,8 @@ import {
 import { Icon } from '../../shared/components/icon/icon';
 import { MobileDock } from '../../shared/components/mobile-dock/mobile-dock';
 import { ThemeToggle } from '../../shared/components/theme-toggle/theme-toggle';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { LanguageSelector } from '../../shared/components/language-selector/language-selector';
 
 const USERNAME_PATTERN = /^[A-Za-z0-9](?:[A-Za-z0-9._-]{1,28}[A-Za-z0-9])?$/;
 
@@ -63,6 +66,8 @@ type InitialsSource = Pick<CurrentUserResponse, 'fullName' | 'username'>;
 @Component({
   selector: 'app-profile-edit',
   imports: [
+    LanguageSelector,
+    TranslatePipe,
     DatePipe,
     Icon,
     MobileDock,
@@ -79,6 +84,7 @@ export class ProfileEdit implements OnInit {
   private readonly usersApi = inject(UsersApi);
   private readonly router = inject(Router);
   private readonly fb = inject(NonNullableFormBuilder);
+  readonly i18n = inject(TranslationService);
 
   readonly profileForm: FormGroup<ProfileEditFormControls> = this.fb.group({
     fullName: [
@@ -215,7 +221,7 @@ export class ProfileEdit implements OnInit {
           this.currentUser.set(user);
           this.authSession.updateCurrentUser(user);
           this.resetFormFromUser(user);
-          this.successMessage.set('Your profile settings were updated.');
+          this.successMessage.set(this.i18n.translate('routes.profileEdit.yourProfileSettingsWereUpdated'));
         },
         error: (error: unknown) => {
           if (this.redirectToLoginIfUnauthorized(error)) {
@@ -225,9 +231,9 @@ export class ProfileEdit implements OnInit {
           this.saveErrorMessage.set(
             resolveApiErrorMessage(error, {
               fallbackMessage:
-                'Your profile changes could not be saved. Please try again.',
+                this.i18n.translate('routes.profileEdit.yourProfileChangesCouldNotBeSavedPleaseTryAgain'),
               statusMessages: {
-                409: 'That username or private email is already in use.',
+                409: this.i18n.translate('routes.profileEdit.thatUsernameOrPrivateEmailIsAlreadyInUse'),
               },
             }),
           );
@@ -267,9 +273,9 @@ export class ProfileEdit implements OnInit {
           this.totpErrorMessage.set(
             resolveApiErrorMessage(error, {
               fallbackMessage:
-                'Authenticator setup could not be started. Please try again.',
+                this.i18n.translate('routes.profileEdit.authenticatorSetupCouldNotBeStartedPleaseTryAgain'),
               statusMessages: {
-                409: 'Two-factor authentication is already enabled.',
+                409: this.i18n.translate('routes.profileEdit.twoFactorAuthenticationIsAlreadyEnabled'),
               },
             }),
           );
@@ -311,11 +317,11 @@ export class ProfileEdit implements OnInit {
           this.totpErrorMessage.set(
             resolveApiErrorMessage(error, {
               fallbackMessage:
-                'The authenticator code could not be verified. Please try again.',
+                this.i18n.translate('routes.profileEdit.theAuthenticatorCodeCouldNotBeVerifiedPleaseTryAgain'),
               statusMessages: {
-                400: 'Enter the current 6-digit authenticator code.',
-                409: 'That authenticator code was already used or setup is not ready.',
-                410: 'The setup expired. Start again and scan the new QR code.',
+                400: this.i18n.translate('validation.enterCurrentAuthenticatorCode'),
+                409: this.i18n.translate('routes.profileEdit.thatAuthenticatorCodeWasAlreadyUsedOrSetupIsNotReady'),
+                410: this.i18n.translate('routes.profileEdit.theSetupExpiredStartAgainAndScanTheNewQrCode'),
               },
             }),
           );
@@ -358,10 +364,10 @@ export class ProfileEdit implements OnInit {
           this.totpErrorMessage.set(
             resolveApiErrorMessage(error, {
               fallbackMessage:
-                'Two-factor authentication could not be disabled. Please try again.',
+                this.i18n.translate('routes.profileEdit.twoFactorAuthenticationCouldNotBeDisabledPleaseTryAgain'),
               statusMessages: {
-                400: 'Check your password and the current authenticator code.',
-                409: 'That authenticator code was already used or 2FA is already disabled.',
+                400: this.i18n.translate('routes.profileEdit.checkYourPasswordAndTheCurrentAuthenticatorCode'),
+                409: this.i18n.translate('routes.profileEdit.thatAuthenticatorCodeWasAlreadyUsedOr2faIsAlreadyDisabled'),
               },
             }),
           );
@@ -406,10 +412,10 @@ export class ProfileEdit implements OnInit {
     }
 
     if (control.hasError('required')) {
-      return 'Enter your current password.';
+      return this.i18n.translate('validation.enterCurrentPassword');
     }
 
-    return 'Password cannot exceed 256 characters.';
+    return this.i18n.translate('validation.passwordMax');
   }
 
   isInvalid(controlName: ProfileEditControlName): boolean {
@@ -426,11 +432,11 @@ export class ProfileEdit implements OnInit {
     }
 
     if (control.hasError('required')) {
-      return 'This field is required.';
+      return this.i18n.translate('validation.required');
     }
 
     if (control.hasError('email')) {
-      return 'Enter a valid email address.';
+      return this.i18n.translate('validation.email');
     }
 
     if (control.hasError('minlength')) {
@@ -448,10 +454,10 @@ export class ProfileEdit implements OnInit {
     }
 
     if (control.hasError('pattern')) {
-      return 'Use 3–30 characters: letters, numbers, dots, underscores, or hyphens. Start and end with a letter or number.';
+      return this.i18n.translate('validation.usernamePattern');
     }
 
-    return 'Please check this field.';
+    return this.i18n.translate('validation.checkField');
   }
 
   initials(source: InitialsSource): string {
@@ -473,14 +479,14 @@ export class ProfileEdit implements OnInit {
     }
 
     if (role === 1) {
-      return 'Admin';
+      return this.i18n.translate('common.roles.admin');
     }
 
     if (role === 2) {
-      return 'Moderator';
+      return this.i18n.translate('common.roles.moderator');
     }
 
-    return 'Student';
+    return this.i18n.translate('common.roles.student');
   }
 
   private loadCurrentUser(): void {
@@ -512,8 +518,9 @@ export class ProfileEdit implements OnInit {
 
           this.loadErrorMessage.set(
             resolveApiErrorMessage(error, {
-              fallbackMessage:
-                'Your profile settings could not be loaded. Please try again.',
+              fallbackMessage: this.i18n.translate(
+                'routes.profileEdit.yourProfileSettingsCouldNotBeLoadedPleaseTryAgain',
+              ),
             }),
           );
         },

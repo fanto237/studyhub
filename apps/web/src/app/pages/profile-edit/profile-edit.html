@@ -11,7 +11,7 @@
       <a
         class="flex items-center gap-3"
         routerLink="/home"
-        aria-label="StudyHub home"
+        [attr.aria-label]="'navigation.aria.home' | translate"
       >
         <span
           class="flex size-11 items-center justify-center rounded-2xl bg-primary text-primary-content shadow-lg shadow-primary/20"
@@ -23,38 +23,39 @@
             StudyHub
           </span>
           <span class="text-xs font-bold text-base-content/50">
-            Account settings
+            {{ 'navigation.accountSettings' | translate }}
           </span>
         </span>
       </a>
 
       <nav
         class="hidden items-center gap-2 lg:flex"
-        aria-label="Settings navigation"
+        [attr.aria-label]="'navigation.aria.settings' | translate"
       >
         <a class="btn btn-ghost btn-sm gap-2" routerLink="/home">
           <app-icon name="home" class="size-4" />
-          Home
+          {{ 'navigation.home' | translate }}
         </a>
         <a class="btn btn-ghost btn-sm gap-2" routerLink="/upload">
           <app-icon name="upload" class="size-4" />
-          Upload
+          {{ 'navigation.upload' | translate }}
         </a>
         <a class="btn btn-ghost btn-sm gap-2" routerLink="/profile">
           <app-icon name="user" class="size-4" />
-          Profile
+          {{ 'navigation.profile' | translate }}
         </a>
         <a
           class="btn btn-primary btn-sm gap-2 text-primary-content"
           routerLink="/profile/edit"
         >
           <app-icon name="shield-check" class="size-4" />
-          Settings
+          {{ 'navigation.settings' | translate }}
         </a>
       </nav>
 
       <div class="flex items-center gap-2">
-        <app-theme-toggle />
+        <app-language-selector />
+          <app-theme-toggle />
       </div>
     </div>
   </header>
@@ -73,18 +74,16 @@
           <p
             class="text-sm font-black uppercase tracking-[0.22em] text-primary"
           >
-            Account settings
+            {{ 'navigation.accountSettings' | translate }}
           </p>
           <h1
             id="settings-heading"
             class="mt-3 text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl"
           >
-            Edit your StudyHub profile.
+            {{ 'routes.profileEdit.editYourStudyhubProfile' | translate }}
           </h1>
           <p class="mt-3 max-w-2xl text-base leading-7 text-base-content/65">
-            Update the public account details that are supported today.
-            University identity fields stay read-only because changing them
-            requires a separate verification flow.
+            {{ 'routes.profileEdit.updateThePublicAccountDetailsThatAreSupportedTodayUniversityIdentityFieldsStayReadOnlyBecauseChangingThemRequiresASeparateVerificationFlow' | translate }}
           </p>
         </div>
 
@@ -93,7 +92,7 @@
           routerLink="/profile"
         >
           <app-icon name="chevron-left" class="size-4" />
-          Back to profile
+          {{ 'navigation.backToProfile' | translate }}
         </a>
       </div>
     </section>
@@ -137,7 +136,7 @@
       <div class="flex items-start gap-3">
         <app-icon name="alert-triangle" class="mt-0.5 size-5 shrink-0" />
         <div>
-          <h2 class="font-black">Settings unavailable</h2>
+          <h2 class="font-black">{{ 'routes.profileEdit.settingsUnavailable' | translate }}</h2>
           <p class="mt-1 text-sm leading-6 opacity-80">{{ message }}</p>
         </div>
       </div>
@@ -146,7 +145,7 @@
         type="button"
         (click)="retryProfile()"
       >
-        Retry settings
+        {{ 'common.actions.retrySettings' | translate }}
       </button>
     </section>
     } @else { @if (currentUser(); as user) {
@@ -162,26 +161,25 @@
             <p
               class="text-sm font-black uppercase tracking-[0.22em] text-primary"
             >
-              Editable profile
+              {{ 'routes.profileEdit.editableProfile' | translate }}
             </p>
             <h2
               id="editable-profile-heading"
               class="mt-2 text-2xl font-black tracking-tight"
             >
-              Public account details
+              {{ 'routes.profileEdit.publicAccountDetails' | translate }}
             </h2>
             <p class="mt-2 max-w-2xl text-sm leading-6 text-base-content/60">
-              These values are saved through the existing StudyHub user endpoint
-              and update your local session immediately after a successful save.
+              {{ 'routes.profileEdit.theseValuesAreSavedThroughTheExistingStudyhubUserEndpointAndUpdateYourLocalSessionImmediatelyAfterASuccessfulSave' | translate }}
             </p>
           </div>
           @if (hasChanges()) {
           <span class="badge badge-warning badge-soft font-bold min-w-fit"
-            >Unsaved changes</span
+            >{{ 'common.status.unsavedChanges' | translate }}</span
           >
           } @else {
           <span class="badge badge-success badge-soft font-bold min-w-fit"
-            >Up to date</span
+            >{{ 'common.status.upToDate' | translate }}</span
           >
           }
         </div>
@@ -206,9 +204,9 @@
         >
           <label class="form-control w-full">
             <span class="label pb-2">
-              <span class="label-text text-sm font-black">Full name</span>
+              <span class="label-text text-sm font-black">{{ 'common.forms.fullName' | translate }}</span>
               <span class="label-text-alt text-base-content/45"
-                >2–120 characters</span
+                >{{ 'routes.profileEdit.text2120Characters' | translate }}</span
               >
             </span>
             <input
@@ -217,7 +215,7 @@
               formControlName="fullName"
               autocomplete="name"
               maxlength="120"
-              placeholder="Your full name"
+              [placeholder]="'routes.profileEdit.yourFullName' | translate"
               [readOnly]="isSaving()"
             />
             @if (fieldError('fullName'); as error) {
@@ -229,9 +227,9 @@
 
           <div class="form-control w-full mt-8">
             <span class="label pb-2">
-              <span class="label-text text-sm font-black">Username</span>
+              <span class="label-text text-sm font-black">{{ 'common.forms.username' | translate }}</span>
               <span class="label-text-alt text-base-content/45"
-                >3–30 characters</span
+                >{{ 'routes.profileEdit.text330Characters' | translate }}</span
               >
             </span>
             <label
@@ -244,7 +242,7 @@
                 formControlName="username"
                 autocomplete="username"
                 maxlength="30"
-                placeholder="username"
+                [placeholder]="'routes.profileEdit.username' | translate"
                 [readOnly]="isSaving()"
               />
             </label>
@@ -261,8 +259,7 @@
               <span
                 class="label-text-alt text-base-content/45 whitespace-normal wrap-break-word"
               >
-                Letters, numbers, dots, underscores, and hyphens. Start and end
-                with a letter or number.
+                {{ 'routes.profileEdit.lettersNumbersDotsUnderscoresAndHyphensStartAndEndWithALetterOrNumber' | translate }}
               </span>
             </span>
             }
@@ -270,9 +267,9 @@
 
           <label class="form-control w-full">
             <span class="label pb-2">
-              <span class="label-text text-sm font-black">Private email</span>
+              <span class="label-text text-sm font-black">{{ 'common.forms.privateEmail' | translate }}</span>
               <span class="label-text-alt text-base-content/45"
-                >Max 320 characters</span
+                >{{ 'routes.profileEdit.max320Characters' | translate }}</span
               >
             </span>
             <input
@@ -281,7 +278,7 @@
               formControlName="privateEmail"
               autocomplete="email"
               maxlength="320"
-              placeholder="you@example.com"
+              [placeholder]="'common.placeholders.privateEmail' | translate"
               type="email"
               [readOnly]="isSaving()"
             />
@@ -295,7 +292,7 @@
           <div
             class="flex flex-col-reverse gap-3 border-t border-base-300 pt-6 sm:flex-row sm:justify-end"
           >
-            <a class="btn btn-ghost" routerLink="/profile">Cancel</a>
+            <a class="btn btn-ghost" routerLink="/profile">{{ 'common.actions.cancel' | translate }}</a>
             <button
               class="btn btn-primary min-w-40 text-primary-content"
               type="submit"
@@ -306,7 +303,7 @@
                 class="loading loading-spinner loading-sm"
                 aria-hidden="true"
               ></span>
-              Saving } @else { Save changes }
+              {{ 'common.actions.saving' | translate }} } @else { {{ 'common.actions.saveChanges' | translate }} }
             </button>
           </div>
         </form>
@@ -314,7 +311,7 @@
 
       <aside
         class="space-y-6 lg:sticky lg:top-24 lg:self-start"
-        aria-label="Account overview"
+        [attr.aria-label]="'routes.profileEdit.accountOverview' | translate"
       >
         <section
           class="rounded-4xl border border-base-300 bg-base-100/85 p-5 shadow-xl shadow-base-300/30 backdrop-blur sm:p-6"
@@ -330,7 +327,7 @@
               <p
                 class="text-[0.7rem] font-black uppercase tracking-[0.24em] text-primary"
               >
-                Signed-in account
+                {{ 'routes.profileEdit.signedInAccount' | translate }}
               </p>
               <h2
                 id="account-overview-heading"
@@ -351,20 +348,20 @@
             @if (user.isVerified) {
             <span class="badge badge-success badge-soft font-bold">
               <app-icon name="shield-check" class="size-3.5" />
-              Verified
+              {{ 'common.status.verified' | translate }}
             </span>
             } @else {
             <span class="badge badge-warning badge-soft font-bold"
-              >Pending verification</span
+              >{{ 'common.status.pendingVerification' | translate }}</span
             >
             } @if (user.isTotpEnabled) {
             <span class="badge badge-success badge-soft font-bold">
               <app-icon name="shield-check" class="size-3.5" />
-              2FA on
+              {{ 'common.status.totpOn' | translate }}
             </span>
             } @else {
             <span class="badge badge-neutral badge-soft font-bold"
-              >2FA off</span
+              >{{ 'common.status.totpOff' | translate }}</span
             >
             }
           </div>
@@ -374,7 +371,7 @@
               <dt
                 class="text-[0.65rem] font-black uppercase tracking-[0.2em] text-base-content/45"
               >
-                School email
+                {{ 'common.forms.schoolEmail' | translate }}
               </dt>
               <dd class="mt-1 break-all text-sm font-bold">
                 {{ user.schoolEmail }}
@@ -384,7 +381,7 @@
               <dt
                 class="text-[0.65rem] font-black uppercase tracking-[0.2em] text-base-content/45"
               >
-                University
+                {{ 'common.labels.university' | translate }}
               </dt>
               <dd class="mt-1 text-sm font-bold">{{ user.universityName }}</dd>
             </div>
@@ -392,7 +389,7 @@
               <dt
                 class="text-[0.65rem] font-black uppercase tracking-[0.2em] text-base-content/45"
               >
-                Verification status
+                {{ 'common.labels.verificationStatus' | translate }}
               </dt>
               <dd class="mt-1 text-sm font-bold">
                 {{ user.isVerified ? 'Verified' : 'Pending verification' }}
@@ -402,7 +399,7 @@
               <dt
                 class="text-[0.65rem] font-black uppercase tracking-[0.2em] text-base-content/45"
               >
-                Role
+                {{ 'common.labels.role' | translate }}
               </dt>
               <dd class="mt-1 text-sm font-bold">
                 {{ formatRole(user.role) }}
@@ -412,7 +409,7 @@
               <dt
                 class="text-[0.65rem] font-black uppercase tracking-[0.2em] text-base-content/45"
               >
-                Joined
+                {{ 'common.labels.joined' | translate }}
               </dt>
               <dd class="mt-1 text-sm font-bold">
                 {{ user.createdAt | date: 'mediumDate' }}
@@ -422,7 +419,7 @@
               <dt
                 class="text-[0.65rem] font-black uppercase tracking-[0.2em] text-base-content/45"
               >
-                Last verified
+                {{ 'common.labels.lastVerified' | translate }}
               </dt>
               <dd class="mt-1 text-sm font-bold">
                 @if (user.lastVerifiedAt) { {{ user.lastVerifiedAt | date:
@@ -447,26 +444,24 @@
                 <p
                   class="text-[0.68rem] font-black uppercase tracking-[0.22em] text-primary"
                 >
-                  Security
+                  {{ 'common.labels.security' | translate }}
                 </p>
                 <h2 id="totp-heading" class="mt-1 text-xl font-black">
-                  Authenticator app (TOTP)
+                  {{ 'routes.profileEdit.authenticatorAppTotp' | translate }}
                 </h2>
               </div>
             </div>
             @if (user.isTotpEnabled) {
             <span class="badge badge-success badge-soft font-bold"
-              >Enabled</span
+              >{{ 'common.status.enabled' | translate }}</span
             >
             } @else {
-            <span class="badge badge-neutral badge-soft font-bold">Off</span>
+            <span class="badge badge-neutral badge-soft font-bold">{{ 'common.status.off' | translate }}</span>
             }
           </div>
 
           <p class="mt-4 text-sm leading-6 text-base-content/60">
-            Add a second step to login with a time-based 6-digit code from an
-            authenticator app. StudyHub only sets login cookies after this code
-            is verified.
+            {{ 'routes.profileEdit.addASecondStepToLoginWithATimeBased6DigitCodeFromAnAuthenticatorAppStudyhubOnlySetsLoginCookiesAfterThisCodeIsVerified' | translate }}
           </p>
 
           @if (totpErrorMessage(); as message) {
@@ -486,11 +481,11 @@
           >
             <div class="flex items-center justify-between gap-4">
               <div>
-                <p class="text-sm font-black">Status</p>
+                <p class="text-sm font-black">{{ 'common.labels.status' | translate }}</p>
                 <p class="mt-1 text-xs font-semibold text-base-content/50">
-                  @if (user.isTotpEnabled) { Enabled @if (user.totpEnabledAt) {
-                  since {{ user.totpEnabledAt | date: 'mediumDate' }} } } @else
-                  { Not configured }
+                  @if (user.isTotpEnabled) { {{ 'common.status.enabled' | translate }} @if (user.totpEnabledAt) {
+                  {{ 'routes.profileEdit.since' | translate }} {{ user.totpEnabledAt | date: 'mediumDate' : undefined : i18n.locale() }} } } @else
+                  { {{ 'common.status.notConfigured' | translate }} }
                 </p>
               </div>
               <input
@@ -498,7 +493,7 @@
                 type="checkbox"
                 disabled
                 [checked]="user.isTotpEnabled"
-                aria-label="TOTP status"
+                [attr.aria-label]="'routes.profileEdit.totpStatus' | translate"
               />
             </div>
 
@@ -511,7 +506,7 @@
                 <img
                   class="mx-auto size-48 rounded-2xl border border-base-300 bg-white p-3 shadow-sm"
                   [src]="setup.qrCodeDataUrl"
-                  alt="Authenticator setup QR code"
+                  [alt]="'routes.profileEdit.authenticatorSetupQrCode' | translate"
                 />
                 } @else if (isGeneratingTotpQr()) {
                 <span
@@ -519,11 +514,11 @@
                   aria-hidden="true"
                 ></span>
                 <p class="mt-3 text-xs font-semibold text-base-content/50">
-                  Generating QR code...
+                  {{ 'common.actions.generatingQrCode' | translate }}
                 </p>
                 } @else {
                 <p class="text-sm font-semibold text-base-content/60">
-                  QR generation failed. Enter the setup key manually instead.
+                  {{ 'routes.profileEdit.qrGenerationFailedEnterTheSetupKeyManuallyInstead' | translate }}
                 </p>
                 }
               </div>
@@ -532,7 +527,7 @@
                 <p
                   class="text-xs font-black uppercase tracking-[0.18em] text-base-content/45"
                 >
-                  Manual setup key
+                  {{ 'routes.profileEdit.manualSetupKey' | translate }}
                 </p>
                 <input
                   class="input input-bordered mt-2 w-full rounded-2xl bg-base-100/80 font-mono text-xs text-base-content"
@@ -540,14 +535,13 @@
                   readonly
                 />
                 <p class="mt-2 text-xs leading-5 text-base-content/50">
-                  Setup expires around {{ setup.expiresAt | date: 'shortTime'
-                  }}. If it expires, start again and scan the new QR code.
+                  {{ 'routes.profileEdit.setupExpiresAroundTimeIfItExpiresStartAgainAndScanTheNewQrCode' | translate: { time: (setup.expiresAt | date: 'shortTime' : undefined : i18n.locale()) } }}
                 </p>
                 <a
                   class="link link-primary mt-2 inline-block text-xs font-bold"
                   [href]="setup.otpAuthUri"
                 >
-                  Open authenticator URI
+                  {{ 'common.actions.openAuthenticatorUri' | translate }}
                 </a>
               </div>
 
@@ -559,7 +553,7 @@
               >
                 <label class="form-control">
                   <span class="label pb-2 text-sm font-black">
-                    Confirm current code
+                    {{ 'routes.profileEdit.confirmCurrentCode' | translate }}
                   </span>
                   <input
                     class="input input-bordered input-lg w-full rounded-2xl bg-base-100 text-center text-2xl font-black tracking-[0.5em]"
@@ -576,7 +570,7 @@
                   <span class="label pt-2 text-sm text-error">{{ error }}</span>
                   } @else {
                   <span class="label pt-2 text-xs text-base-content/55">
-                    Enter exactly 6 digits from your authenticator app.
+                    {{ 'validation.exactlySixAuthenticatorDigits' | translate }}
                   </span>
                   }
                 </label>
@@ -592,7 +586,7 @@
                       class="loading loading-spinner loading-sm"
                       aria-hidden="true"
                     ></span>
-                    Enabling } @else { Enable 2FA }
+                    {{ 'common.actions.enabling' | translate }} } @else { {{ 'common.actions.enableTotp' | translate }} }
                   </button>
                   <button
                     class="btn btn-ghost"
@@ -600,7 +594,7 @@
                     (click)="cancelTotpSetup()"
                     [disabled]="isEnablingTotp()"
                   >
-                    Cancel
+                    {{ 'common.actions.cancel' | translate }}
                   </button>
                 </div>
               </form>
@@ -617,7 +611,7 @@
                 class="loading loading-spinner loading-sm"
                 aria-hidden="true"
               ></span>
-              Starting setup } @else { Set up authenticator }
+              {{ 'common.actions.startingSetup' | translate }} } @else { {{ 'common.actions.setUpAuthenticator' | translate }} }
             </button>
             } } @else {
             <form
@@ -627,19 +621,18 @@
               novalidate
             >
               <p class="text-sm leading-6 text-base-content/60">
-                To disable 2FA, enter your password and the current code from
-                your authenticator app. Other refresh sessions are revoked.
+                {{ 'routes.profileEdit.toDisable2faEnterYourPasswordAndTheCurrentCodeFromYourAuthenticatorAppOtherRefreshSessionsAreRevoked' | translate }}
               </p>
 
               <label class="form-control">
-                <span class="label pb-2 text-sm font-black">Password</span>
+                <span class="label pb-2 text-sm font-black">{{ 'common.forms.password' | translate }}</span>
                 <input
                   class="input input-bordered w-full rounded-2xl bg-base-100"
                   [class.input-error]="isDisableTotpPasswordInvalid()"
                   formControlName="password"
                   autocomplete="current-password"
                   maxlength="256"
-                  placeholder="Your current password"
+                  [placeholder]="'common.placeholders.currentPassword' | translate"
                   type="password"
                 />
                 @if (disableTotpPasswordError(); as error) {
@@ -649,7 +642,7 @@
 
               <label class="form-control">
                 <span class="label pb-2 text-sm font-black">
-                  Authenticator code
+                  {{ 'common.forms.authenticatorCode' | translate }}
                 </span>
                 <input
                   class="input input-bordered input-lg w-full rounded-2xl bg-base-100 text-center text-2xl font-black tracking-[0.5em]"
@@ -666,7 +659,7 @@
                 <span class="label pt-2 text-sm text-error">{{ error }}</span>
                 } @else {
                 <span class="label pt-2 text-xs text-base-content/55">
-                  Enter exactly 6 digits from your authenticator app.
+                  {{ 'validation.exactlySixAuthenticatorDigits' | translate }}
                 </span>
                 }
               </label>
@@ -681,7 +674,7 @@
                   class="loading loading-spinner loading-sm"
                   aria-hidden="true"
                 ></span>
-                Disabling } @else { Disable 2FA }
+                {{ 'common.actions.disabling' | translate }} } @else { {{ 'common.actions.disableTotp' | translate }} }
               </button>
             </form>
             }
