@@ -66,6 +66,22 @@ export interface CreatePostResponse {
   message: string;
 }
 
+export interface GeneratePostMetadataSuggestionsRequest {
+  file: File;
+  title?: string | null;
+  locale?: string | null;
+}
+
+export interface GeneratePostMetadataSuggestionsResponse {
+  title: string | null;
+  description: string | null;
+  tags: string[];
+  detectedLanguage?: string | null;
+  languageConfidence?: number | null;
+  warnings: string[];
+  message: string;
+}
+
 export interface PostDetailUser {
   id: string;
   username: string;
