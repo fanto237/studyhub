@@ -111,6 +111,16 @@ export const ICONS = {
       strokeLinejoin: 'round',
     }),
   ]),
+  sparkles: strokeIcon([
+    strokePath('M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z', {
+      strokeLinecap: 'round',
+      strokeLinejoin: 'round',
+    }),
+    strokePath('M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15ZM5 4l.7 1.8L8 6.5l-2.3.7L5 9l-.7-1.8L2 6.5l2.3-.7L5 4Z', {
+      strokeLinecap: 'round',
+      strokeLinejoin: 'round',
+    }),
+  ]),
   'alert-triangle': strokeIcon([
     strokePath(
       'M12 8v5m0 4h.01M10.3 4.3 2.8 17a2 2 0 0 0 1.7 3h15a2 2 0 0 0 1.7-3L13.7 4.3a2 2 0 0 0-3.4 0Z',
