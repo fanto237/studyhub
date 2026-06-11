@@ -5,4 +5,5 @@
   <Project Path="../libs/application/Application.csproj" />
   <Project Path="../libs/domain/Domain.csproj" />
   <Project Path="../libs/infrastructure/Infrastructure.csproj" />
+  <Project Path="mobile/mobile.csproj" />
 </Solution>
