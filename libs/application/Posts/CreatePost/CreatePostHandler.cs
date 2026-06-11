@@ -1,4 +1,3 @@
-using System.Text;
 using Application.Posts;
 using Application.Posts.Abstractions;
 using Domain.Entities;
@@ -9,9 +8,6 @@ namespace Application.Posts.CreatePost;
 
 public class CreatePostHandler
 {
-  private static readonly byte[] PdfHeader = "%PDF-"u8.ToArray();
-  private static readonly byte[] EncryptMarker = "/Encrypt"u8.ToArray();
-
   public static async Task<CreatePostResult> Handle(
       CreatePostCommand command,
       IValidator<CreatePostCommand> validator,
@@ -36,14 +32,14 @@ public class CreatePostHandler
           $"PDF files must be {CreatePostCommandValidator.MaxFileSizeBytes / (1024 * 1024)} MB or smaller.");
     }
 
-    if (!HasPdfHeader(command.FileBytes))
+    if (!PdfPostFileValidator.HasPdfHeader(command.FileBytes))
     {
       return new CreatePostResult(
           CreatePostOutcome.InvalidFile,
           "Only valid PDF files are allowed.");
     }
 
-    if (ContainsSequence(command.FileBytes, EncryptMarker))
+    if (PdfPostFileValidator.ContainsEncryptMarker(command.FileBytes))
     {
       return new CreatePostResult(
           CreatePostOutcome.InvalidFile,
@@ -149,29 +145,6 @@ public class CreatePostHandler
 
       throw;
     }
-  }
-
-  private static bool HasPdfHeader(ReadOnlySpan<byte> fileBytes)
-  {
-    return fileBytes.Length >= PdfHeader.Length && fileBytes[..PdfHeader.Length].SequenceEqual(PdfHeader);
-  }
-
-  private static bool ContainsSequence(ReadOnlySpan<byte> source, ReadOnlySpan<byte> sequence)
-  {
-    if (source.Length < sequence.Length)
-    {
-      return false;
-    }
-
-    for (var index = 0; index <= source.Length - sequence.Length; index++)
-    {
-      if (source.Slice(index, sequence.Length).SequenceEqual(sequence))
-      {
-        return true;
-      }
-    }
-
-    return false;
   }
 
   private static string NormalizeContentType(string contentType)
