@@ -4,6 +4,7 @@ using Api.Responses;
 using Application.Posts.CreatePost;
 using Application.Posts.DeletePost;
 using Application.Posts.DownloadPost;
+using Application.Posts.GeneratePostMetadata;
 using Application.Posts.GetPost;
 using Application.Posts.GetPosts;
 using Application.Posts.ReportPost;
@@ -54,6 +55,11 @@ public static class PostEndpoints
     group.MapPost("/{postId:guid}/download", DownloadPost)
         .WithName("DownloadPost")
         .WithDescription("Returns a downloadable PDF URL for a visible StudyHub post.");
+
+    group.MapPost("/metadata-suggestions", GenerateMetadataSuggestions)
+        .WithName("GeneratePostMetadataSuggestions")
+        .WithDescription("Generates editable AI metadata suggestions from a PDF without creating a post.")
+        .DisableAntiforgery();
 
     group.MapPost(string.Empty, CreatePost)
         .WithName("CreatePost")
@@ -286,6 +292,66 @@ public static class PostEndpoints
       ReportPostOutcome.NotFound => Results.NotFound(SendResponse.Fail(new { message = result.Message })),
       ReportPostOutcome.AlreadyReported => Results.Conflict(SendResponse.Fail(new { message = result.Message })),
       ReportPostOutcome.Forbidden => Results.Json(SendResponse.Fail(new { message = result.Message }), statusCode: StatusCodes.Status403Forbidden),
+      _ => Results.BadRequest(SendResponse.Fail(new { message = result.Message })),
+    };
+  }
+
+  private static async Task<IResult> GenerateMetadataSuggestions(
+      [FromForm] GeneratePostMetadataRequest request,
+      ClaimsPrincipal user,
+      IMessageBus bus,
+      CancellationToken cancellationToken)
+  {
+    var userIdValue = user.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (!Guid.TryParse(userIdValue, out var userId))
+    {
+      return Results.Json(SendResponse.Fail(new { message = "Authentication is required." }), statusCode: StatusCodes.Status401Unauthorized);
+    }
+
+    if (request.File is null)
+    {
+      return Results.BadRequest(SendResponse.Fail(new { message = "A PDF file is required." }));
+    }
+
+    if (request.File.Length == 0)
+    {
+      return Results.BadRequest(SendResponse.Fail(new { message = "The uploaded PDF file cannot be empty." }));
+    }
+
+    if (request.File.Length > CreatePostCommandValidator.MaxFileSizeBytes)
+    {
+      return Results.Json(
+          SendResponse.Fail(new { message = $"PDF files must be {CreatePostCommandValidator.MaxFileSizeBytes / (1024 * 1024)} MB or smaller." }),
+          statusCode: StatusCodes.Status413PayloadTooLarge);
+    }
+
+    await using var fileStream = request.File.OpenReadStream();
+    await using var memoryStream = new MemoryStream((int)request.File.Length);
+    await fileStream.CopyToAsync(memoryStream, cancellationToken);
+
+    var command = new GeneratePostMetadataCommand(
+        userId,
+        request.Title,
+        request.File.FileName,
+        string.IsNullOrWhiteSpace(request.File.ContentType) ? "application/pdf" : request.File.ContentType,
+        memoryStream.ToArray());
+
+    var result = await bus.InvokeAsync<GeneratePostMetadataResult>(command, cancellationToken);
+
+    return result.Outcome switch
+    {
+      GeneratePostMetadataOutcome.Success => Results.Ok(SendResponse.Success(new GeneratePostMetadataResponse(
+          result.Title,
+          result.Description,
+          result.Tags ?? [],
+          result.DetectedLanguage,
+          result.LanguageConfidence,
+          result.Warnings ?? [],
+          result.Message))),
+      GeneratePostMetadataOutcome.PayloadTooLarge => Results.Json(SendResponse.Fail(new { message = result.Message }), statusCode: StatusCodes.Status413PayloadTooLarge),
+      GeneratePostMetadataOutcome.ProviderUnavailable => Results.Json(SendResponse.Fail(new { message = result.Message }), statusCode: StatusCodes.Status503ServiceUnavailable),
+      GeneratePostMetadataOutcome.InsufficientText => Results.Json(SendResponse.Fail(new { message = result.Message, warnings = result.Warnings ?? [] }), statusCode: StatusCodes.Status422UnprocessableEntity),
+      GeneratePostMetadataOutcome.InvalidFile => Results.BadRequest(SendResponse.Fail(new { message = result.Message })),
       _ => Results.BadRequest(SendResponse.Fail(new { message = result.Message })),
     };
   }
