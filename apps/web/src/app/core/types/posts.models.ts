@@ -69,7 +69,6 @@ export interface CreatePostResponse {
 export interface GeneratePostMetadataSuggestionsRequest {
   file: File;
   title?: string | null;
-  locale?: string | null;
 }
 
 export interface GeneratePostMetadataSuggestionsResponse {

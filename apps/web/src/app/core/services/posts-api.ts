@@ -7,6 +7,8 @@ import {
   type CreatePostRequest,
   type CreatePostResponse,
   type DownloadPostResponse,
+  type GeneratePostMetadataSuggestionsRequest,
+  type GeneratePostMetadataSuggestionsResponse,
   type GetPostResponse,
   type GetPostsParams,
   type GetPostsResponse,
@@ -40,6 +42,32 @@ export class PostsApi {
           }
 
           throw new Error(response.message ?? 'The post could not be loaded.');
+        }),
+      );
+  }
+
+  generateMetadataSuggestions(request: GeneratePostMetadataSuggestionsRequest) {
+    const formData = new FormData();
+    formData.append('File', request.file);
+
+    const title = request.title?.trim();
+    if (title) {
+      formData.append('Title', title);
+    }
+
+    return this.http
+      .post<
+        ApiEnvelope<GeneratePostMetadataSuggestionsResponse>
+      >('/api/posts/metadata-suggestions', formData, { withCredentials: true })
+      .pipe(
+        map((response) => {
+          if (response.status === 'success' && response.data) {
+            return response.data;
+          }
+
+          throw new Error(
+            response.message ?? 'Metadata suggestions could not be generated.',
+          );
         }),
       );
   }
