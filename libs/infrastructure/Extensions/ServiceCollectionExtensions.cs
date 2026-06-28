@@ -39,6 +39,7 @@ public static class ServiceCollectionExtensions
         .Validate(options => !string.IsNullOrWhiteSpace(options.AccessKeyId), $"{CloudflareOptions.SectionName}:AccessKeyId is required.")
         .Validate(options => !string.IsNullOrWhiteSpace(options.SecretAccessKey), $"{CloudflareOptions.SectionName}:SecretAccessKey is required.")
         .Validate(options => !string.IsNullOrWhiteSpace(options.BucketName), $"{CloudflareOptions.SectionName}:BucketName is required.")
+        .Validate(options => !string.IsNullOrWhiteSpace(options.PublicBaseUrl), $"{CloudflareOptions.SectionName}:PublicBaseUrl is required.")
         .ValidateOnStart();
 
     services.AddDbContext<StudyHubDbContext>(options =>
