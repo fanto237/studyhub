@@ -213,6 +213,13 @@ public static class UserEndpoints
         item.TotpEnabledAt,
         item.KarmaScore,
         item.CreatedAt,
+        item.AiMetadataGenerationUsage is null
+            ? null
+            : new CurrentUserAiMetadataGenerationUsageResponse(
+                item.AiMetadataGenerationUsage.Limit,
+                item.AiMetadataGenerationUsage.UsedToday,
+                item.AiMetadataGenerationUsage.Remaining,
+                item.AiMetadataGenerationUsage.ResetAt),
         item.LatestPosts
             .Select(post => new CurrentUserLatestPostResponse(
                 post.Id,

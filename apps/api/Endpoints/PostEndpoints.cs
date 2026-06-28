@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Security.Claims;
 using Api.DTOs.Posts;
 using Api.Responses;
@@ -300,6 +301,7 @@ public static class PostEndpoints
       [FromForm] GeneratePostMetadataRequest request,
       ClaimsPrincipal user,
       IMessageBus bus,
+      HttpContext httpContext,
       CancellationToken cancellationToken)
   {
     var userIdValue = user.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -347,13 +349,52 @@ public static class PostEndpoints
           result.DetectedLanguage,
           result.LanguageConfidence,
           result.Warnings ?? [],
-          result.Message))),
+          result.Message,
+          BuildAiMetadataQuotaResponse(result)))),
       GeneratePostMetadataOutcome.PayloadTooLarge => Results.Json(SendResponse.Fail(new { message = result.Message }), statusCode: StatusCodes.Status413PayloadTooLarge),
-      GeneratePostMetadataOutcome.ProviderUnavailable => Results.Json(SendResponse.Fail(new { message = result.Message }), statusCode: StatusCodes.Status503ServiceUnavailable),
+      GeneratePostMetadataOutcome.ProviderUnavailable => Results.Json(SendResponse.Fail(new
+      {
+        message = result.Message,
+        limit = result.DailyLimit,
+        remaining = result.RemainingToday,
+        resetAt = result.ResetAt,
+      }), statusCode: StatusCodes.Status503ServiceUnavailable),
+      GeneratePostMetadataOutcome.DailyLimitReached => BuildMetadataDailyLimitReachedResult(result, httpContext),
       GeneratePostMetadataOutcome.InsufficientText => Results.Json(SendResponse.Fail(new { message = result.Message, warnings = result.Warnings ?? [] }), statusCode: StatusCodes.Status422UnprocessableEntity),
       GeneratePostMetadataOutcome.InvalidFile => Results.BadRequest(SendResponse.Fail(new { message = result.Message })),
       _ => Results.BadRequest(SendResponse.Fail(new { message = result.Message })),
     };
+  }
+
+  private static AiMetadataQuotaResponse? BuildAiMetadataQuotaResponse(GeneratePostMetadataResult result)
+  {
+    return result.DailyLimit is int limit
+        && result.RemainingToday is int remaining
+        && result.ResetAt is DateTimeOffset resetAt
+            ? new AiMetadataQuotaResponse(limit, remaining, resetAt)
+            : null;
+  }
+
+  private static IResult BuildMetadataDailyLimitReachedResult(
+      GeneratePostMetadataResult result,
+      HttpContext httpContext)
+  {
+    if (result.ResetAt is DateTimeOffset resetAt)
+    {
+      var retryAfter = resetAt - DateTimeOffset.UtcNow;
+      if (retryAfter > TimeSpan.Zero)
+      {
+        httpContext.Response.Headers.RetryAfter = Math.Ceiling(retryAfter.TotalSeconds).ToString(CultureInfo.InvariantCulture);
+      }
+    }
+
+    return Results.Json(SendResponse.Fail(new
+    {
+      message = result.Message,
+      limit = result.DailyLimit,
+      remaining = result.RemainingToday,
+      resetAt = result.ResetAt,
+    }), statusCode: StatusCodes.Status429TooManyRequests);
   }
 
   private static async Task<IResult> CreatePost(

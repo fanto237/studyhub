@@ -65,6 +65,7 @@ public static class ServiceCollectionExtensions
     services.AddSingleton<ITotpService, TotpService>();
     services.AddScoped<ICommentRepository, CommentRepository>();
     services.AddScoped<IPostRepository, PostRepository>();
+    services.AddScoped<IAiMetadataGenerationQuotaService, AiMetadataGenerationQuotaService>();
     services.AddScoped<IPostFileStorageService, CloudflareR2PostFileStorageService>();
     services.AddScoped<IPdfTextExtractionService, PdfPigTextExtractionService>();
     services.AddHttpClient<IPostMetadataAiService, GroqPostMetadataAiService>((serviceProvider, httpClient) =>
