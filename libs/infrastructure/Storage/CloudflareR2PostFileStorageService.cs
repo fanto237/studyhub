@@ -44,7 +44,7 @@ public class CloudflareR2PostFileStorageService(
   {
     var baseUrl = options.PublicBaseUrl.TrimEnd('/');
 
-    return $"{baseUrl}/{options.BucketName}/{EncodeObjectKey(objectKey)}";
+    return $"{baseUrl}/{EncodeObjectKey(objectKey)}";
   }
 
   private static string EncodeObjectKey(string objectKey)
