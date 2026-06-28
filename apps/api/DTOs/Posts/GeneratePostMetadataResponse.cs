@@ -7,4 +7,10 @@ public sealed record GeneratePostMetadataResponse(
     string? DetectedLanguage,
     double? LanguageConfidence,
     IReadOnlyList<string> Warnings,
-    string Message);
+    string Message,
+    AiMetadataQuotaResponse? Quota);
+
+public sealed record AiMetadataQuotaResponse(
+    int Limit,
+    int Remaining,
+    DateTimeOffset ResetAt);

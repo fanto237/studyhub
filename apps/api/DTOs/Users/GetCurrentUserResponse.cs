@@ -16,7 +16,14 @@ public record GetCurrentUserResponse(
     DateTimeOffset? TotpEnabledAt,
     int KarmaScore,
     DateTimeOffset CreatedAt,
+    CurrentUserAiMetadataGenerationUsageResponse? AiMetadataGenerationUsage,
     IReadOnlyList<CurrentUserLatestPostResponse> LatestPosts);
+
+public record CurrentUserAiMetadataGenerationUsageResponse(
+    int Limit,
+    int UsedToday,
+    int Remaining,
+    DateTimeOffset ResetAt);
 
 public record CurrentUserLatestPostResponse(
     Guid Id,
