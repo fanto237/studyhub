@@ -12,7 +12,7 @@
     ],
     "sharedGlobals": []
   },
-  "nxCloudId": "69b91a011df24083485ebfd9",
+  "nxCloudId": "6a4134609e7ebd1a595d7356",
   "plugins": ["@nx/dotnet"],
   "targetDefaults": {
     "@angular/build:application": {
