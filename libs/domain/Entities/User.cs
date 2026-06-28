@@ -34,4 +34,5 @@ public class User
   public ICollection<UserAuthCode> AuthCodes { get; set; } = [];
   public ICollection<UserRefreshToken> RefreshTokens { get; set; } = [];
   public ICollection<UserTotpLoginChallenge> TotpLoginChallenges { get; set; } = [];
+  public ICollection<UserAiMetadataGenerationUsage> AiMetadataGenerationUsages { get; set; } = [];
 }
