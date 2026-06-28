@@ -51,7 +51,7 @@ public class CreatePostHandler
     var normalizedTitle = PostMetadataNormalizer.NormalizeTitle(command.Title);
     var normalizedDescription = PostMetadataNormalizer.NormalizeDescription(command.Description);
     var normalizedTags = PostMetadataNormalizer.NormalizeTags(command.Tags);
-    var objectKey = $"posts/{command.UserId.ToString("N")}/{postId.ToString("N")}.pdf";
+    var objectKey = $"posts/{command.UserId:N}/{postId:N}.pdf";
     string? uploadedObjectKey = null;
 
     try

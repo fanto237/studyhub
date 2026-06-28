@@ -37,6 +37,27 @@
         </a>
 
         <div class="flex items-center gap-1">
+          <details class="dropdown dropdown-end">
+            <summary
+              class="btn btn-ghost btn-circle btn-sm list-none [&::-webkit-details-marker]:hidden"
+              [attr.aria-label]="'navigation.aria.primary' | translate"
+            >
+              <app-icon name="menu" class="size-4" />
+            </summary>
+            <ul
+              class="menu dropdown-content z-50 mt-3 w-56 rounded-box border border-base-300 bg-base-100 p-2 shadow-xl"
+            >
+              <li>
+                <a routerLink="/contact">{{ 'routes.landing.contact' | translate }}</a>
+              </li>
+              <li>
+                <a routerLink="/terms">{{ 'common.legal.termsOfService' | translate }}</a>
+              </li>
+              <li>
+                <a routerLink="/policy">{{ 'common.legal.privacyPolicy' | translate }}</a>
+              </li>
+            </ul>
+          </details>
           <app-language-selector />
           <app-theme-toggle />
           <button

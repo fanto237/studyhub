@@ -426,11 +426,19 @@
               />
               <span class="text-sm leading-6 text-base-content/70">
                 {{ 'routes.signup.iAgreeToThe' | translate }}
-                <a class="link link-primary font-semibold" href="#terms"
+                <a
+                  class="link link-primary font-semibold"
+                  routerLink="/terms"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   >{{ 'common.legal.termsOfService' | translate }}</a
                 >
                 {{ 'common.grammar.and' | translate }}
-                <a class="link link-primary font-semibold" href="#privacy"
+                <a
+                  class="link link-primary font-semibold"
+                  routerLink="/policy"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   >{{ 'common.legal.privacyPolicy' | translate }}</a
                 >. {{ 'routes.signup.form.verificationConsent' | translate }} @if (fieldError('termsAccepted'); as
                 error) {

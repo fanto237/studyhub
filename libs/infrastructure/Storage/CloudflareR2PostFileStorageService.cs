@@ -16,10 +16,12 @@ public class CloudflareR2PostFileStorageService(
   {
     await using var stream = new MemoryStream(request.Content, writable: false);
 
+    var key = $"{options.Prefix.Trim('/')}/{request.ObjectKey}";
+
     var putObjectRequest = new PutObjectRequest
     {
       BucketName = options.BucketName,
-      Key = request.ObjectKey,
+      Key = key,
       InputStream = stream,
       ContentType = request.ContentType,
       DisablePayloadSigning = true,
@@ -30,7 +32,7 @@ public class CloudflareR2PostFileStorageService(
 
     await s3Client.PutObjectAsync(putObjectRequest, cancellationToken);
 
-    return new StoredPostFile(request.ObjectKey, BuildStorageUrl(request.ObjectKey));
+    return new StoredPostFile(key, BuildStorageUrl(key));
   }
 
   public async Task DeleteFileAsync(string objectKey, CancellationToken cancellationToken)

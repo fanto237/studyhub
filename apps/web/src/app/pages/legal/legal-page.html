@@ -1,0 +1,161 @@
+<div class="min-h-screen overflow-x-hidden bg-base-100 text-base-content">
+  <div
+    class="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_12%_8%,rgba(74,77,230,0.16),transparent_26%),radial-gradient(circle_at_88%_12%,rgba(236,72,153,0.11),transparent_24%),radial-gradient(circle_at_60%_92%,rgba(20,184,166,0.14),transparent_30%)]"
+    aria-hidden="true"
+  ></div>
+
+  <div
+    class="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 py-5 sm:px-8 lg:px-10"
+  >
+    <app-site-header>
+      <a siteHeaderNav class="btn btn-ghost btn-sm" routerLink="/contact"
+        >{{ 'routes.landing.contact' | translate }}</a
+      >
+      <a siteHeaderNav class="btn btn-ghost btn-sm" routerLink="/terms"
+        >{{ 'common.legal.termsOfService' | translate }}</a
+      >
+      <a siteHeaderNav class="btn btn-ghost btn-sm" routerLink="/policy"
+        >{{ 'common.legal.privacyPolicy' | translate }}</a
+      >
+
+      <details siteHeaderActions class="dropdown dropdown-end lg:hidden">
+        <summary
+          class="btn btn-ghost btn-circle btn-sm list-none sm:btn-md [&::-webkit-details-marker]:hidden"
+          [attr.aria-label]="'navigation.aria.primary' | translate"
+        >
+          <app-icon name="menu" class="size-5" />
+        </summary>
+        <ul
+          class="menu dropdown-content z-50 mt-3 w-56 rounded-box border border-base-300 bg-base-100 p-2 shadow-xl"
+        >
+          <li>
+            <a routerLink="/contact">{{ 'routes.landing.contact' | translate }}</a>
+          </li>
+          <li>
+            <a routerLink="/terms">{{ 'common.legal.termsOfService' | translate }}</a>
+          </li>
+          <li>
+            <a routerLink="/policy">{{ 'common.legal.privacyPolicy' | translate }}</a>
+          </li>
+          <li class="mt-2 border-t border-base-300 pt-2">
+            <a class="btn btn-ghost btn-sm justify-start" routerLink="/login">{{ 'navigation.logInTitle' | translate }}</a>
+          </li>
+          <li class="mt-2">
+            <a class="btn btn-primary btn-sm justify-start text-primary-content hover:text-primary-content" routerLink="/signup">{{ 'navigation.signUpTitle' | translate }}</a>
+          </li>
+        </ul>
+      </details>
+
+      <a
+        siteHeaderActions
+        class="btn btn-ghost btn-sm hidden sm:btn-md lg:inline-flex"
+        routerLink="/login"
+        >{{ 'navigation.logInTitle' | translate }}</a
+      >
+      <a
+        siteHeaderActions
+        class="btn btn-primary btn-sm hidden text-primary-content sm:btn-md lg:inline-flex"
+        routerLink="/signup"
+        >{{ 'navigation.signUpTitle' | translate }}</a
+      >
+    </app-site-header>
+
+    <main class="flex-1 py-12 sm:py-16 lg:py-20">
+      <section class="mx-auto max-w-4xl text-center" aria-labelledby="legal-heading">
+        <p class="badge badge-primary badge-soft px-4 py-3 font-semibold">
+          {{ document().eyebrow }}
+        </p>
+        <h1
+          id="legal-heading"
+          class="mt-5 text-4xl font-black leading-tight tracking-tight sm:text-5xl lg:text-6xl"
+        >
+          {{ document().title }}
+        </h1>
+        <p class="mx-auto mt-5 max-w-3xl text-base leading-8 text-base-content/70 sm:text-lg">
+          {{ document().summary }}
+        </p>
+        <p class="mt-5 text-sm font-semibold uppercase tracking-[0.2em] text-base-content/45">
+          {{ document().lastUpdatedLabel }} · {{ document().lastUpdated }}
+        </p>
+      </section>
+
+      <div class="mx-auto mt-12 grid max-w-5xl gap-6 lg:grid-cols-[0.8fr_2fr]">
+        <aside class="space-y-4 lg:sticky lg:top-6 lg:self-start">
+          <section class="card border border-base-300 bg-base-100/90 shadow-sm backdrop-blur">
+            <div class="card-body gap-4">
+              <span
+                class="flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary"
+              >
+                <app-icon name="shield-check" class="size-6" />
+              </span>
+              <div>
+                <h2 class="text-lg font-black">{{ document().title }}</h2>
+                <p class="mt-2 text-sm leading-6 text-base-content/65">
+                  {{ document().lastUpdatedLabel }}: {{ document().lastUpdated }}
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section class="card border border-primary/10 bg-primary/10 shadow-sm">
+            <div class="card-body gap-4">
+              <span
+                class="flex size-12 items-center justify-center rounded-2xl bg-base-100 text-primary shadow-sm"
+              >
+                <app-icon name="document" class="size-6" />
+              </span>
+              <div>
+                <h2 class="text-lg font-black">{{ alternateDocument().title }}</h2>
+                <p class="mt-2 text-sm leading-6 text-base-content/65">
+                  {{ alternateDocument().summary }}
+                </p>
+              </div>
+              <a class="btn btn-outline btn-sm" [routerLink]="alternateRoute()">
+                {{ alternateDocument().title }}
+              </a>
+            </div>
+          </section>
+        </aside>
+
+        <article class="space-y-5" [attr.aria-label]="document().title">
+          @for (section of document().sections; track section.heading; let index = $index) {
+          <section
+            class="card border border-base-300 bg-base-100/95 shadow-sm backdrop-blur transition duration-200 hover:shadow-lg"
+          >
+            <div class="card-body gap-4 p-6 sm:p-8">
+              <div class="flex gap-4">
+                <span
+                  class="mt-1 flex size-10 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-sm font-black text-primary"
+                >
+                  {{ index + 1 }}
+                </span>
+                <div class="min-w-0">
+                  <h2 class="text-2xl font-black tracking-tight">
+                    {{ section.heading }}
+                  </h2>
+                  <div class="mt-4 space-y-4 text-base leading-8 text-base-content/70">
+                    @for (paragraph of section.paragraphs; track paragraph) {
+                    <p>{{ paragraph }}</p>
+                    }
+                  </div>
+
+                  @if (section.bullets.length > 0) {
+                  <ul class="mt-5 space-y-3 text-sm leading-7 text-base-content/70">
+                    @for (bullet of section.bullets; track bullet) {
+                    <li class="flex gap-3">
+                      <app-icon name="check" class="mt-1 size-4 shrink-0 text-primary" />
+                      <span>{{ bullet }}</span>
+                    </li>
+                    }
+                  </ul>
+                  }
+                </div>
+              </div>
+            </div>
+          </section>
+          }
+        </article>
+      </div>
+    </main>
+  </div>
+</div>

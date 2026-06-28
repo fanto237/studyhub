@@ -10,10 +10,50 @@
         >{{ 'routes.landing.community' | translate }}</a
       >
 
+      <details siteHeaderActions class="dropdown dropdown-end lg:hidden">
+        <summary
+          class="btn btn-ghost btn-circle btn-sm list-none sm:btn-md [&::-webkit-details-marker]:hidden"
+          [attr.aria-label]="'navigation.aria.primary' | translate"
+        >
+          <app-icon name="menu" class="size-5" />
+        </summary>
+        <ul
+          class="menu dropdown-content z-50 mt-3 w-56 rounded-box border border-base-300 bg-base-100 p-2 shadow-xl"
+        >
+          <li>
+            <a routerLink="/contact">{{ 'routes.landing.contact' | translate }}</a>
+          </li>
+          <li>
+            <a routerLink="/terms">{{ 'common.legal.termsOfService' | translate }}</a>
+          </li>
+          <li>
+            <a routerLink="/policy">{{ 'common.legal.privacyPolicy' | translate }}</a>
+          </li>
+          @if (authSession.isLoading()) {
+          <li class="mt-2 border-t border-base-300 pt-2">
+            <button class="btn btn-ghost btn-sm justify-start" type="button" disabled>
+              {{ 'routes.landing.checking' | translate }}
+            </button>
+          </li>
+          } @else { @if (authSession.isAuthenticated()) {
+          <li class="mt-2 border-t border-base-300 pt-2">
+            <a class="btn btn-primary btn-sm justify-start text-primary-content hover:text-primary-content" routerLink="/home">{{ 'navigation.continueHome' | translate }}</a>
+          </li>
+          } @else {
+          <li class="mt-2 border-t border-base-300 pt-2">
+            <a class="btn btn-ghost btn-sm justify-start" routerLink="/login">{{ 'navigation.logInTitle' | translate }}</a>
+          </li>
+          <li class="mt-2">
+            <a class="btn btn-primary btn-sm justify-start text-primary-content hover:text-primary-content" routerLink="/signup">{{ 'navigation.signUpTitle' | translate }}</a>
+          </li>
+          } }
+        </ul>
+      </details>
+
       @if (authSession.isLoading()) {
       <button
         siteHeaderActions
-        class="btn btn-ghost btn-sm sm:btn-md"
+        class="btn btn-ghost btn-sm hidden sm:btn-md lg:inline-flex"
         type="button"
         disabled
       >
@@ -22,20 +62,20 @@
       } @else { @if (authSession.isAuthenticated()) {
       <a
         siteHeaderActions
-        class="btn btn-primary btn-sm text-primary-content sm:btn-md"
+        class="btn btn-primary btn-sm hidden text-primary-content sm:btn-md lg:inline-flex"
         routerLink="/home"
         >{{ 'navigation.continueHome' | translate }}</a
       >
       } @else {
       <a
         siteHeaderActions
-        class="btn btn-ghost btn-sm sm:btn-md"
+        class="btn btn-ghost btn-sm hidden sm:btn-md lg:inline-flex"
         routerLink="/login"
         >{{ 'navigation.logInTitle' | translate }}</a
       >
       <a
         siteHeaderActions
-        class="btn btn-primary btn-sm text-primary-content sm:btn-md"
+        class="btn btn-primary btn-sm hidden text-primary-content sm:btn-md lg:inline-flex"
         routerLink="/signup"
         >{{ 'navigation.signUpTitle' | translate }}</a
       >
@@ -495,17 +535,17 @@
         >
         <a
           class="link-hover text-base-content/70 hover:text-primary"
-          href="#contact"
+          routerLink="/contact"
           >{{ 'routes.landing.contact' | translate }}</a
         >
         <a
           class="link-hover text-base-content/70 hover:text-primary"
-          href="#privacy"
+          routerLink="/policy"
           >{{ 'common.legal.privacyPolicy' | translate }}</a
         >
         <a
           class="link-hover text-base-content/70 hover:text-primary"
-          href="#terms"
+          routerLink="/terms"
           >{{ 'common.legal.termsOfService' | translate }}</a
         >
       </nav>
