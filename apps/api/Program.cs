@@ -1,11 +1,11 @@
 using Api.Endpoints;
 using Api.Extensions;
 using Api.Responses;
-using Application;
 using Application.Extensions;
 using Application.Posts.CreatePost;
 using Domain.Entities;
 using Infrastructure.Extensions;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Wolverine;
 
@@ -14,6 +14,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseWolverine(options =>
 {
   options.Discovery.IncludeAssembly(typeof(CreatePostHandler).Assembly);
+});
+
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+  options.ForwardedHeaders = ForwardedHeaders.XForwardedFor
+      | ForwardedHeaders.XForwardedProto
+      | ForwardedHeaders.XForwardedHost;
+
+  options.ConfigureKnownForwarders(builder.Configuration);
 });
 
 builder.Services.AddOpenApi();
@@ -41,10 +50,13 @@ app.UseExceptionHandler(exceptionApp =>
   });
 });
 
+app.UseForwardedHeaders();
+
 if (!app.Environment.IsDevelopment())
 {
   app.UseHttpsRedirection();
 }
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapAuthEndpoints();
@@ -52,4 +64,7 @@ app.MapCommentEndpoints();
 app.MapFeedEndpoints();
 app.MapPostEndpoints();
 app.MapUserEndpoints();
+
+await app.BootstrapDatabaseAsync();
+
 app.Run();

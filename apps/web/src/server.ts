@@ -12,6 +12,11 @@ const serverDistFolder = dirname(fileURLToPath(import.meta.url));
 const browserDistFolder = resolve(serverDistFolder, '../browser');
 
 const app = express();
+const trustProxy =
+  process.env['TRUST_PROXY']?.trim() || 'loopback, linklocal, uniquelocal';
+
+app.set('trust proxy', trustProxy);
+
 const angularApp = new AngularNodeAppEngine();
 
 /**
