@@ -79,6 +79,13 @@ export interface GeneratePostMetadataSuggestionsResponse {
   languageConfidence?: number | null;
   warnings: string[];
   message: string;
+  quota?: AiMetadataQuota | null;
+}
+
+export interface AiMetadataQuota {
+  limit: number;
+  remaining: number;
+  resetAt: string;
 }
 
 export interface PostDetailUser {

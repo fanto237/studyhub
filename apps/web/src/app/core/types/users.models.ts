@@ -25,7 +25,15 @@ export interface CurrentUserResponse {
   totpEnabledAt: string | null;
   karmaScore: number;
   createdAt: string;
+  aiMetadataGenerationUsage?: CurrentUserAiMetadataGenerationUsage | null;
   latestPosts: CurrentUserLatestPost[];
+}
+
+export interface CurrentUserAiMetadataGenerationUsage {
+  limit: number;
+  usedToday: number;
+  remaining: number;
+  resetAt: string;
 }
 
 export interface UpdateCurrentUserRequest {
