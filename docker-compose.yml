@@ -55,7 +55,7 @@ services:
     depends_on:
       - api
     ports:
-      - '${WEB_BIND_ADDRESS}:${WEB_PUBLIC_PORT}:4000'
+      - '8081:4000'
     networks:
       - studyhub_net
 
