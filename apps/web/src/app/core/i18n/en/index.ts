@@ -4,8 +4,10 @@ import { errors } from './errors';
 import { navigation } from './navigation';
 import { shared } from './shared';
 import { validation } from './validation';
+import { contact } from './routes/contact';
 import { landing } from './routes/landing';
 import { home } from './routes/home';
+import { privacy } from './routes/privacy';
 import { profileEdit } from './routes/profile-edit';
 import { profile } from './routes/profile';
 import { upload } from './routes/upload';
@@ -13,6 +15,7 @@ import { postDetail } from './routes/post-detail';
 import { userProfile } from './routes/user-profile';
 import { login } from './routes/login';
 import { signup } from './routes/signup';
+import { terms } from './routes/terms';
 
 export const en = {
   language: {
@@ -35,5 +38,8 @@ export const en = {
     userProfile,
     login,
     signup,
+    terms,
+    privacy,
+    contact,
   },
 } as const satisfies TranslationSchema;
