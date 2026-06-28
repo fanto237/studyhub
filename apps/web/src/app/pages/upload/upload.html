@@ -88,7 +88,7 @@
             <div class="mb-3 flex items-center justify-between gap-3">
               <h2 id="file-heading" class="text-lg font-black">{{ 'common.file.pdfFile' | translate }}</h2>
               @if (selectedFile()) {
-              <button class="btn btn-ghost btn-xs" type="button" [disabled]="isUploading()" (click)="removeSelectedFile()">
+              <button class="btn btn-ghost btn-xs" type="button" [disabled]="isUploading() || isGeneratingMetadata()" (click)="removeSelectedFile()">
                 {{ 'common.actions.removeFile' | translate }}
               </button>
               }
@@ -99,12 +99,12 @@
               class="hidden"
               type="file"
               accept="application/pdf,.pdf"
-              [disabled]="isUploading()"
+              [disabled]="isUploading() || isGeneratingMetadata()"
               (change)="onFileSelected($event)"
             />
 
             <div
-              class="rounded-[2rem] border-2 border-dashed bg-base-200/55 p-6 text-center transition sm:p-10"
+              class="rounded-4xl border-2 border-dashed bg-base-200/55 p-6 text-center transition sm:p-10"
               [class.border-primary]="isDragOver()"
               [class.bg-primary/5]="isDragOver()"
               [class.border-base-300]="!isDragOver()"
@@ -121,9 +121,9 @@
                 <p class="mt-1 text-sm font-semibold text-base-content/55">
                   {{ selectedFileSize() }} · {{ 'routes.upload.readyToUpload' | translate }}
                 </p>
-                <label class="btn btn-outline btn-sm mt-5" [class.btn-disabled]="isUploading()">
+                <label class="btn btn-outline btn-sm mt-5" [class.btn-disabled]="isUploading() || isGeneratingMetadata()">
                   {{ 'common.actions.chooseDifferentFile' | translate }}
-                  <input class="hidden" type="file" accept="application/pdf,.pdf" [disabled]="isUploading()" (change)="onFileSelected($event)" />
+                  <input class="hidden" type="file" accept="application/pdf,.pdf" [disabled]="isUploading() || isGeneratingMetadata()" (change)="onFileSelected($event)" />
                 </label>
               </div>
               } @else {
@@ -135,9 +135,9 @@
                 <p class="mt-2 text-sm leading-6 text-base-content/60">
                   {{ 'routes.upload.orBrowseFromYourDeviceFilesMustBePdfsAndMaxsizeMbOrSmaller' | translate: { maxSize: maxFileSizeMb } }}
                 </p>
-                <label class="btn btn-primary mt-5 text-primary-content" [class.btn-disabled]="isUploading()">
+                <label class="btn btn-primary mt-5 text-primary-content" [class.btn-disabled]="isUploading() || isGeneratingMetadata()">
                   {{ 'common.actions.browseFiles' | translate }}
-                  <input class="hidden" type="file" accept="application/pdf,.pdf" [disabled]="isUploading()" (change)="onFileSelected($event)" />
+                  <input class="hidden" type="file" accept="application/pdf,.pdf" [disabled]="isUploading() || isGeneratingMetadata()" (change)="onFileSelected($event)" />
                 </label>
               </div>
               }
@@ -153,7 +153,67 @@
           </section>
 
           <section class="grid gap-5" aria-labelledby="metadata-heading">
-            <h2 id="metadata-heading" class="text-lg font-black">{{ 'routes.upload.documentDetails' | translate }}</h2>
+            <div class="flex flex-col gap-3 rounded-3xl border border-primary/15 bg-primary/5 p-4 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <h2 id="metadata-heading" class="text-lg font-black">{{ 'routes.upload.documentDetails' | translate }}</h2>
+                <p class="mt-1 text-sm leading-6 text-base-content/60">
+                  {{ 'routes.upload.aiPrivacyNotice' | translate }}
+                </p>
+              </div>
+              <button
+                class="btn btn-secondary shrink-0 gap-2"
+                type="button"
+                [disabled]="!selectedFile() || fileControl.invalid || isUploading() || isGeneratingMetadata()"
+                (click)="onGenerateMetadataSuggestions()"
+              >
+                @if (isGeneratingMetadata()) {
+                <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+                {{ 'routes.upload.suggestingWithAi' | translate }} } @else {
+                <app-icon name="sparkles" class="size-5" />
+                {{ 'routes.upload.suggestWithAi' | translate }} }
+              </button>
+            </div>
+
+            @if (metadataSuggestionErrorMessage(); as message) {
+            <div class="alert alert-warning" role="alert">
+              <app-icon name="alert-triangle" class="size-5 shrink-0" />
+              <span>{{ message }}</span>
+            </div>
+            }
+
+            @if (metadataSuggestionMessage(); as message) {
+            <div class="alert alert-info" role="status">
+              <app-icon name="sparkles" class="size-5 shrink-0" />
+              <span>{{ message }}</span>
+            </div>
+            }
+
+            @if (pendingMetadataSuggestion(); as suggestion) {
+            <div class="rounded-3xl border border-info/30 bg-info/10 p-4">
+              <p class="text-sm font-black uppercase tracking-[0.18em] text-info">{{ 'routes.upload.suggestedMetadata' | translate }}</p>
+              @if (suggestion.title) {
+              <p class="mt-3 text-base font-black text-base-content">{{ suggestion.title }}</p>
+              }
+              @if (suggestion.description) {
+              <p class="mt-3 text-sm leading-6 text-base-content/75">{{ suggestion.description }}</p>
+              }
+              @if (suggestion.tags.length) {
+              <div class="mt-3 flex flex-wrap gap-2">
+                @for (tag of suggestion.tags; track tag) {
+                <span class="badge badge-info badge-soft">{{ tag }}</span>
+                }
+              </div>
+              }
+              <div class="mt-4 flex flex-col gap-2 sm:flex-row">
+                <button class="btn btn-info btn-sm" type="button" (click)="usePendingMetadataSuggestion()">
+                  {{ 'routes.upload.useSuggestedMetadata' | translate }}
+                </button>
+                <button class="btn btn-ghost btn-sm" type="button" (click)="dismissPendingMetadataSuggestion()">
+                  {{ 'routes.upload.dismissSuggestion' | translate }}
+                </button>
+              </div>
+            </div>
+            }
 
             <label class="form-control">
               <span class="label pb-2 font-semibold">{{ 'common.forms.title' | translate }}</span>
@@ -209,7 +269,7 @@
                     <button
                       class="text-base leading-none"
                       type="button"
-                      [disabled]="isUploading()"
+                      [disabled]="isUploading() || isGeneratingMetadata()"
                       (click)="removeTag(tag)"
                       [attr.aria-label]="('common.actions.removeTagFilter' | translate) + ': ' + tag"
                     >
@@ -222,7 +282,7 @@
                     id="tag-input"
                     class="min-w-36 flex-1 bg-transparent px-1 py-2 outline-none placeholder:text-base-content/40"
                     [formControl]="tagControl"
-                    [disabled]="isUploading() || selectedTags().length >= maxTagCount"
+                    [disabled]="isUploading() || isGeneratingMetadata() || selectedTags().length >= maxTagCount"
                     maxlength="100"
                     [placeholder]="'routes.upload.addATag' | translate"
                     type="text"
@@ -246,8 +306,8 @@
           <div class="flex flex-col gap-3 border-t border-base-300 pt-6 sm:flex-row-reverse sm:items-center sm:justify-between">
             <button
               class="btn btn-primary btn-lg text-primary-content"
-              [class.btn-disabled]="uploadForm.invalid || fileControl.invalid || isUploading()"
-              [disabled]="uploadForm.invalid || fileControl.invalid || isUploading()"
+              [class.btn-disabled]="uploadForm.invalid || fileControl.invalid || isUploading() || isGeneratingMetadata()"
+              [disabled]="uploadForm.invalid || fileControl.invalid || isUploading() || isGeneratingMetadata()"
               type="submit"
             >
               @if (isUploading()) {
@@ -258,10 +318,10 @@
             </button>
 
             <div class="flex flex-col gap-2 sm:flex-row">
-              <button class="btn btn-outline" type="button" [disabled]="isUploading()" (click)="resetForm()">
+              <button class="btn btn-outline" type="button" [disabled]="isUploading() || isGeneratingMetadata()" (click)="resetForm()">
                 {{ 'common.actions.reset' | translate }}
               </button>
-              <a class="btn btn-ghost" routerLink="/home" [class.btn-disabled]="isUploading()">
+              <a class="btn btn-ghost" routerLink="/home" [class.btn-disabled]="isUploading() || isGeneratingMetadata()">
                 {{ 'common.actions.cancel' | translate }}
               </a>
             </div>
@@ -270,7 +330,7 @@
       </section>
 
       <aside class="space-y-6 lg:sticky lg:top-24 lg:self-start" [attr.aria-label]="'routes.upload.uploadGuidance' | translate">
-        <section class="rounded-[2rem] border border-base-300 bg-base-100/85 p-5 shadow-xl shadow-base-300/30 backdrop-blur sm:p-6">
+        <section class="rounded-4xl border border-base-300 bg-base-100/85 p-5 shadow-xl shadow-base-300/30 backdrop-blur sm:p-6">
           <span class="flex size-12 items-center justify-center rounded-2xl bg-accent/15 text-accent-content">
             <app-icon name="check" class="size-6" />
           </span>
@@ -291,7 +351,7 @@
           </ul>
         </section>
 
-        <section class="rounded-[2rem] border border-primary/20 bg-primary p-5 text-primary-content shadow-xl shadow-primary/20 sm:p-6">
+        <section class="rounded-4xl border border-primary/20 bg-primary p-5 text-primary-content shadow-xl shadow-primary/20 sm:p-6">
           <span class="badge border-white/20 bg-white/15 text-primary-content">{{ 'routes.upload.afterUpload' | translate }}</span>
           <h2 class="mt-4 text-xl font-black">{{ 'routes.upload.afterUploadTitle' | translate }}</h2>
           <p class="mt-2 text-sm leading-6 text-primary-content/80">

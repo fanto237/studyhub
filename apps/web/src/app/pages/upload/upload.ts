@@ -22,11 +22,12 @@ import { AuthSessionStore } from '../../core/services/auth-session-store';
 import { PostsApi } from '../../core/services/posts-api';
 import { TranslationService } from '../../core/services/translation';
 import { resolveApiErrorMessage } from '../../core/types/api-error.util';
+import { type GeneratePostMetadataSuggestionsResponse } from '../../core/types/posts.models';
 import { Icon } from '../../shared/components/icon/icon';
+import { LanguageSelector } from '../../shared/components/language-selector/language-selector';
 import { MobileDock } from '../../shared/components/mobile-dock/mobile-dock';
 import { ThemeToggle } from '../../shared/components/theme-toggle/theme-toggle';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
-import { LanguageSelector } from '../../shared/components/language-selector/language-selector';
 
 type UploadFormControls = {
   title: FormControl<string>;
@@ -44,7 +45,12 @@ const MAX_TAG_LENGTH = 100;
   imports: [
     LanguageSelector,
     TranslatePipe,
-    Icon, MobileDock, ReactiveFormsModule, RouterLink, ThemeToggle],
+    Icon,
+    MobileDock,
+    ReactiveFormsModule,
+    RouterLink,
+    ThemeToggle,
+  ],
   templateUrl: './upload.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -65,12 +71,14 @@ export class Upload implements OnDestroy {
   readonly maxTagCount = MAX_TAG_COUNT;
   readonly maxTagLength = MAX_TAG_LENGTH;
 
-  readonly uploadForm: FormGroup<UploadFormControls> = this.fb.nonNullable.group(
-    {
-      title: ['', [Validators.required, Validators.maxLength(MAX_TITLE_LENGTH)]],
+  readonly uploadForm: FormGroup<UploadFormControls> =
+    this.fb.nonNullable.group({
+      title: [
+        '',
+        [Validators.required, Validators.maxLength(MAX_TITLE_LENGTH)],
+      ],
       description: ['', [Validators.maxLength(MAX_DESCRIPTION_LENGTH)]],
-    },
-  );
+    });
 
   readonly tagControl = new FormControl('', {
     nonNullable: true,
@@ -85,10 +93,15 @@ export class Upload implements OnDestroy {
   readonly selectedFile = signal<File | null>(null);
   readonly isDragOver = signal(false);
   readonly isUploading = signal(false);
+  readonly isGeneratingMetadata = signal(false);
   readonly uploadErrorMessage = signal<string | null>(null);
   readonly successMessage = signal<string | null>(null);
   readonly tagErrorMessage = signal<string | null>(null);
   readonly fileErrorMessage = signal<string | null>(null);
+  readonly metadataSuggestionErrorMessage = signal<string | null>(null);
+  readonly metadataSuggestionMessage = signal<string | null>(null);
+  readonly pendingMetadataSuggestion =
+    signal<GeneratePostMetadataSuggestionsResponse | null>(null);
 
   readonly selectedFileSize = computed(() => {
     const file = this.selectedFile();
@@ -111,7 +124,9 @@ export class Upload implements OnDestroy {
     }
 
     if (control.hasError('maxlength')) {
-      return this.i18n.translate('validation.titleMax', { max: MAX_TITLE_LENGTH });
+      return this.i18n.translate('validation.titleMax', {
+        max: MAX_TITLE_LENGTH,
+      });
     }
 
     return this.i18n.translate('validation.checkTitle');
@@ -125,14 +140,19 @@ export class Upload implements OnDestroy {
     }
 
     if (control.hasError('maxlength')) {
-      return this.i18n.translate('validation.descriptionMax', { max: MAX_DESCRIPTION_LENGTH });
+      return this.i18n.translate('validation.descriptionMax', {
+        max: MAX_DESCRIPTION_LENGTH,
+      });
     }
 
     return this.i18n.translate('validation.checkDescription');
   }
 
   tagInputError(): string | null {
-    if (this.tagControl.invalid && (this.tagControl.dirty || this.tagControl.touched)) {
+    if (
+      this.tagControl.invalid &&
+      (this.tagControl.dirty || this.tagControl.touched)
+    ) {
       return this.i18n.translate('validation.tagsMax', { max: MAX_TAG_LENGTH });
     }
 
@@ -154,7 +174,7 @@ export class Upload implements OnDestroy {
   onDragOver(event: DragEvent): void {
     event.preventDefault();
     event.stopPropagation();
-    if (!this.isUploading()) {
+    if (!this.isUploading() && !this.isGeneratingMetadata()) {
       this.isDragOver.set(true);
     }
   }
@@ -170,7 +190,7 @@ export class Upload implements OnDestroy {
     event.stopPropagation();
     this.isDragOver.set(false);
 
-    if (this.isUploading()) {
+    if (this.isUploading() || this.isGeneratingMetadata()) {
       return;
     }
 
@@ -189,6 +209,7 @@ export class Upload implements OnDestroy {
     this.fileControl.markAsTouched();
     this.fileControl.setErrors({ required: true });
     this.fileErrorMessage.set(null);
+    this.clearMetadataSuggestionState();
 
     if (this.fileInput) {
       this.fileInput.nativeElement.value = '';
@@ -224,13 +245,15 @@ export class Upload implements OnDestroy {
   removeTag(tag: string): void {
     const normalizedLower = tag.trim().toLowerCase();
     this.selectedTags.update((tags) =>
-      tags.filter((selectedTag) => selectedTag.toLowerCase() !== normalizedLower),
+      tags.filter(
+        (selectedTag) => selectedTag.toLowerCase() !== normalizedLower,
+      ),
     );
     this.tagErrorMessage.set(null);
   }
 
   resetForm(): void {
-    if (this.isUploading()) {
+    if (this.isUploading() || this.isGeneratingMetadata()) {
       return;
     }
 
@@ -242,6 +265,68 @@ export class Upload implements OnDestroy {
     this.uploadErrorMessage.set(null);
     this.successMessage.set(null);
     this.tagErrorMessage.set(null);
+    this.clearMetadataSuggestionState();
+  }
+
+  onGenerateMetadataSuggestions(): void {
+    this.metadataSuggestionErrorMessage.set(null);
+    this.metadataSuggestionMessage.set(null);
+    this.pendingMetadataSuggestion.set(null);
+
+    const file = this.selectedFile();
+    if (!file || this.fileControl.invalid) {
+      this.fileControl.markAsTouched();
+      return;
+    }
+
+    this.isGeneratingMetadata.set(true);
+
+    this.postsApi
+      .generateMetadataSuggestions({
+        file,
+        title: this.uploadForm.controls.title.value,
+      })
+      .subscribe({
+        next: (suggestion) => {
+          this.applyMetadataSuggestions(suggestion, false);
+        },
+        error: (error: unknown) => {
+          if (this.redirectToLoginIfUnauthorized(error)) {
+            this.isGeneratingMetadata.set(false);
+            return;
+          }
+
+          this.metadataSuggestionErrorMessage.set(
+            resolveApiErrorMessage(error, {
+              fallbackMessage: this.i18n.translate(
+                'routes.upload.metadataSuggestionFailed',
+              ),
+              statusMessages: {
+                413: this.i18n.translate('validation.pdfMaxSize', {
+                  maxSize: this.maxFileSizeMb,
+                }),
+              },
+            }),
+          );
+          this.isGeneratingMetadata.set(false);
+        },
+        complete: () => {
+          this.isGeneratingMetadata.set(false);
+        },
+      });
+  }
+
+  usePendingMetadataSuggestion(): void {
+    const suggestion = this.pendingMetadataSuggestion();
+    if (!suggestion) {
+      return;
+    }
+
+    this.applyMetadataSuggestions(suggestion, true);
+  }
+
+  dismissPendingMetadataSuggestion(): void {
+    this.pendingMetadataSuggestion.set(null);
   }
 
   onSubmit(): void {
@@ -281,21 +366,29 @@ export class Upload implements OnDestroy {
       })
       .subscribe({
         next: (response) => {
-          this.successMessage.set(response.message || this.i18n.translate('routes.upload.yourPdfWasUploaded'));
+          this.successMessage.set(
+            response.message ||
+              this.i18n.translate('routes.upload.yourPdfWasUploaded'),
+          );
           this.successRedirectTimer = setTimeout(() => {
             void this.router.navigate(['/posts', response.id]);
           }, 650);
         },
         error: (error: unknown) => {
           if (this.redirectToLoginIfUnauthorized(error)) {
+            this.isUploading.set(false);
             return;
           }
 
           this.uploadErrorMessage.set(
             resolveApiErrorMessage(error, {
-              fallbackMessage: this.i18n.translate('routes.upload.thePdfCouldNotBeUploadedPleaseTryAgain'),
+              fallbackMessage: this.i18n.translate(
+                'routes.upload.thePdfCouldNotBeUploadedPleaseTryAgain',
+              ),
               statusMessages: {
-                413: this.i18n.translate('validation.pdfMaxSize', { maxSize: this.maxFileSizeMb }),
+                413: this.i18n.translate('validation.pdfMaxSize', {
+                  maxSize: this.maxFileSizeMb,
+                }),
               },
             }),
           );
@@ -311,6 +404,7 @@ export class Upload implements OnDestroy {
     this.fileControl.markAsTouched();
     this.fileErrorMessage.set(null);
     this.uploadErrorMessage.set(null);
+    this.clearMetadataSuggestionState();
 
     if (!file) {
       this.selectedFile.set(null);
@@ -339,7 +433,9 @@ export class Upload implements OnDestroy {
     }
 
     if (file.size > MAX_FILE_SIZE_BYTES) {
-      return this.i18n.translate('validation.pdfMaxSize', { maxSize: this.maxFileSizeMb });
+      return this.i18n.translate('validation.pdfMaxSize', {
+        maxSize: this.maxFileSizeMb,
+      });
     }
 
     const hasPdfExtension = file.name.toLowerCase().endsWith('.pdf');
@@ -350,6 +446,101 @@ export class Upload implements OnDestroy {
     }
 
     return null;
+  }
+
+  private applyMetadataSuggestions(
+    suggestion: GeneratePostMetadataSuggestionsResponse,
+    overwriteMetadata: boolean,
+  ): void {
+    const suggestedTitle = suggestion.title?.trim();
+    const suggestedDescription = suggestion.description?.trim();
+    const currentTitle = this.uploadForm.controls.title.value.trim();
+    const currentDescription =
+      this.uploadForm.controls.description.value.trim();
+    let needsConfirmation = false;
+
+    if (suggestedTitle) {
+      if (overwriteMetadata || currentTitle.length === 0) {
+        this.uploadForm.controls.title.setValue(suggestedTitle);
+        this.uploadForm.controls.title.markAsDirty();
+      } else {
+        needsConfirmation = true;
+      }
+    }
+
+    if (suggestedDescription) {
+      if (overwriteMetadata || currentDescription.length === 0) {
+        this.uploadForm.controls.description.setValue(suggestedDescription);
+        this.uploadForm.controls.description.markAsDirty();
+      } else {
+        needsConfirmation = true;
+      }
+    }
+
+    this.pendingMetadataSuggestion.set(needsConfirmation ? suggestion : null);
+
+    const addedTagCount = this.mergeSuggestedTags(suggestion.tags ?? []);
+    const warningText = suggestion.warnings?.length
+      ? ` ${suggestion.warnings.join(' ')}`
+      : '';
+
+    if (this.pendingMetadataSuggestion()) {
+      this.metadataSuggestionMessage.set(
+        this.i18n.translate('routes.upload.suggestedMetadataReady') +
+          warningText,
+      );
+      return;
+    }
+
+    this.metadataSuggestionMessage.set(
+      this.i18n.translate('routes.upload.metadataSuggestionsAdded', {
+        count: addedTagCount,
+      }) + warningText,
+    );
+  }
+
+  private mergeSuggestedTags(values: string[]): number {
+    this.tagErrorMessage.set(null);
+
+    const nextTags = [...this.selectedTags()];
+    let addedCount = 0;
+
+    for (const value of values) {
+      const tag = value.trim().replace(/\s+/g, ' ');
+      if (!tag || tag.length > MAX_TAG_LENGTH) {
+        continue;
+      }
+
+      if (nextTags.length >= MAX_TAG_COUNT) {
+        this.tagErrorMessage.set(
+          this.i18n.translate('validation.tagsCountMax', {
+            max: MAX_TAG_COUNT,
+          }),
+        );
+        break;
+      }
+
+      const normalizedLower = tag.toLowerCase();
+      if (
+        nextTags.some(
+          (selectedTag) => selectedTag.toLowerCase() === normalizedLower,
+        )
+      ) {
+        continue;
+      }
+
+      nextTags.push(tag);
+      addedCount++;
+    }
+
+    this.selectedTags.set(nextTags);
+    return addedCount;
+  }
+
+  private clearMetadataSuggestionState(): void {
+    this.metadataSuggestionErrorMessage.set(null);
+    this.metadataSuggestionMessage.set(null);
+    this.pendingMetadataSuggestion.set(null);
   }
 
   private addTags(values: string[], clearInput: boolean): void {
@@ -365,18 +556,30 @@ export class Upload implements OnDestroy {
       }
 
       if (tag.length > MAX_TAG_LENGTH) {
-        this.tagErrorMessage.set(this.i18n.translate('validation.tagsMax', { max: MAX_TAG_LENGTH }));
+        this.tagErrorMessage.set(
+          this.i18n.translate('validation.tagsMax', { max: MAX_TAG_LENGTH }),
+        );
         break;
       }
 
       if (nextTags.length >= MAX_TAG_COUNT) {
-        this.tagErrorMessage.set(this.i18n.translate('validation.tagsCountMax', { max: MAX_TAG_COUNT }));
+        this.tagErrorMessage.set(
+          this.i18n.translate('validation.tagsCountMax', {
+            max: MAX_TAG_COUNT,
+          }),
+        );
         break;
       }
 
       const normalizedLower = tag.toLowerCase();
-      if (nextTags.some((selectedTag) => selectedTag.toLowerCase() === normalizedLower)) {
-        this.tagErrorMessage.set(this.i18n.translate('validation.tagAlreadyAdded', { tag }));
+      if (
+        nextTags.some(
+          (selectedTag) => selectedTag.toLowerCase() === normalizedLower,
+        )
+      ) {
+        this.tagErrorMessage.set(
+          this.i18n.translate('validation.tagAlreadyAdded', { tag }),
+        );
         continue;
       }
 
