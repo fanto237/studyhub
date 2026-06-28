@@ -1,5 +1,6 @@
 using Application.Auth;
 using Application.Auth.Abstractions;
+using Application.Posts.Abstractions;
 using Application.Users.GetCurrentUser;
 using FluentValidation;
 
@@ -11,6 +12,7 @@ public class UpdateCurrentUserHandler
         UpdateCurrentUserCommand command,
         IValidator<UpdateCurrentUserCommand> validator,
         IAuthRepository authRepository,
+        IAiMetadataGenerationQuotaService aiMetadataGenerationQuotaService,
         CancellationToken cancellationToken)
     {
         var validationResult = await validator.ValidateAsync(command, cancellationToken);
@@ -89,11 +91,21 @@ public class UpdateCurrentUserHandler
                 "The requested user was not found.");
         }
 
+        var quotaStatus = await aiMetadataGenerationQuotaService.GetStatusAsync(user.Id, cancellationToken);
+        var currentUser = currentUserResult.Item with
+        {
+            AiMetadataGenerationUsage = new CurrentUserAiMetadataGenerationUsage(
+                quotaStatus.Limit,
+                quotaStatus.UsedToday,
+                quotaStatus.Remaining,
+                quotaStatus.ResetAt),
+        };
+
         return new UpdateCurrentUserResult(
             UpdateCurrentUserOutcome.Success,
             hasUsernameChange || hasFullNameChange || hasPrivateEmailChange
                 ? "Profile updated successfully."
                 : "No profile changes were applied.",
-            currentUserResult.Item);
+            currentUser);
     }
 }

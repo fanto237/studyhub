@@ -21,7 +21,14 @@ public record CurrentUserProfile(
     DateTimeOffset? TotpEnabledAt,
     int KarmaScore,
     DateTimeOffset CreatedAt,
-    IReadOnlyList<CurrentUserLatestPost> LatestPosts);
+    IReadOnlyList<CurrentUserLatestPost> LatestPosts,
+    CurrentUserAiMetadataGenerationUsage? AiMetadataGenerationUsage = null);
+
+public record CurrentUserAiMetadataGenerationUsage(
+    int Limit,
+    int UsedToday,
+    int Remaining,
+    DateTimeOffset ResetAt);
 
 public record CurrentUserLatestPost(
     Guid Id,
