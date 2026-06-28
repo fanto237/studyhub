@@ -1,0 +1,171 @@
+name: Build, Push, and Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    name: Build and Push API/Web Images
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      API_IMAGE_REPOSITORY: studyhub-api
+      WEB_IMAGE_REPOSITORY: studyhub-web
+      NODE_VERSION: 24
+      PNPM_VERSION: 11.3.0
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v5
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', 'apps/Studyhub.slnx') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Cache Nx and Angular build artifacts
+        uses: actions/cache@v5
+        with:
+          path: |
+            .nx/cache
+            .angular/cache
+          key: ${{ runner.os }}-nx-${{ hashFiles('pnpm-lock.yaml', 'nx.json', 'apps/web/project.json', 'tsconfig.base.json', 'apps/web/tsconfig.json', 'apps/web/tsconfig.app.json', 'apps/web/tsconfig.server.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nx-
+
+      - name: Install pnpm dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Restore API dependencies
+        run: dotnet restore apps/api/Api.csproj
+
+      - name: Build web
+        run: pnpm exec nx build web --configuration=production
+
+      - name: Publish API
+        run: dotnet publish apps/api/Api.csproj -c Release -o api /p:UseAppHost=false
+
+      - name: Prepare web runtime bundle
+        shell: bash
+        run: |
+          rm -rf web
+          mkdir -p web
+          cp -R dist/apps/web/. web/
+
+      - name: Compute image metadata
+        id: meta
+        shell: bash
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          SHORT_SHA="${GITHUB_SHA::7}"
+          API_IMAGE="${{ secrets.ZOT_URL }}/${API_IMAGE_REPOSITORY}"
+          WEB_IMAGE="${{ secrets.ZOT_URL }}/${WEB_IMAGE_REPOSITORY}"
+
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "short_sha=${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+          echo "api_image=${API_IMAGE}" >> "$GITHUB_OUTPUT"
+          echo "web_image=${WEB_IMAGE}" >> "$GITHUB_OUTPUT"
+          echo "api_version_tag=${API_IMAGE}:${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "api_immutable_tag=${API_IMAGE}:${VERSION}-sha-${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+          echo "api_latest_tag=${API_IMAGE}:latest" >> "$GITHUB_OUTPUT"
+          echo "web_version_tag=${WEB_IMAGE}:${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "web_immutable_tag=${WEB_IMAGE}:${VERSION}-sha-${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+          echo "web_latest_tag=${WEB_IMAGE}:latest" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Log in to Zot registry
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ secrets.ZOT_URL }}
+          username: ${{ secrets.ZOT_USER }}
+          password: ${{ secrets.ZOT_PASSWORD }}
+
+      - name: Build and push API image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./apps/api/Dockerfile.api
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ${{ steps.meta.outputs.api_version_tag }}
+            ${{ steps.meta.outputs.api_immutable_tag }}
+            ${{ steps.meta.outputs.api_latest_tag }}
+          cache-from: type=gha,scope=studyhub-api
+          cache-to: type=gha,mode=max,scope=studyhub-api
+
+      - name: Build and push web image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./apps/web/Dockerfile.web
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ${{ steps.meta.outputs.web_version_tag }}
+            ${{ steps.meta.outputs.web_immutable_tag }}
+            ${{ steps.meta.outputs.web_latest_tag }}
+          cache-from: type=gha,scope=studyhub-web
+          cache-to: type=gha,mode=max,scope=studyhub-web
+
+      - name: Pull new images on server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script_stop: true
+          script: |
+            echo '${{ secrets.ZOT_PASSWORD }}' | docker login ${{ secrets.ZOT_URL }} -u ${{ secrets.ZOT_USER }} --password-stdin
+            docker pull ${{ secrets.ZOT_URL }}/${{ env.API_IMAGE_REPOSITORY }}:latest
+            docker pull ${{ secrets.ZOT_URL }}/${{ env.WEB_IMAGE_REPOSITORY }}:latest
+
+      - name: Dokploy Deployment
+        uses: benbristow/dokploy-deploy-action@0.2.2
+        with:
+          api_token: ${{ secrets.DOKPLOY_AUTH_TOKEN }}
+          application_id: ${{ secrets.DOKPLOY_APPLICATION_ID }}
+          dokploy_url: ${{ secrets.DOKPLOY_URL }}
+          service_type: compose
+
+      - name: Write deployment summary
+        run: |
+          {
+            echo '### Docker images published'
+            echo "- API image: \`${{ steps.meta.outputs.api_image }}\`"
+            echo "  - Version tag: \`${{ steps.meta.outputs.api_version_tag }}\`"
+            echo "  - Immutable tag: \`${{ steps.meta.outputs.api_immutable_tag }}\`"
+            echo "  - Latest tag: \`${{ steps.meta.outputs.api_latest_tag }}\`"
+            echo "- Web image: \`${{ steps.meta.outputs.web_image }}\`"
+            echo "  - Version tag: \`${{ steps.meta.outputs.web_version_tag }}\`"
+            echo "  - Immutable tag: \`${{ steps.meta.outputs.web_immutable_tag }}\`"
+            echo "  - Latest tag: \`${{ steps.meta.outputs.web_latest_tag }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
