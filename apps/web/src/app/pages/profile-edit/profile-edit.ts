@@ -61,6 +61,9 @@ type TotpSetupView = TotpSetupResponse & {
   qrCodeDataUrl: string | null;
 };
 
+type QrCodeApi = typeof import('qrcode');
+type QrCodeModule = QrCodeApi & { default?: QrCodeApi };
+
 type InitialsSource = Pick<CurrentUserResponse, 'fullName' | 'username'>;
 
 @Component({
@@ -262,7 +265,9 @@ export class ProfileEdit implements OnInit {
 
           this.totpSetup.set(setupView);
           this.enableTotpForm.reset({ code: '' });
-          this.totpSuccessMessage.set(setup.message);
+          this.totpSuccessMessage.set(
+            this.i18n.translate('routes.profileEdit.scanTheQrCodeOrEnterTheSetupKeyInYourAuthenticatorAppThenConfirmThe6DigitCode'),
+          );
           void this.generateTotpQrCode(setupView);
         },
         error: (error: unknown) => {
@@ -307,7 +312,9 @@ export class ProfileEdit implements OnInit {
           this.totpSetup.set(null);
           this.enableTotpForm.reset({ code: '' });
           this.disableTotpForm.reset({ password: '', code: '' });
-          this.totpSuccessMessage.set(status.message);
+          this.totpSuccessMessage.set(
+            this.i18n.translate('routes.profileEdit.twoFactorAuthenticationIsNowEnabled'),
+          );
         },
         error: (error: unknown) => {
           if (this.redirectToLoginIfUnauthorized(error)) {
@@ -354,7 +361,9 @@ export class ProfileEdit implements OnInit {
         next: (status) => {
           this.applyTotpStatus(status.isTotpEnabled, status.totpEnabledAt);
           this.disableTotpForm.reset({ password: '', code: '' });
-          this.totpSuccessMessage.set(status.message);
+          this.totpSuccessMessage.set(
+            this.i18n.translate('routes.profileEdit.twoFactorAuthenticationIsNowDisabled'),
+          );
         },
         error: (error: unknown) => {
           if (this.redirectToLoginIfUnauthorized(error)) {
@@ -531,7 +540,8 @@ export class ProfileEdit implements OnInit {
     this.isGeneratingTotpQr.set(true);
 
     try {
-      const qrcode = await import('qrcode');
+      const qrcodeModule = (await import('qrcode')) as QrCodeModule;
+      const qrcode = qrcodeModule.default ?? qrcodeModule;
       const qrCodeDataUrl = await qrcode.toDataURL(setup.otpAuthUri, {
         errorCorrectionLevel: 'M',
         margin: 1,
