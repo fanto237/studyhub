@@ -12,6 +12,7 @@ export const upload = {
   dragAndDropYourPdfHere: 'Ziehe deine PDF hierher',
   eGCalculusIFinalExam2024: 'z. B. Analysis I Abschlussprüfung 2024',
   afterUploadTitle: 'Als Nächstes siehst du die Detailseite.',
+  metadataSuggestionDailyLimitReached: 'Du hast das Tageslimit von 5 KI-Vorschlägen erreicht. Versuche es morgen erneut.',
   metadataSuggestionFailed: 'KI-Vorschläge konnten nicht generiert werden. Du kannst die Felder weiterhin manuell ausfüllen.',
   metadataSuggestionsAdded: '{count} vorgeschlagene Tag(s) hinzugefügt; die Beschreibung wurde ausgefüllt, falls sie leer war.',
   newStudyhubResource: 'Neue StudyHub-Ressource',

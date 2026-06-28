@@ -12,6 +12,7 @@ export const upload = {
   dragAndDropYourPdfHere: 'Drag and drop your PDF here',
   eGCalculusIFinalExam2024: 'e.g., Calculus I Final Exam 2024',
   afterUploadTitle: 'You\'ll see the detail page next.',
+  metadataSuggestionDailyLimitReached: 'You have reached the daily limit of 5 AI suggestions. Try again tomorrow.',
   metadataSuggestionFailed: 'AI suggestions could not be generated. You can keep filling the fields manually.',
   metadataSuggestionsAdded: '{count} suggested tag(s) added and the description was filled if it was empty.',
   newStudyhubResource: 'New StudyHub resource',

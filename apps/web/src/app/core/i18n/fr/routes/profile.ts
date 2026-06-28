@@ -1,4 +1,5 @@
 export const profile = {
+  aiSuggestionsToday: 'Suggestions IA aujourd’hui',
   loggedInProfile: 'Profil connecté',
   myUploads: 'Mes téléversements',
   noUploads: 'Aucun téléversement',

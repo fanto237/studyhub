@@ -1,6 +1,7 @@
 import { type TranslationSchema } from '../../schema';
 
 export const profile = {
+  aiSuggestionsToday: 'KI-Vorschläge heute',
   loggedInProfile: 'Angemeldetes Profil',
   myUploads: 'Meine Uploads',
   noUploads: 'Keine Uploads',

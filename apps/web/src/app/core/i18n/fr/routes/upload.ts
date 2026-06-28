@@ -16,6 +16,8 @@ export const upload = {
   newStudyhubResource: 'Nouvelle ressource StudyHub',
   onlyUploadPdfsYouAreAllowedToShareWithYourStudyhubCommunity:
     "N'uploader que des PDF que vous êtes autorisé à partager avec votre communauté StudyHub.",
+  metadataSuggestionDailyLimitReached:
+    'Vous avez atteint la limite quotidienne de 5 suggestions IA. Réessayez demain.',
   metadataSuggestionFailed:
     'Les suggestions IA n’ont pas pu être générées. Vous pouvez continuer à remplir les champs manuellement.',
   metadataSuggestionsAdded:
