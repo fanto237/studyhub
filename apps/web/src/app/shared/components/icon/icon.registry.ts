@@ -78,6 +78,11 @@ export const ICONS = {
       strokeLinecap: 'round',
     }),
   ]),
+  menu: strokeIcon([
+    strokePath('M4 7h16M4 12h16M4 17h16', {
+      strokeLinecap: 'round',
+    }),
+  ]),
   users: strokeIcon([
     strokePath('M16 11a4 4 0 1 0-8 0 4 4 0 0 0 8 0Z'),
     strokePath(

@@ -13,6 +13,33 @@ export const appRoutes: Route[] = [
     title: 'StudyHub',
   },
   {
+    path: 'terms',
+    loadComponent: () =>
+      import('./pages/legal/legal-page').then((module) => module.LegalPage),
+    title: 'Terms of Service | StudyHub',
+    data: { legalDocument: 'terms' },
+  },
+  {
+    path: 'privacy',
+    loadComponent: () =>
+      import('./pages/legal/legal-page').then((module) => module.LegalPage),
+    title: 'Privacy Policy | StudyHub',
+    data: { legalDocument: 'privacy' },
+  },
+  {
+    path: 'policy',
+    loadComponent: () =>
+      import('./pages/legal/legal-page').then((module) => module.LegalPage),
+    title: 'Privacy Policy | StudyHub',
+    data: { legalDocument: 'privacy' },
+  },
+  {
+    path: 'contact',
+    loadComponent: () =>
+      import('./pages/contact/contact').then((module) => module.Contact),
+    title: 'Contact | StudyHub',
+  },
+  {
     path: 'home',
     canActivate: [requireAuthSessionGuard],
     loadComponent: () =>
