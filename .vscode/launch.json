@@ -5,13 +5,19 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "C#: Api Debug",
+      "name": "Mobile",
+      "type": "maui",
+      "request": "launch",
+      "preLaunchTask": "maui: Build"
+    },
+    {
+      "name": "Api",
       "type": "dotnet",
       "request": "launch",
       "projectPath": "${workspaceFolder}/apps/api/Api.csproj"
     },
     {
-      "name": "ng serve",
+      "name": "Web",
       "type": "chrome",
       "request": "launch",
       "url": "http://localhost:4200/",
