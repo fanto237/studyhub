@@ -1,0 +1,64 @@
+services:
+  api:
+    image: ${ZOT_URL}/studyhub-api:latest
+    pull_policy: always
+    container_name: studyhub-api
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT
+      - ASPNETCORE_URLS
+      - ConnectionStrings__Default
+      - JwtSetting__Secret
+      - JwtSetting__Issuer
+      - JwtSetting__Audience
+      - JwtSetting__AccessTokenLifetimeMinutes
+      - JwtSetting__RefreshTokenLifetimeDays
+      - Cloudflare__Api
+      - Cloudflare__AccessKeyId
+      - Cloudflare__SecretAccessKey
+      - Cloudflare__BucketName
+      - Cloudflare__PublicBaseUrl
+      - EmailSetting__From
+      - EmailSetting__Server
+      - EmailSetting__Username
+      - EmailSetting__Password
+      - EmailSetting__DisplayName
+      - EmailSetting__Port
+      - EmailSetting__UseSsl
+      - Groq__ApiKey
+      - Groq__BaseUrl
+      - Groq__Model
+      - Groq__TimeoutSeconds
+      - Groq__MaxInputCharacters
+      - Totp__Issuer
+      - Totp__SetupLifetimeMinutes
+      - Totp__LoginChallengeLifetimeMinutes
+      - Totp__MaxLoginAttempts
+      - Totp__SecretEncryptionKey
+      - ForwardedHeaders__KnownNetworks__0
+      - ForwardedHeaders__KnownProxies__0
+    expose:
+      - '8080'
+    networks:
+      - studyhub_net
+
+  web:
+    image: ${ZOT_URL}/studyhub-web:latest
+    pull_policy: always
+    container_name: studyhub-web
+    restart: unless-stopped
+    environment:
+      - NODE_ENV
+      - PORT
+      - API_PROXY_TARGET
+      - TRUST_PROXY
+    depends_on:
+      - api
+    ports:
+      - '${WEB_BIND_ADDRESS}:${WEB_PUBLIC_PORT}:4000'
+    networks:
+      - studyhub_net
+
+networks:
+  studyhub_net:
+    driver: bridge
