@@ -16,6 +16,7 @@ public class GeneratePostMetadataHandler
       IValidator<GeneratePostMetadataCommand> validator,
       IPdfTextExtractionService pdfTextExtractionService,
       IPostMetadataAiService postMetadataAiService,
+      IAiMetadataGenerationQuotaService aiMetadataGenerationQuotaService,
       ILogger<GeneratePostMetadataHandler> logger,
       CancellationToken cancellationToken)
   {
@@ -71,6 +72,17 @@ public class GeneratePostMetadataHandler
           Warnings: ["No OCR was performed for this PDF."]);
     }
 
+    var quotaResult = await aiMetadataGenerationQuotaService.TryConsumeAsync(command.UserId, cancellationToken);
+    if (!quotaResult.IsAllowed)
+    {
+      return new GeneratePostMetadataResult(
+          GeneratePostMetadataOutcome.DailyLimitReached,
+          "Daily AI metadata suggestion limit reached. Try again tomorrow.",
+          DailyLimit: quotaResult.Limit,
+          RemainingToday: quotaResult.Remaining,
+          ResetAt: quotaResult.ResetAt);
+    }
+
     try
     {
       var aiResult = await postMetadataAiService.GenerateAsync(
@@ -110,14 +122,20 @@ public class GeneratePostMetadataHandler
           normalizedTags,
           aiResult.DetectedLanguage,
           aiResult.LanguageConfidence,
-          warnings);
+          warnings,
+          quotaResult.Limit,
+          quotaResult.Remaining,
+          quotaResult.ResetAt);
     }
     catch (Exception exception)
     {
       logger.LogWarning(exception, "AI metadata provider failed for user {UserId}", command.UserId);
       return new GeneratePostMetadataResult(
           GeneratePostMetadataOutcome.ProviderUnavailable,
-          "AI suggestions are temporarily unavailable. You can still upload the PDF manually.");
+          "AI suggestions are temporarily unavailable. You can still upload the PDF manually.",
+          DailyLimit: quotaResult.Limit,
+          RemainingToday: quotaResult.Remaining,
+          ResetAt: quotaResult.ResetAt);
     }
   }
 

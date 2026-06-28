@@ -8,4 +8,7 @@ public sealed record GeneratePostMetadataResult(
     IReadOnlyList<string>? Tags = null,
     string? DetectedLanguage = null,
     double? LanguageConfidence = null,
-    IReadOnlyList<string>? Warnings = null);
+    IReadOnlyList<string>? Warnings = null,
+    int? DailyLimit = null,
+    int? RemainingToday = null,
+    DateTimeOffset? ResetAt = null);

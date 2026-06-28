@@ -7,5 +7,6 @@ public enum GeneratePostMetadataOutcome
   PayloadTooLarge,
   InvalidFile,
   InsufficientText,
+  DailyLimitReached,
   ProviderUnavailable,
 }
