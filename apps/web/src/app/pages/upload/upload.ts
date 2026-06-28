@@ -296,6 +296,14 @@ export class Upload implements OnDestroy {
             return;
           }
 
+          if (error instanceof HttpErrorResponse && error.status === 429) {
+            this.metadataSuggestionErrorMessage.set(
+              this.i18n.translate('routes.upload.metadataSuggestionDailyLimitReached'),
+            );
+            this.isGeneratingMetadata.set(false);
+            return;
+          }
+
           this.metadataSuggestionErrorMessage.set(
             resolveApiErrorMessage(error, {
               fallbackMessage: this.i18n.translate(

@@ -10,7 +10,11 @@
     class="sticky top-0 z-40 border-b border-base-300 bg-base-100/90 px-4 py-3 shadow-sm backdrop-blur sm:px-6 lg:px-8"
   >
     <div class="mx-auto flex max-w-7xl items-center justify-between gap-3">
-      <a class="flex items-center gap-3" routerLink="/home" [attr.aria-label]="'navigation.aria.home' | translate">
+      <a
+        class="flex items-center gap-3"
+        routerLink="/home"
+        [attr.aria-label]="'navigation.aria.home' | translate"
+      >
         <span
           class="flex size-11 items-center justify-center rounded-2xl bg-primary text-primary-content shadow-lg shadow-primary/20"
         >
@@ -26,7 +30,10 @@
         </span>
       </a>
 
-      <nav class="hidden items-center gap-2 lg:flex" [attr.aria-label]="'navigation.aria.profile' | translate">
+      <nav
+        class="hidden items-center gap-2 lg:flex"
+        [attr.aria-label]="'navigation.aria.profile' | translate"
+      >
         <a class="btn btn-ghost btn-sm gap-2" routerLink="/home">
           <app-icon name="home" class="size-4" />
           {{ 'navigation.home' | translate }}
@@ -35,7 +42,10 @@
           <app-icon name="upload" class="size-4" />
           {{ 'navigation.upload' | translate }}
         </a>
-        <a class="btn btn-primary btn-sm gap-2 text-primary-content" routerLink="/profile">
+        <a
+          class="btn btn-primary btn-sm gap-2 text-primary-content"
+          routerLink="/profile"
+        >
           <app-icon name="user" class="size-4" />
           {{ 'navigation.profile' | translate }}
         </a>
@@ -48,9 +58,14 @@
     </div>
   </header>
 
-  <main class="relative mx-auto max-w-7xl px-4 pb-24 pt-6 sm:px-6 lg:px-8 lg:py-8">
+  <main
+    class="relative mx-auto max-w-7xl px-4 pb-24 pt-6 sm:px-6 lg:px-8 lg:py-8"
+  >
     <div class="grid gap-6 xl:grid-cols-[22rem_minmax(0,1fr)]">
-      <aside class="space-y-6 xl:sticky xl:top-24 xl:self-start" [attr.aria-label]="'routes.profile.profileSummary' | translate">
+      <aside
+        class="space-y-6 xl:sticky xl:top-24 xl:self-start"
+        [attr.aria-label]="'routes.profile.profileSummary' | translate"
+      >
         <section
           class="rounded-[2rem] border border-base-300 bg-base-100/85 p-5 shadow-xl shadow-base-300/30 backdrop-blur sm:p-6"
         >
@@ -75,11 +90,17 @@
             <div class="flex items-start gap-3">
               <app-icon name="alert-triangle" class="mt-0.5 size-5 shrink-0" />
               <div>
-                <h2 class="font-black">{{ 'routes.profile.profileUnavailable' | translate }}</h2>
+                <h2 class="font-black">
+                  {{ 'routes.profile.profileUnavailable' | translate }}
+                </h2>
                 <p class="mt-1 text-sm leading-6 opacity-80">{{ message }}</p>
               </div>
             </div>
-            <button class="btn btn-warning btn-sm mt-4" type="button" (click)="retryProfile()">
+            <button
+              class="btn btn-warning btn-sm mt-4"
+              type="button"
+              (click)="retryProfile()"
+            >
               {{ 'common.actions.retryProfile' | translate }}
             </button>
           </div>
@@ -91,7 +112,9 @@
               {{ initials(user) }}
             </span>
             <div class="mt-5 min-w-0">
-              <p class="text-[0.7rem] font-black uppercase tracking-[0.24em] text-primary">
+              <p
+                class="text-[0.7rem] font-black uppercase tracking-[0.24em] text-primary"
+              >
                 {{ 'routes.profile.loggedInProfile' | translate }}
               </p>
               <h1 class="mt-2 text-2xl font-black tracking-tight">
@@ -100,7 +123,9 @@
               <p class="mt-1 text-sm font-semibold text-base-content/55">
                 @{{ user.username }}
               </p>
-              <p class="mt-2 text-sm font-semibold leading-6 text-base-content/65">
+              <p
+                class="mt-2 text-sm font-semibold leading-6 text-base-content/65"
+              >
                 {{ user.universityName }}
               </p>
             </div>
@@ -116,20 +141,26 @@
               {{ 'common.status.verified' | translate }}
             </span>
             } @else {
-            <span class="badge badge-warning badge-soft font-bold">{{ 'common.status.pendingVerification' | translate }}</span>
-            }
-            @if (user.isTotpEnabled) {
+            <span class="badge badge-warning badge-soft font-bold"
+              >{{ 'common.status.pendingVerification' | translate }}</span
+            >
+            } @if (user.isTotpEnabled) {
             <span class="badge badge-success badge-soft font-bold">
               <app-icon name="shield-check" class="size-3.5" />
               {{ 'common.status.totpOn' | translate }}
             </span>
             } @else {
-            <span class="badge badge-neutral badge-soft font-bold">{{ 'common.status.totpOff' | translate }}</span>
+            <span class="badge badge-soft font-bold"
+              >{{ 'common.status.totpOff' | translate }}</span
+            >
             }
           </div>
 
           <div class="mt-5 flex justify-center">
-            <a class="btn btn-primary btn-sm gap-2 text-primary-content" routerLink="/profile/edit">
+            <a
+              class="btn btn-primary btn-sm gap-2 text-primary-content"
+              routerLink="/profile/edit"
+            >
               <app-icon name="user" class="size-4" />
               {{ 'navigation.accountSettings' | translate }}
             </a>
@@ -143,7 +174,9 @@
               </p>
             </div>
             <div class="rounded-2xl bg-accent/15 p-4 text-accent-content">
-              <p class="text-2xl font-black">{{ pagination().totalCount | number }}</p>
+              <p class="text-2xl font-black">
+                {{ pagination().totalCount | number }}
+              </p>
               <p class="mt-1 text-[0.65rem] font-bold uppercase tracking-wide">
                 {{ 'common.metrics.uploads' | translate }}
               </p>
@@ -151,16 +184,41 @@
           </div>
 
           <dl class="mt-5 space-y-3">
+            @if (user.aiMetadataGenerationUsage; as aiUsage) {
+            <div class="rounded-2xl border border-info/20 bg-info/10 p-4">
+              <div class="flex items-center justify-between gap-3">
+                <dt
+                  class="text-[0.65rem] font-black uppercase tracking-[0.2em] text-info"
+                >
+                  {{ 'routes.profile.aiSuggestionsToday' | translate }}
+                </dt>
+                <dd class="text-sm font-black text-info">
+                  {{ aiUsage.usedToday | number }} / {{ aiUsage.limit | number }}
+                </dd>
+              </div>
+              <progress
+                class="progress progress-info mt-3 h-3 w-full"
+                [value]="aiUsage.usedToday"
+                [max]="aiUsage.limit"
+                [attr.aria-label]="'routes.profile.aiSuggestionsToday' | translate"
+              ></progress>
+            </div>
+            }
             <div class="rounded-2xl border border-base-300 bg-base-200/65 p-4">
-              <dt class="text-[0.65rem] font-black uppercase tracking-[0.2em] text-base-content/45">
+              <dt
+                class="text-[0.65rem] font-black uppercase tracking-[0.2em] text-base-content/45"
+              >
                 {{ 'common.labels.joined' | translate }}
               </dt>
               <dd class="mt-1 text-sm font-bold">
-                {{ user.createdAt | date: 'mediumDate' : undefined : i18n.locale() }}
+                {{ user.createdAt | date: 'mediumDate' : undefined :
+                i18n.locale() }}
               </dd>
             </div>
             <div class="rounded-2xl border border-base-300 bg-base-200/65 p-4">
-              <dt class="text-[0.65rem] font-black uppercase tracking-[0.2em] text-base-content/45">
+              <dt
+                class="text-[0.65rem] font-black uppercase tracking-[0.2em] text-base-content/45"
+              >
                 {{ 'common.forms.privateEmail' | translate }}
               </dt>
               <dd class="mt-1 break-all text-sm font-bold">
@@ -168,7 +226,9 @@
               </dd>
             </div>
             <div class="rounded-2xl border border-base-300 bg-base-200/65 p-4">
-              <dt class="text-[0.65rem] font-black uppercase tracking-[0.2em] text-base-content/45">
+              <dt
+                class="text-[0.65rem] font-black uppercase tracking-[0.2em] text-base-content/45"
+              >
                 {{ 'common.forms.schoolEmail' | translate }}
               </dt>
               <dd class="mt-1 break-all text-sm font-bold">
@@ -176,12 +236,17 @@
               </dd>
             </div>
             @if (user.lastVerifiedAt) {
-            <div class="rounded-2xl border border-success/20 bg-success/10 p-4 text-success-content">
-              <dt class="text-[0.65rem] font-black uppercase tracking-[0.2em] opacity-70">
+            <div
+              class="rounded-2xl border border-success/20 bg-success/10 p-4 text-success-content"
+            >
+              <dt
+                class="text-[0.65rem] font-black uppercase tracking-[0.2em] opacity-70"
+              >
                 {{ 'common.labels.lastVerified' | translate }}
               </dt>
               <dd class="mt-1 text-sm font-bold">
-                {{ user.lastVerifiedAt | date: 'mediumDate' : undefined : i18n.locale() }}
+                {{ user.lastVerifiedAt | date: 'mediumDate' : undefined :
+                i18n.locale() }}
               </dd>
             </div>
             }
@@ -193,25 +258,38 @@
           class="rounded-[2rem] border border-base-300 bg-base-100/85 p-5 shadow-xl shadow-base-300/30 backdrop-blur sm:p-6"
           aria-labelledby="visible-stats-heading"
         >
-          <p id="visible-stats-heading" class="text-sm font-black uppercase tracking-[0.22em] text-base-content/45">
+          <p
+            id="visible-stats-heading"
+            class="text-sm font-black uppercase tracking-[0.22em] text-base-content/45"
+          >
             {{ 'common.metrics.visiblePageStats' | translate }}
           </p>
           <div class="mt-4 grid grid-cols-3 gap-2">
             <div class="rounded-2xl bg-base-200/80 p-3 text-center">
-              <p class="text-lg font-black text-primary">{{ scoreTotals.upvotes | number }}</p>
-              <p class="mt-1 text-[0.62rem] font-bold uppercase tracking-wide text-base-content/45">
+              <p class="text-lg font-black text-primary">
+                {{ scoreTotals.upvotes | number }}
+              </p>
+              <p
+                class="mt-1 text-[0.62rem] font-bold uppercase tracking-wide text-base-content/45"
+              >
                 {{ 'common.metrics.upvotes' | translate }}
               </p>
             </div>
             <div class="rounded-2xl bg-base-200/80 p-3 text-center">
-              <p class="text-lg font-black text-secondary">{{ scoreTotals.downvotes | number }}</p>
-              <p class="mt-1 text-[0.62rem] font-bold uppercase tracking-wide text-base-content/45">
+              <p class="text-lg font-black text-secondary">
+                {{ scoreTotals.downvotes | number }}
+              </p>
+              <p
+                class="mt-1 text-[0.62rem] font-bold uppercase tracking-wide text-base-content/45"
+              >
                 {{ 'common.metrics.down' | translate }}
               </p>
             </div>
             <div class="rounded-2xl bg-base-200/80 p-3 text-center">
               <p class="text-lg font-black">{{ scoreTotals.score | number }}</p>
-              <p class="mt-1 text-[0.62rem] font-bold uppercase tracking-wide text-base-content/45">
+              <p
+                class="mt-1 text-[0.62rem] font-bold uppercase tracking-wide text-base-content/45"
+              >
                 {{ 'common.metrics.score' | translate }}
               </p>
             </div>
@@ -224,29 +302,50 @@
           class="rounded-[2rem] border border-base-300 bg-base-100/85 p-5 shadow-xl shadow-base-300/30 backdrop-blur sm:p-7"
           aria-labelledby="profile-heading"
         >
-          <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+          <div
+            class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between"
+          >
             <div>
-              <p class="text-sm font-black uppercase tracking-[0.22em] text-primary">
+              <p
+                class="text-sm font-black uppercase tracking-[0.22em] text-primary"
+              >
                 {{ 'routes.profile.myUploads' | translate }}
               </p>
-              <h2 id="profile-heading" class="mt-3 text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl">
+              <h2
+                id="profile-heading"
+                class="mt-3 text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl"
+              >
                 {{ 'routes.profile.yourStudyhubContributions' | translate }}
               </h2>
-              <p class="mt-3 max-w-2xl text-base leading-7 text-base-content/65">
-                {{ 'routes.profile.reviewEveryResourceYouHaveSharedTrackHowClassmatesRespondAndKeepDownloadingOrVotingInteractionsInSyncWithYourProfileList' | translate }}
+              <p
+                class="mt-3 max-w-2xl text-base leading-7 text-base-content/65"
+              >
+                {{
+                'routes.profile.reviewEveryResourceYouHaveSharedTrackHowClassmatesRespondAndKeepDownloadingOrVotingInteractionsInSyncWithYourProfileList'
+                | translate }}
               </p>
             </div>
 
             <div class="grid grid-cols-2 gap-3 sm:min-w-80">
-              <div class="rounded-2xl bg-primary p-4 text-primary-content shadow-lg shadow-primary/20">
-                <span class="text-2xl font-black">{{ pagination().totalCount | number }}</span>
-                <span class="mt-1 block text-xs font-bold uppercase tracking-wide opacity-80">
+              <div
+                class="rounded-2xl bg-primary p-4 text-primary-content shadow-lg shadow-primary/20"
+              >
+                <span class="text-2xl font-black"
+                  >{{ pagination().totalCount | number }}</span
+                >
+                <span
+                  class="mt-1 block text-xs font-bold uppercase tracking-wide opacity-80"
+                >
                   {{ 'common.metrics.totalUploads' | translate }}
                 </span>
               </div>
               <div class="rounded-2xl bg-base-200 p-4">
-                <span class="text-2xl font-black">{{ uploads().length | number }}</span>
-                <span class="mt-1 block text-xs font-bold uppercase tracking-wide text-base-content/55">
+                <span class="text-2xl font-black"
+                  >{{ uploads().length | number }}</span
+                >
+                <span
+                  class="mt-1 block text-xs font-bold uppercase tracking-wide text-base-content/55"
+                >
                   {{ 'common.metrics.visibleNow' | translate }}
                 </span>
               </div>
@@ -258,7 +357,9 @@
           class="rounded-[2rem] border border-base-300 bg-base-100/85 p-5 shadow-xl shadow-base-300/30 backdrop-blur sm:p-6"
           aria-labelledby="upload-controls-heading"
         >
-          <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div
+            class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"
+          >
             <div>
               <h3 id="upload-controls-heading" class="text-lg font-black">
                 {{ 'common.actions.browseYourUploads' | translate }}
@@ -268,7 +369,10 @@
               </p>
             </div>
 
-            <div class="flex flex-wrap gap-2" [attr.aria-label]="'common.sort.uploadSortOptions' | translate">
+            <div
+              class="flex flex-wrap gap-2"
+              [attr.aria-label]="'common.sort.uploadSortOptions' | translate"
+            >
               @for (option of sortOptions(); track option.value) {
               <button
                 class="btn btn-sm gap-2"
@@ -286,8 +390,12 @@
           </div>
 
           @if (hasUploadFilters()) {
-          <div class="mt-5 flex flex-wrap items-center gap-2 border-t border-base-300 pt-4">
-            <span class="text-xs font-black uppercase tracking-[0.18em] text-base-content/45">
+          <div
+            class="mt-5 flex flex-wrap items-center gap-2 border-t border-base-300 pt-4"
+          >
+            <span
+              class="text-xs font-black uppercase tracking-[0.18em] text-base-content/45"
+            >
               {{ 'common.forms.tags' | translate }}
             </span>
             @for (tag of selectedTags(); track tag) {
@@ -300,13 +408,21 @@
               {{ tag }} ×
             </button>
             }
-            <button class="btn btn-ghost btn-xs" type="button" (click)="clearUploadFilters()">
+            <button
+              class="btn btn-ghost btn-xs"
+              type="button"
+              (click)="clearUploadFilters()"
+            >
               {{ 'common.actions.clearFilters' | translate }}
             </button>
           </div>
           } @else if (visibleTags().length > 0) {
-          <div class="mt-5 flex flex-wrap items-center gap-2 border-t border-base-300 pt-4">
-            <span class="text-xs font-black uppercase tracking-[0.18em] text-base-content/45">
+          <div
+            class="mt-5 flex flex-wrap items-center gap-2 border-t border-base-300 pt-4"
+          >
+            <span
+              class="text-xs font-black uppercase tracking-[0.18em] text-base-content/45"
+            >
               {{ 'routes.profile.quickFilters' | translate }}
             </span>
             @for (tag of visibleTags().slice(0, 8); track tag) {
@@ -330,14 +446,16 @@
             {{ 'common.actions.retry' | translate }}
           </button>
         </div>
-        }
-
-        @if (isLoadingUploads()) {
+        } @if (isLoadingUploads()) {
         <div class="grid gap-4">
           @for (placeholder of [1, 2, 3]; track placeholder) {
-          <article class="rounded-3xl border border-base-300 bg-base-100/95 p-5 shadow-sm">
+          <article
+            class="rounded-3xl border border-base-300 bg-base-100/95 p-5 shadow-sm"
+          >
             <div class="flex gap-4">
-              <div class="hidden w-14 shrink-0 rounded-2xl bg-base-200/80 p-1.5 sm:block">
+              <div
+                class="hidden w-14 shrink-0 rounded-2xl bg-base-200/80 p-1.5 sm:block"
+              >
                 <div class="skeleton h-full min-h-28 rounded-xl"></div>
               </div>
               <div class="min-w-0 flex-1 space-y-4">
@@ -381,11 +499,16 @@
             (click)="loadMore()"
           >
             @if (isLoadingMore()) {
-            <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+            <span
+              class="loading loading-spinner loading-sm"
+              aria-hidden="true"
+            ></span>
             Loading } @else { Load more }
           </button>
           } @else {
-          <p class="rounded-full bg-base-100/80 px-4 py-2 text-sm font-bold text-base-content/55">
+          <p
+            class="rounded-full bg-base-100/80 px-4 py-2 text-sm font-bold text-base-content/55"
+          >
             {{ 'routes.profile.youHaveReachedTheEndOfYourUploads' | translate }}
           </p>
           }
@@ -400,11 +523,20 @@
           >
             <app-icon name="upload" class="size-8" />
           </span>
-          <h3 class="mt-5 text-2xl font-black">{{ 'routes.profile.youHaveNotUploadedAnyDocumentsYet' | translate }}</h3>
-          <p class="mx-auto mt-3 max-w-md text-sm leading-6 text-base-content/60">
-            {{ 'routes.profile.whenYouSharePastPapersOrStudyResourcesTheyWillAppearHereAsAPaginatedListForEasyReview' | translate }}
+          <h3 class="mt-5 text-2xl font-black">
+            {{ 'routes.profile.youHaveNotUploadedAnyDocumentsYet' | translate }}
+          </h3>
+          <p
+            class="mx-auto mt-3 max-w-md text-sm leading-6 text-base-content/60"
+          >
+            {{
+            'routes.profile.whenYouSharePastPapersOrStudyResourcesTheyWillAppearHereAsAPaginatedListForEasyReview'
+            | translate }}
           </p>
-          <a class="btn btn-primary mt-6 text-primary-content" routerLink="/home">
+          <a
+            class="btn btn-primary mt-6 text-primary-content"
+            routerLink="/home"
+          >
             {{ 'navigation.browseStudyHub' | translate }}
           </a>
         </section>
