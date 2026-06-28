@@ -18,6 +18,7 @@ services:
       - Cloudflare__SecretAccessKey
       - Cloudflare__BucketName
       - Cloudflare__PublicBaseUrl
+      - Cloudflare__Prefix
       - EmailSetting__From
       - EmailSetting__Server
       - EmailSetting__Username
